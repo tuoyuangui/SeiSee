@@ -14,6 +14,8 @@
 #include <QComboBox>
 #include <QTextCodec>
 #include <QUuid>
+#include <QPainter>
+#include <QFontMetrics>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -29,6 +31,38 @@
 #include "util2.h"
 #include "util2qt.h"
 #include "furlib.h"
+
+
+class VerticalTimeLabel : public QWidget
+{
+public:
+    explicit VerticalTimeLabel(QWidget* parent = 0) : QWidget(parent)
+    {
+        setFixedSize(16, 38);
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAttribute(Qt::WA_TranslucentBackground);
+    }
+
+protected:
+    void paintEvent(QPaintEvent*)
+    {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+
+        QFont font = painter.font();
+        font.setPixelSize(11);
+        font.setStyleHint(QFont::Courier);
+        painter.setFont(font);
+
+        QFontMetrics metrics(font);
+        painter.translate(width() / 2.0, height() / 2.0);
+        painter.rotate(-90);
+        painter.drawText(QPointF(-metrics.horizontalAdvance(QStringLiteral("Time")) / 2.0,
+                                 (metrics.ascent() - metrics.descent()) / 2.0),
+                         QStringLiteral("Time"));
+    }
+};
 
 
 #ifdef _MSC_VER
@@ -553,6 +587,10 @@ MainWindow::MainWindow(QWidget *parent) :
     timeScrl->setFixedWidth(50);
     timeRightScrl->setFixedWidth(50);
     hlabView. setFixedWidth(50);
+
+    VerticalTimeLabel* timeLabel = new VerticalTimeLabel(timeScrl->viewport());
+    timeLabel->move(2, 4);
+    timeLabel->show();
 
     seisLayout->setMargin (0);
     seisLayout->setSpacing(0);
@@ -1770,11 +1808,14 @@ void MainWindow::ArrangeSections()
 
     int nh=hdrAxisCk.List().count();
 
-    QFontMetrics fm(hlabView.fontMetrics());
+    QFont headerFont;
+    headerFont.setPixelSize(11);
+    headerFont.setStyleHint(QFont::Courier);
+    QFontMetrics fm(headerFont);
 
     int ht = fm.height();
 
-    int h = nh * (ht + 2) + 4;
+    int h = nh * (ht + 2) + 12;
 
     hdrsScrl->setFixedHeight  (h);//(nh+1)*13);
     hdrsBottomScrl->setFixedHeight(h);
@@ -2721,22 +2762,9 @@ void MainWindow::on_actionAxes_Setup_triggered()
 
 void MainWindow::axesDlgEvent()
 {
-    QStringList list = hdrAxisCk.List();
-    int         nh   = list.count();
-
     hdrsAxis.setHdrList(hdrAxisCk.List());
     hdrsBottomAxis.setHdrList(hdrAxisCk.List());
     hdrsLab. setHdrList(hdrAxisCk.List());
-
-    QFontMetrics fm(hlabView.fontMetrics());
-
-    int ht = fm.height();
-
-    int h = nh * (ht + 2) + 4;
-
-    hdrsScrl->setFixedHeight  (h);
-    hdrsBottomScrl->setFixedHeight(h);
-    hlabView. setFixedHeight  (h);
 
     double ti = AxisDlg.dT/1000.;
     bool   tl = AxisDlg.tL;
@@ -2747,6 +2775,7 @@ void MainWindow::axesDlgEvent()
     seisSct .setTl(tl);
 
     ui->ckTimLines->setChecked(tl);
+    ArrangeSections();
 }
 
 void MainWindow::FillHdrListGrids()

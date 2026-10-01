@@ -29,18 +29,22 @@ void GfxObjHsrsLab::DoDraw()
    int ya = 0;
    int yb = m_view->height()-1;
 
-   int ht  = gfx->GetTextHeight();
+   QFont labelFont;
+   labelFont.setPixelSize(11);
+   labelFont.setStyleHint(QFont::Courier);
+   QFontMetrics labelMetrics(labelFont);
 
-   int nh, y;
-
+   int rowHeight = labelMetrics.height() + 2;
+   int labelDescent = labelMetrics.descent();
+   int nh;
    int Nh = m_hdrs.count();
 
    for(nh=0;nh<Nh;nh++)
    {
      QString hname = m_hdrs[Nh-nh-1];
-     y = yb - (nh + 1) * (ht + 2) -2 ;
+     int baseline = yb - 1 - 8 - labelDescent - nh * rowHeight;
 
-     gfx->DrawText (2,y+ht-4, hname);
+     gfx->DrawText (2,baseline, hname);
    }
 
 }

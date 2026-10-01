@@ -81,6 +81,7 @@ void GfxView::paintEvent(QPaintEvent* pe)
 
     painter.begin(this);
 
+    painter.setFont(font());
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing,false);
     painter.setRenderHint(QPainter::SmoothPixmapTransform,false);

@@ -12,7 +12,9 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -26,7 +28,7 @@ QT_BEGIN_NAMESPACE
 class Ui_ProcParmDialog
 {
 public:
-    QVBoxLayout *verticalLayout_4;
+    QVBoxLayout *verticalLayout_6;
     QGroupBox *groupBox;
     QHBoxLayout *horizontalLayout_14;
     QLabel *label;
@@ -49,14 +51,20 @@ public:
     QLabel *label_9;
     QCheckBox *ckFilt;
     QGroupBox *groupBox_2;
-    QHBoxLayout *horizontalLayout_15;
+    QHBoxLayout *horizontalLayout_5;
+    QGridLayout *gridLayout;
     QLabel *label_10;
     QLineEdit *edAgcw;
     QLabel *label_11;
+    QLabel *label_12;
+    QComboBox *cbAgcType;
     QVBoxLayout *verticalLayout;
     QCheckBox *ckAgc;
+    QGroupBox *groupBox_4;
+    QHBoxLayout *horizontalLayout_16;
+    QVBoxLayout *verticalLayout_4;
     QCheckBox *ckNorm;
-    QSpacerItem *horizontalSpacer;
+    QSpacerItem *horizontalSpacer_2;
     QGroupBox *groupBox_3;
     QVBoxLayout *verticalLayout_3;
     QHBoxLayout *horizontalLayout_7;
@@ -68,11 +76,11 @@ public:
     {
         if (ProcParmDialog->objectName().isEmpty())
             ProcParmDialog->setObjectName(QString::fromUtf8("ProcParmDialog"));
-        ProcParmDialog->resize(335, 345);
-        ProcParmDialog->setMaximumSize(QSize(360, 345));
+        ProcParmDialog->resize(340, 414);
+        ProcParmDialog->setMaximumSize(QSize(360, 414));
         ProcParmDialog->setModal(true);
-        verticalLayout_4 = new QVBoxLayout(ProcParmDialog);
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_6 = new QVBoxLayout(ProcParmDialog);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         groupBox = new QGroupBox(ProcParmDialog);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         horizontalLayout_14 = new QHBoxLayout(groupBox);
@@ -186,29 +194,48 @@ public:
         horizontalLayout_14->addLayout(verticalLayout_2);
 
 
-        verticalLayout_4->addWidget(groupBox);
+        verticalLayout_6->addWidget(groupBox);
 
         groupBox_2 = new QGroupBox(ProcParmDialog);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        horizontalLayout_15 = new QHBoxLayout(groupBox_2);
-        horizontalLayout_15->setObjectName(QString::fromUtf8("horizontalLayout_15"));
+        horizontalLayout_5 = new QHBoxLayout(groupBox_2);
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        gridLayout = new QGridLayout();
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         label_10 = new QLabel(groupBox_2);
         label_10->setObjectName(QString::fromUtf8("label_10"));
         label_10->setFont(font1);
 
-        horizontalLayout_15->addWidget(label_10);
+        gridLayout->addWidget(label_10, 0, 0, 1, 1);
 
         edAgcw = new QLineEdit(groupBox_2);
         edAgcw->setObjectName(QString::fromUtf8("edAgcw"));
         edAgcw->setMinimumSize(QSize(72, 0));
 
-        horizontalLayout_15->addWidget(edAgcw);
+        gridLayout->addWidget(edAgcw, 0, 1, 1, 1);
 
         label_11 = new QLabel(groupBox_2);
         label_11->setObjectName(QString::fromUtf8("label_11"));
         label_11->setFont(font);
 
-        horizontalLayout_15->addWidget(label_11);
+        gridLayout->addWidget(label_11, 0, 2, 1, 1);
+
+        label_12 = new QLabel(groupBox_2);
+        label_12->setObjectName(QString::fromUtf8("label_12"));
+        label_12->setFont(font1);
+
+        gridLayout->addWidget(label_12, 1, 0, 1, 1);
+
+        cbAgcType = new QComboBox(groupBox_2);
+        cbAgcType->addItem(QString());
+        cbAgcType->addItem(QString());
+        cbAgcType->setObjectName(QString::fromUtf8("cbAgcType"));
+        cbAgcType->setEditable(false);
+
+        gridLayout->addWidget(cbAgcType, 1, 1, 1, 1);
+
+
+        horizontalLayout_5->addLayout(gridLayout);
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(2);
@@ -218,20 +245,33 @@ public:
 
         verticalLayout->addWidget(ckAgc);
 
-        ckNorm = new QCheckBox(groupBox_2);
+
+        horizontalLayout_5->addLayout(verticalLayout);
+
+
+        verticalLayout_6->addWidget(groupBox_2);
+
+        groupBox_4 = new QGroupBox(ProcParmDialog);
+        groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
+        horizontalLayout_16 = new QHBoxLayout(groupBox_4);
+        horizontalLayout_16->setObjectName(QString::fromUtf8("horizontalLayout_16"));
+        verticalLayout_4 = new QVBoxLayout();
+        verticalLayout_4->setSpacing(2);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        ckNorm = new QCheckBox(groupBox_4);
         ckNorm->setObjectName(QString::fromUtf8("ckNorm"));
 
-        verticalLayout->addWidget(ckNorm);
+        verticalLayout_4->addWidget(ckNorm);
 
 
-        horizontalLayout_15->addLayout(verticalLayout);
+        horizontalLayout_16->addLayout(verticalLayout_4);
 
-        horizontalSpacer = new QSpacerItem(0, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(0, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_15->addItem(horizontalSpacer);
+        horizontalLayout_16->addItem(horizontalSpacer_2);
 
 
-        verticalLayout_4->addWidget(groupBox_2);
+        verticalLayout_6->addWidget(groupBox_4);
 
         groupBox_3 = new QGroupBox(ProcParmDialog);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
@@ -258,7 +298,7 @@ public:
         verticalLayout_3->addLayout(horizontalLayout_7);
 
 
-        verticalLayout_4->addWidget(groupBox_3);
+        verticalLayout_6->addWidget(groupBox_3);
 
 
         retranslateUi(ProcParmDialog);
@@ -283,7 +323,12 @@ public:
         groupBox_2->setTitle(QCoreApplication::translate("ProcParmDialog", "Automatic Gain Control", nullptr));
         label_10->setText(QCoreApplication::translate("ProcParmDialog", "Window Length", nullptr));
         label_11->setText(QCoreApplication::translate("ProcParmDialog", "ms", nullptr));
+        label_12->setText(QCoreApplication::translate("ProcParmDialog", "Type", nullptr));
+        cbAgcType->setItemText(0, QCoreApplication::translate("ProcParmDialog", "ABS", nullptr));
+        cbAgcType->setItemText(1, QCoreApplication::translate("ProcParmDialog", "RMS", nullptr));
+
         ckAgc->setText(QCoreApplication::translate("ProcParmDialog", "Use AGC", nullptr));
+        groupBox_4->setTitle(QCoreApplication::translate("ProcParmDialog", "Normalization", nullptr));
         ckNorm->setText(QCoreApplication::translate("ProcParmDialog", "Use Normalization", nullptr));
         groupBox_3->setTitle(QString());
         okButton->setText(QCoreApplication::translate("ProcParmDialog", "OK", nullptr));

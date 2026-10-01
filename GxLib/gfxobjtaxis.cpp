@@ -62,7 +62,7 @@ void   GfxObjTAxis::DoDraw()
       int tt = round(t*1000);
 
       sprintf(lab,"%d",tt);
-      int wt = gfx->GetTextWidth(lab,11);
+      int wt = gfx->GetTextWidth(lab);
 
       int labelX = m_rightSide ? x+8 : x-wt-8;
       gfx->DrawText (labelX,s+ht2-2,lab);
