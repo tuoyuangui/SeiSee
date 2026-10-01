@@ -56,6 +56,8 @@ obj/
 *.suo
 *.cache
 *.docstates
+# QT
+.qmake.stash
 
 # 构建输出
 dist/
@@ -65,6 +67,11 @@ out/
 *.dll
 *.so
 *.dylib
+*/debug/
+*/release/
+*.Debug
+*.Release
+Makefile
 
 # 日志文件
 *.log

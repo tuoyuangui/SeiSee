@@ -67,6 +67,23 @@
 			"problemMatcher": "$gcc"
 		},
 		{
+			"label": "Clean build outputs",
+			"type": "process",
+			"command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$make = 'C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe'; if (Test-Path -LiteralPath 'Makefile') { & $make clean; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE } }; Get-ChildItem -Path . -File -Recurse -Force | Where-Object { $_.Name -like 'Makefile*' -or $_.Name -match '\\.(Debug|Release)$' -or $_.Name -eq '.qmake.stash' } | Remove-Item -Force; Get-ChildItem -Path . -Directory -Recurse -Force | Where-Object { $_.Name -in @('debug', 'release') } | Sort-Object { $_.FullName.Length } -Descending | Remove-Item -Recurse -Force"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"problemMatcher": []
+		},
+		{
 			"label": "Run SeiSeeMp",
 			"type": "process",
 			"command": "${workspaceFolder}/SeiSeeMp/release/SeiSeeMp.exe",
