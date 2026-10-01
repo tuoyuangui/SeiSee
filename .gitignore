@@ -67,11 +67,13 @@ out/
 *.dll
 *.so
 *.dylib
-*/debug/
-*/release/
+*.o
+*.a
+debug/
+release/
 *.Debug
 *.Release
-Makefile
+Makefile*
 
 # 日志文件
 *.log
