@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "SeiSeeMp",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/SeiSeeMp/debug/SeiSeeMp.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/Qt/Tools/mingw810_64/bin/gdb.exe",
+            "preLaunchTask": "Build Debug"
+        },
+        {
+            "name": "SegDSeeMp",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/SegDSeeMp/debug/SegDSeeMp.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/Qt/Tools/mingw810_64/bin/gdb.exe",
+            "preLaunchTask": "Build Debug"
+        }
+    ]
+}

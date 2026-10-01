@@ -43,6 +43,4 @@ void GfxObjHsrsLab::DoDraw()
      gfx->DrawText (2,y+ht-4, hname);
    }
 
-   gfx->DrawRect(xa,ya,xb,yb,0);
-   //gfx->DrawLine(xa,ya,xb,yb,0);
 }

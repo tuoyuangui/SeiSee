@@ -1,0 +1,21 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.defaultPackageManager": "ms-python.python:pip",
+    "C_Cpp.default.compilerPath": "C:/Qt/Tools/mingw810_64/bin/g++.exe",
+    "C_Cpp.default.intelliSenseMode": "windows-gcc-x64",
+    "C_Cpp.default.cppStandard": "c++11",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**",
+        "C:/Qt/5.15.2/mingw81_64/include",
+        "C:/Qt/5.15.2/mingw81_64/include/**",
+        "C:/Qt/5.15.2/mingw81_64/mkspecs/win32-g++"
+    ],
+    "qttools.searchMode": "path",
+    "qttools.extraSearchDirectories": [
+        "C:/Qt/5.15.2/mingw81_64/bin"
+    ],
+    "files.associations": {
+        "*.ui": "xml",
+        "*.rc": "cpp"
+    }
+}

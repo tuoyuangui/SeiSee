@@ -1,0 +1,16 @@
+debug/main.o
+debug/edithdrdialog.o
+debug/mainwindow.o
+debug/procparmdialog.o
+debug/aboutdialog.o
+debug/axisdialog.o
+debug/workthread.o
+debug/saveasdialog.o
+debug/qrc_myrc.o
+debug/moc_mainwindow.o
+debug/moc_edithdrdialog.o
+debug/moc_procparmdialog.o
+debug/moc_aboutdialog.o
+debug/moc_axisdialog.o
+debug/moc_workthread.o
+debug/moc_saveasdialog.o

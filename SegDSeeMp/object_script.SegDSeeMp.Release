@@ -1,0 +1,10 @@
+release/main.o
+release/mainwindow.o
+release/procparmdialog.o
+release/readerthread.o
+release/aboutdialog.o
+release/qrc_myrc.o
+release/moc_mainwindow.o
+release/moc_procparmdialog.o
+release/moc_readerthread.o
+release/moc_aboutdialog.o

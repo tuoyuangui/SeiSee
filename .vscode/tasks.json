@@ -1,0 +1,112 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "qmake",
+			"type": "process",
+			"command": "C:/Qt/5.15.2/mingw81_64/bin/qmake.exe",
+			"args": [
+				"GxApps.pro",
+				"-r"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "qmake Debug",
+			"type": "process",
+			"command": "C:/Qt/5.15.2/mingw81_64/bin/qmake.exe",
+			"args": ["GxApps.pro", "-r", "CONFIG+=debug"],
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Debug",
+			"type": "process",
+			"command": "C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe",
+			"args": ["-j8"],
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"dependsOn": "qmake Debug",
+			"dependsOrder": "sequence",
+			"problemMatcher": "$gcc"
+		},
+		{
+			"label": "Build all",
+			"type": "process",
+			"command": "C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe",
+			"args": [
+				"-j8"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"dependsOn": "qmake",
+			"dependsOrder": "sequence",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$gcc"
+		},
+		{
+			"label": "Run SeiSeeMp",
+			"type": "process",
+			"command": "${workspaceFolder}/SeiSeeMp/release/SeiSeeMp.exe",
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"dependsOn": "Build all",
+			"dependsOrder": "sequence",
+			"problemMatcher": []
+		},
+		{
+			"label": "Run SegDSeeMp",
+			"type": "process",
+			"command": "${workspaceFolder}/SegDSeeMp/release/SegDSeeMp.exe",
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"dependsOn": "Build all",
+			"dependsOrder": "sequence",
+			"problemMatcher": []
+		},
+		{
+			"label": "Open current .ui in Qt Designer",
+			"type": "process",
+			"command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Start-Process -FilePath 'C:/Qt/5.15.2/mingw81_64/bin/designer.exe' -ArgumentList '\"${file}\"'"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		}
+	]
+}

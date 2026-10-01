@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <QFont>
+#include <QFontMetrics>
 
 #include "gfxobjseishdrs.h"
+#include "gfxview.h"
 
 #define min(a, b)  (((a) < (b)) ? (a) : (b))
 #define max(a, b)  (((a) > (b)) ? (a) : (b))
@@ -8,6 +11,13 @@
 GfxObjSeisHdrs::GfxObjSeisHdrs(QObject* parent) :
     GfxObjSeis(parent)
 {
+  m_bottomSide = false;
+}
+
+void GfxObjSeisHdrs::setBottomSide(bool v)
+{
+  m_bottomSide = v;
+  Update();
 }
 
 void GfxObjSeisHdrs::setHdrList(QList<QString> v)
@@ -35,109 +45,97 @@ void GfxObjSeisHdrs::DoDraw()
     }
 
     int y1 = 0;        //   y2pix(Y1);
-    int y2 = gfx->H(); //   y2pix(Y2);
+    int y2 = m_view->height(); //   y2pix(Y2);
 
 //  gfx->DrawRect(x1,y1,x2-1,y2-1,0);
-    gfx->DrawLine(x1,y2-1,x2,y2-1,0 );
-    gfx->DrawLine(x2-1,y1, x2-1,y2,0 );
+    int axisY = m_bottomSide ? y1 : y2-1;
+
+    gfx->DrawLine(x1,axisY,m_view->width()-1,axisY,0 );
 
     if(!s_src || s_src->Nt()<1) return;
 
-    int ht  = gfx->GetTextHeight();
-    int wto = gfx->GetTextWidth ("123456789");
-    int wtc;
+    QFont labelFont;
+    labelFont.setPixelSize(11);
+    labelFont.setStyleHint(QFont::Courier);
+    QFontMetrics labelMetrics(labelFont);
 
-    double xp,xc;
+    int ht = labelMetrics.height();
+    int labelAscent = labelMetrics.ascent();
+    int labelDescent = labelMetrics.descent();
+    int wto = gfx->GetTextWidth("123456789", 11);
 
-    double pl,pr;
-    int    nl,nr;
+    int traceCount = s_src->Nt();
+    if(traceCount < 2) return;
 
-    int    nc, n1, n2;
-
-    pl = pix2x(L);
-    pr = pix2x(R);
-
-    nl = s_src->Tx(pl);
-    nr = s_src->Tx(pr);
-    n1 = s_src->Tx(m_X1);
-    n2 = s_src->Tx(m_X2);
+    double pl = pix2x(L);
+    double pr = pix2x(R);
+    int nl = s_src->Tx(pl);
+    int nr = s_src->Tx(pr);
+    int n1 = s_src->Tx(m_X1);
+    int n2 = s_src->Tx(m_X2);
+    int nc;
 
     if(nl>nr) { int tmp = nr; nr=nl; nl=tmp; }
     if(n1>n2) { int tmp = n2; n2=n1; n1=tmp; }
 
-    if(nl<0)                  nl=0;
-    if(nr<0)                  nr=s_src->Nt()-1;
-    if(n1<0)                  n1=0;
-    if(n2<0)                  n2=s_src->Nt()-1;
+    if(nl<0) nl=0;
+    if(nr<0) nr=traceCount-1;
+    if(n1<0) n1=0;
+    if(n2<0) n2=traceCount-1;
+    if(nl>=traceCount) nl=traceCount-1;
+    if(nr>=traceCount) nr=traceCount-1;
+    if(n1>=traceCount-1) n1=traceCount-2;
+    if(n2>=traceCount) n2=traceCount-1;
 
-     nc=nl-10;
+    double xp,xc;
 
-     xp = x2fpix(s_src->Tp(n1));
-     xc = x2fpix(s_src->Tp(n1+1));
+    xp = x2fpix(s_src->Tp(n1));
+    xc = x2fpix(s_src->Tp(n1+1));
 
-     int step = 4 / fabs(xp-xc);
+    double pixelsPerTrace = fabs(xp-xc);
+    if(pixelsPerTrace == 0) return;
 
-     if(step<1) step=1;
+    int tickStep = max(1, int(4 / pixelsPerTrace));
+    int labelStep = max(1, int(ceil(wto / pixelsPerTrace)));
+    labelStep = max(tickStep, ((labelStep + tickStep - 1) / tickStep) * tickStep);
 
-     int na = nl/step-10;
-     int nb = nr/step+10;
+    int firstTick = (nl/tickStep - 10) * tickStep;
+    int lastTick = (nr/tickStep + 10) * tickStep;
+    int tickDirection = m_bottomSide ? 1 : -1;
+    int Nh = m_hdrs.count();
+    int labelGap = 8;
 
-     na = na*step;
-     nb = nb*step;
-
-     char   lab[1024];
-     double v;
-
-     int nh;
-
-     for(nc=na;nc<nb;nc+=step)
-      {
+    char lab[1024];
+    for(nc=firstTick;nc<=lastTick;nc+=tickStep)
+    {
         if(nc<0 || nc>=s_src->Nt()) continue;
 
         xc = x2pix(s_src->Tp(nc));
-        v  = s_src->Th(nc,0); sprintf(lab,"%g",v);
+        bool hasLabel = (nc % labelStep) == 0;
+        if(!hasLabel) continue;
+        if(nc==traceCount-1) continue;
 
-        gfx->DrawVLine(xc,y2-4,y2,0,0);
-      }
+        gfx->DrawVLine(xc,axisY,axisY+tickDirection*6,0,0);
 
-     xp = x2fpix(s_src->Tp(n1));
-     xc = x2fpix(s_src->Tp(n1+1));
+        for(int nh=0;nh<Nh;nh++)
+        {
+            QString hname = m_hdrs[Nh-nh-1];
+            double v = s_src->Th(nc,hname);
 
-     step = wto / fabs(xp-xc);
+            int iv = v;
+            if(iv==v) sprintf(lab,"%d", iv);
+            else      sprintf(lab, "%g", v);
 
-     if(step<1) step=1;
+            int textWidth = gfx->GetTextWidth(lab,11);
+            int textX = xc - textWidth/2;
+            int baseline = m_bottomSide
+                ? axisY + labelGap + labelAscent + nh * (ht + 2)
+                : axisY - labelGap - labelDescent - nh * (ht + 2);
 
-     na = nl/step-10;
-     nb = nr/step+10;
+            if(textX>x1 && textX+textWidth<x2)
+                gfx->DrawText(textX,baseline,lab);
+        }
+    }
 
-     na = na*step;
-     nb = nb*step;
-
-     int y;
-
-     int Nh = m_hdrs.count();
-
-     for(nc=na;nc<nb;nc+=step)
-     {
-       if(nc<0 || nc>=s_src->Nt()) continue;
-
-       for(nh=0;nh<Nh;nh++)
-       {
-         QString hname = m_hdrs[Nh-nh-1];
-         xc = x2pix(s_src->Tp(nc));
-         v  = s_src->Th(nc,hname);
-
-         int iv = v;
-         if(iv==v) sprintf(lab,"%d", iv);
-         else      sprintf(lab, "%g", v);
-
-         wtc = gfx->GetTextWidth(lab)/2;
-
-         y = y2 - (nh + 1) * (ht + 2) - 2 ;
-
-         if(xc-wtc>x1 && xc+wtc<x2) gfx->DrawText(xc-wtc,y+ht-4,lab);
-         gfx->DrawVLine(xc,y+ht-2,y+ht ,0,0);
-       }
-     }
 }
 

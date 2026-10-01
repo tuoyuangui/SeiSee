@@ -4,6 +4,7 @@
 #include "gfx.h"
 
 #include <QFont>
+#include <QFontMetrics>
 #include <QDebug>
 
 #define min(a, b)  (((a) < (b)) ? (a) : (b))
@@ -1218,6 +1219,16 @@ int Gfx::GetTextWidth (QString str)
 {
    QFontMetrics fm = _ipainter.fontMetrics();
    return fm.width(QString(str));
+}
+
+int Gfx::GetTextWidth(QString str, int size)
+{
+    QFont font;
+    font.setPixelSize(size);
+    font.setStyleHint(QFont::Courier);
+
+    QFontMetrics fm(font);
+    return fm.width(str);
 }
 
 int Gfx::GetTextHeight()

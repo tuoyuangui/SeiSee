@@ -11,6 +11,8 @@
 #include <QDebug>
 #include <QThread>
 #include <QPlainTextEdit>
+#include <QScrollBar>
+#include <QResizeEvent>
 
 #include "gfxview.h"
 #include "myscrollarea.h"
@@ -129,6 +131,9 @@ public slots:
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
+protected:
+    void resizeEvent(QResizeEvent* event);
     
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -146,6 +151,9 @@ public slots:
 private slots:
 
     void binHdrGridChangedEvent();
+    void syncHorizontalAxisScrollBar(int minimum, int maximum);
+    void syncVerticalAxisScrollBar(int minimum, int maximum);
+    void fitAxesToViewport();
 
     void dirGridEvent(int row, int mode);
 
@@ -388,18 +396,26 @@ private:
     QVector<bool>     chsSel;
 
     GfxView           timeView;
+    GfxView           timeRightView;
     GfxView           hdrsView;
+    GfxView           hdrsBottomView;
     GfxView           seisView;
     GfxView           hlabView;
 
     MyScrollArea*     hdrsScrl;
+    MyScrollArea*     hdrsBottomScrl;
     MyScrollArea*     timeScrl;
+    MyScrollArea*     timeRightScrl;
     MyScrollArea*     seisScrl;
+    QScrollBar*       horizontalAxisScrollBar;
+    QScrollBar*       verticalAxisScrollBar;
 
     GfxSrcFile        seisSrc;
     GfxObjSeisSect    seisSct;
     GfxObjSeisHdrs    hdrsAxis;
+    GfxObjSeisHdrs    hdrsBottomAxis;
     GfxObjTAxis       timeAxis;
+    GfxObjTAxis       timeRightAxis;
     GfxObjHsrsLab     hdrsLab;
 
     MyStringTable     dirGrid;

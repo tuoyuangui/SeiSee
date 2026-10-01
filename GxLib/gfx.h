@@ -167,6 +167,7 @@ public:
     void SetPixel(int v, int x, int y);
 
     int GetTextWidth (QString str);
+    int GetTextWidth (QString str, int size);
     int GetTextHeight();
 
     void SetTrim(int x1, int x2, int y1, int y2);

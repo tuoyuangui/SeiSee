@@ -11,6 +11,7 @@ class GfxObjSeisHdrs : public GfxObjSeis
 protected:
 
     QList<QString> m_hdrs;
+    bool m_bottomSide;
 
     virtual void DoDraw();
 
@@ -20,6 +21,8 @@ public:
     virtual double Y2() {return pix2y(gfx->H()); }
 
     GfxObjSeisHdrs(QObject *parent = 0);
+
+    void setBottomSide(bool v);
 
     void setHdrList(QList<QString> v);
 };

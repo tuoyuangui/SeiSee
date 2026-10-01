@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QSettings>
 #include <QScrollBar>
+#include <QSignalBlocker>
+#include <QTimer>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QComboBox>
@@ -252,14 +254,23 @@ MainWindow::MainWindow(QWidget *parent) :
     seisView.setYs(1);
 
     timeAxis.setView(&timeView);
+    timeRightAxis.setView(&timeRightView);
     hdrsAxis.setView(&hdrsView);
+    hdrsBottomAxis.setView(&hdrsBottomView);
     seisSct .setView(&seisView);
     hdrsLab. setView(&hlabView);
 
+    timeRightAxis.setRightSide(true);
+    hdrsBottomAxis.setBottomSide(true);
+    timeAxis.setTrim(false);
+    timeRightAxis.setTrim(false);
+    hdrsAxis.setTrim(false);
+    hdrsBottomAxis.setTrim(false);
     hdrsLab.setTrim(false);
 
     seisSct .setSrc(&seisSrc);
     hdrsAxis.setSrc(&seisSrc);
+    hdrsBottomAxis.setSrc(&seisSrc);
 
     timeAxis.setYo(0);
     timeAxis.setXo(0);
@@ -269,17 +280,44 @@ MainWindow::MainWindow(QWidget *parent) :
     timeAxis.setY2(6);
     timeAxis.setYs(10);
     timeAxis.setTi(0.1);
+    timeRightAxis.setYo(0);
+    timeRightAxis.setXo(0);
+    timeRightAxis.setX1(0);
+    timeRightAxis.setX2(13);
+    timeRightAxis.setY1(0);
+    timeRightAxis.setY2(6);
+    timeRightAxis.setYs(10);
+    timeRightAxis.setTi(0.1);
 
     seisSct. setTi(0.1);
 
 
     hdrsScrl   = new MyScrollArea(&hdrsView,2);
+    hdrsBottomScrl = new MyScrollArea(&hdrsBottomView,2);
     seisScrl   = new MyScrollArea(&seisView,3);
     timeScrl   = new MyScrollArea(&timeView,1);
+    timeRightScrl = new MyScrollArea(&timeRightView,1);
+        horizontalAxisScrollBar = new QScrollBar(Qt::Horizontal, this);
+        verticalAxisScrollBar = new QScrollBar(Qt::Vertical, this);
+
+        connect(seisScrl->horizontalScrollBar(), SIGNAL(rangeChanged(int,int)),
+            this, SLOT(syncHorizontalAxisScrollBar(int,int)));
+        connect(seisScrl->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
+            this, SLOT(syncVerticalAxisScrollBar(int,int)));
+        connect(seisScrl->horizontalScrollBar(), SIGNAL(valueChanged(int)),
+            horizontalAxisScrollBar, SLOT(setValue(int)));
+        connect(horizontalAxisScrollBar, SIGNAL(valueChanged(int)),
+            seisScrl->horizontalScrollBar(), SLOT(setValue(int)));
+        connect(seisScrl->verticalScrollBar(), SIGNAL(valueChanged(int)),
+            verticalAxisScrollBar, SLOT(setValue(int)));
+        connect(verticalAxisScrollBar, SIGNAL(valueChanged(int)),
+            seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
     hdrsScrl->setFixedHeight  (63);
+    hdrsBottomScrl->setFixedHeight(63);
     hlabView. setFixedHeight  (63);
     timeScrl->setMaximumWidth (62);
+    timeRightScrl->setMaximumWidth(62);
 
     myEventCatcher* ef;
 
@@ -377,7 +415,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect
             (
+                timeRightScrl,
+                SIGNAL(zoomChanged(double,double,int,int)),
+                this,
+                SLOT(sclZoomV(double,double,int,int))
+                );
+
+    connect
+            (
                 hdrsScrl,
+                SIGNAL(zoomChanged(double,double,int,int)),
+                this,
+                SLOT(sclZoomH(double,double,int,int))
+                );
+
+    connect
+            (
+                hdrsBottomScrl,
                 SIGNAL(zoomChanged(double,double,int,int)),
                 this,
                 SLOT(sclZoomH(double,double,int,int))
@@ -485,12 +539,19 @@ MainWindow::MainWindow(QWidget *parent) :
     hdrsScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
     timeScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     timeScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    timeRightScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    timeRightScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    hdrsBottomScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    hdrsBottomScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    seisScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    seisScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
 
     QGridLayout*      seisLayout;
 
     seisLayout = new QGridLayout;
 
     timeScrl->setFixedWidth(50);
+    timeRightScrl->setFixedWidth(50);
     hlabView. setFixedWidth(50);
 
     seisLayout->setMargin (0);
@@ -500,6 +561,12 @@ MainWindow::MainWindow(QWidget *parent) :
     seisLayout->addWidget(timeScrl, 1,0);
     seisLayout->addWidget(hdrsScrl, 0,1);
     seisLayout->addWidget(seisScrl, 1,1);
+    seisLayout->addWidget(hdrsBottomScrl, 2,1);
+    seisLayout->addWidget(timeRightScrl, 1,2);
+    seisLayout->addWidget(horizontalAxisScrollBar, 3,0,1,3);
+    seisLayout->addWidget(verticalAxisScrollBar, 0,3,3,1);
+    seisLayout->setColumnStretch(1,1);
+    seisLayout->setRowStretch(1,1);
 
     ui->seisFrame->setLayout(seisLayout);
     ui->seisFrame->setMouseTracking(true);
@@ -1623,8 +1690,11 @@ int MainWindow::InitSeisView()
 
     hdrsAxis.setXs(1);
     hdrsAxis.setYs(10);
+    hdrsBottomAxis.setXs(1);
+    hdrsBottomAxis.setYs(10);
 
     hdrsAxis.setHdrList(hdrAxisCk.List());
+    hdrsBottomAxis.setHdrList(hdrAxisCk.List());
     hdrsLab. setHdrList(hdrAxisCk.List());
 
     if(ui->rbDirRev->isChecked())
@@ -1633,6 +1703,8 @@ int MainWindow::InitSeisView()
         seisSct. setX2(-1);
         hdrsAxis.setX1(sf->Nt());
         hdrsAxis.setX2(-1);
+        hdrsBottomAxis.setX1(sf->Nt());
+        hdrsBottomAxis.setX2(-1);
     }
     else
     {
@@ -1640,6 +1712,8 @@ int MainWindow::InitSeisView()
         seisSct. setX2(sf->Nt());
         hdrsAxis.setX1(-1);
         hdrsAxis.setX2(sf->Nt());
+        hdrsBottomAxis.setX1(-1);
+        hdrsBottomAxis.setX2(sf->Nt());
     }
 
     double tmin = sf->Tmin()+_dly_min/1000.;
@@ -1649,6 +1723,8 @@ int MainWindow::InitSeisView()
     seisSct. setY2(tmax); // !!!
     timeAxis.setY1(tmin);
     timeAxis.setY2(tmax); // !!!
+    timeRightAxis.setY1(tmin);
+    timeRightAxis.setY2(tmax);
 
     seisSct.setTrim(true);
 
@@ -1686,9 +1762,11 @@ void MainWindow::ArrangeSections()
     ui->seisFrame->setVisible(true);
 
     int hh = timeAxis.HeightView();
+    int axisHeight = qMax(hh, seisScrl->viewport()->height());
 
     seisView.setFixedHeight(hh);
-    timeView.setFixedHeight(hh);//+100);
+    timeRightView.setFixedHeight(axisHeight);
+    timeView.setFixedHeight(axisHeight);
 
     int nh=hdrAxisCk.List().count();
 
@@ -1699,6 +1777,9 @@ void MainWindow::ArrangeSections()
     int h = nh * (ht + 2) + 4;
 
     hdrsScrl->setFixedHeight  (h);//(nh+1)*13);
+    hdrsBottomScrl->setFixedHeight(h);
+    hdrsView.setFixedHeight(h);
+    hdrsBottomView.setFixedHeight(h);
     hlabView. setFixedHeight  (h);//(nh+1)*13);
 
     double x=0;
@@ -1706,11 +1787,79 @@ void MainWindow::ArrangeSections()
 
     seisSct. setXo(x);
     hdrsAxis.setXo(x);
+    hdrsBottomAxis.setXo(x);
     x += (seisSct.X2()-seisSct.X1());
     w += seisSct.WidthView()+1;
 
     seisView.setFixedWidth(w);
-    hdrsView.setFixedWidth(w);//+100);
+    int axisWidth = qMax(static_cast<int>(w), seisScrl->viewport()->width());
+    hdrsView.setFixedWidth(axisWidth);
+    hdrsBottomView.setFixedWidth(axisWidth);
+    timeView.setFixedWidth(50);
+    timeRightView.setFixedWidth(50);
+
+    syncHorizontalAxisScrollBar(seisScrl->horizontalScrollBar()->minimum(),
+                                seisScrl->horizontalScrollBar()->maximum());
+    syncVerticalAxisScrollBar(seisScrl->verticalScrollBar()->minimum(),
+                              seisScrl->verticalScrollBar()->maximum());
+
+    QTimer::singleShot(0, this, SLOT(fitAxesToViewport()));
+}
+
+void MainWindow::fitAxesToViewport()
+{
+    if(!ui || !ui->seisFrame->isVisible()) return;
+
+    if(ui->seisFrame->layout()) ui->seisFrame->layout()->activate();
+
+    int axisHeight = qMax(timeAxis.HeightView(), seisScrl->viewport()->height());
+    int axisWidth = qMax(static_cast<int>(seisSct.WidthView()+1),
+                         seisScrl->viewport()->width());
+
+    timeView.setFixedHeight(axisHeight);
+    timeRightView.setFixedHeight(axisHeight);
+    hdrsView.setFixedWidth(axisWidth);
+    hdrsBottomView.setFixedWidth(axisWidth);
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    if(ui && ui->seisFrame->isVisible()) ArrangeSections();
+}
+
+void MainWindow::syncHorizontalAxisScrollBar(int minimum, int maximum)
+{
+    QScrollBar* source = seisScrl->horizontalScrollBar();
+    QSignalBlocker blocker(horizontalAxisScrollBar);
+    bool shouldShow = maximum > minimum;
+    bool visibilityChanged = horizontalAxisScrollBar->isHidden() == shouldShow;
+
+    horizontalAxisScrollBar->setRange(minimum, maximum);
+    horizontalAxisScrollBar->setPageStep(source->pageStep());
+    horizontalAxisScrollBar->setSingleStep(source->singleStep());
+    horizontalAxisScrollBar->setValue(source->value());
+    horizontalAxisScrollBar->setVisible(shouldShow);
+
+    if(visibilityChanged)
+        QTimer::singleShot(0, this, SLOT(fitAxesToViewport()));
+}
+
+void MainWindow::syncVerticalAxisScrollBar(int minimum, int maximum)
+{
+    QScrollBar* source = seisScrl->verticalScrollBar();
+    QSignalBlocker blocker(verticalAxisScrollBar);
+    bool shouldShow = maximum > minimum;
+    bool visibilityChanged = verticalAxisScrollBar->isHidden() == shouldShow;
+
+    verticalAxisScrollBar->setRange(minimum, maximum);
+    verticalAxisScrollBar->setPageStep(source->pageStep());
+    verticalAxisScrollBar->setSingleStep(source->singleStep());
+    verticalAxisScrollBar->setValue(source->value());
+    verticalAxisScrollBar->setVisible(shouldShow);
+
+    if(visibilityChanged)
+        QTimer::singleShot(0, this, SLOT(fitAxesToViewport()));
 }
 
 
@@ -1998,7 +2147,9 @@ void MainWindow::GetRegInfo()
     seisView.setXs(xs);
     seisView.setYs(ys);
     hdrsView.setXs(xs);
+    hdrsBottomView.setXs(xs);
     timeView.setYs(ys);
+    timeRightView.setYs(ys);
 
     double ti = settings.value("Ti", "0.1").toDouble();
     bool   tl = settings.value("Tl", "false").toBool();
@@ -2218,23 +2369,22 @@ void MainWindow::SetZoom(double xs,  double ys, int xo, int yo, bool push)
     seisView.setXs(xs);
     seisView.setYs(ys);
     hdrsView.setXs(xs);
+    hdrsBottomView.setXs(xs);
     timeView.setYs(ys);
-
-    int xoo;
-
-    seisScrl->setHscroll(xo);
-
-    xoo = seisScrl->Hscroll();
-
-    seisScrl->setVscroll(yo);
-
-    hdrsScrl->setHscroll(xo);
-
-    timeScrl->setVscroll(yo);
-
-    xoo = seisScrl->Hscroll();
+    timeRightView.setYs(ys);
 
     ArrangeSections();
+
+    seisScrl->setHscroll(xo);
+    seisScrl->setVscroll(yo);
+
+    xo = seisScrl->Hscroll();
+    yo = seisScrl->Vscroll();
+
+    hdrsScrl->setHscroll(xo);
+    hdrsBottomScrl->setHscroll(xo);
+    timeScrl->setVscroll(yo);
+    timeRightScrl->setVscroll(yo);
 
     FillEdits();
 }
@@ -2575,6 +2725,7 @@ void MainWindow::axesDlgEvent()
     int         nh   = list.count();
 
     hdrsAxis.setHdrList(hdrAxisCk.List());
+    hdrsBottomAxis.setHdrList(hdrAxisCk.List());
     hdrsLab. setHdrList(hdrAxisCk.List());
 
     QFontMetrics fm(hlabView.fontMetrics());
@@ -2584,12 +2735,14 @@ void MainWindow::axesDlgEvent()
     int h = nh * (ht + 2) + 4;
 
     hdrsScrl->setFixedHeight  (h);
+    hdrsBottomScrl->setFixedHeight(h);
     hlabView. setFixedHeight  (h);
 
     double ti = AxisDlg.dT/1000.;
     bool   tl = AxisDlg.tL;
 
     timeAxis.setTi(ti);
+    timeRightAxis.setTi(ti);
     seisSct .setTi(ti);
     seisSct .setTl(tl);
 
@@ -3429,6 +3582,8 @@ void MainWindow::on_rbDirNorm_toggled(bool checked)
         seisSct. setX2(sf->Nt());
         hdrsAxis.setX1(-1);
         hdrsAxis.setX2(sf->Nt());
+        hdrsBottomAxis.setX1(-1);
+        hdrsBottomAxis.setX2(sf->Nt());
     }
 }
 
@@ -3444,6 +3599,8 @@ void MainWindow::on_rbDirRev_toggled(bool checked)
         seisSct. setX2(-1);
         hdrsAxis.setX1(sf->Nt());
         hdrsAxis.setX2(-1);
+        hdrsBottomAxis.setX1(sf->Nt());
+        hdrsBottomAxis.setX2(-1);
     }
 }
 
