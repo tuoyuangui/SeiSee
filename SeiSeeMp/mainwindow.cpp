@@ -36,33 +36,58 @@
 class VerticalTimeLabel : public QWidget
 {
 public:
-    explicit VerticalTimeLabel(QWidget* parent = 0) : QWidget(parent)
+    explicit VerticalTimeLabel(QWidget* parent = nullptr) 
+        : QWidget(parent)
     {
         setFixedSize(16, 38);
-        setAttribute(Qt::WA_TransparentForMouseEvents);
-        setAttribute(Qt::WA_NoSystemBackground);
-        setAttribute(Qt::WA_TranslucentBackground);
+        int font_Id = QFontDatabase::addApplicationFont(":/fonts/TIMES.TTF");
+        QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
+
+        // 初始化默认字体（与原 paintEvent 中的设置一致）
+        m_font.setFamily(QStringLiteral("Courier New"));
+
+        if(!font_list.isEmpty())
+        {
+            m_font.setFamily(font_list[0]);
+        }
+
+        m_font.setPixelSize(11);
+        m_font.setStyleHint(QFont::Courier);
+    }
+
+    // 设置完整字体（自动触发重绘）
+    void setFont(const QFont& font)
+    {
+        m_font = font;
+        update();   // 刷新界面
+    }
+
+    // 设置字体像素大小（自动触发重绘）
+    void SetFontSize(int size)
+    {
+        m_font.setPixelSize(size);
+        update();
     }
 
 protected:
-    void paintEvent(QPaintEvent*)
+    void paintEvent(QPaintEvent*) override
     {
         QPainter painter(this);
         painter.setRenderHint(QPainter::TextAntialiasing);
 
-        QFont font = painter.font();
-        font.setFamily(QString::fromUtf8("Courier New"));
-        font.setPixelSize(11);
-        font.setStyleHint(QFont::Courier);
-        painter.setFont(font);
+        // 使用成员字体 m_font
+        painter.setFont(m_font);
 
-        QFontMetrics metrics(font);
+        QFontMetrics metrics(m_font);
         painter.translate(width() / 2.0, height() / 2.0);
         painter.rotate(-90);
         painter.drawText(QPointF(-metrics.horizontalAdvance(QStringLiteral("Time")) / 2.0,
                                  (metrics.ascent() - metrics.descent()) / 2.0),
                          QStringLiteral("Time"));
     }
+
+private:
+    QFont m_font;   // 存储当前使用的字体
 };
 
 
@@ -280,6 +305,7 @@ MainWindow::MainWindow(QWidget *parent) :
     hdrElstDtLayout->addWidget(&hdrElstDtGrid);
     ui->hdrElstDtFrame->setLayout(hdrElstDtLayout);
 
+
     //----------------------------------------------------------
 
     seisSct.setWFcolor(Qt::black);
@@ -326,7 +352,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     seisSct. setTi(0.1);
 
-
     hdrsScrl   = new MyScrollArea(&hdrsView,2);
     hdrsBottomScrl = new MyScrollArea(&hdrsBottomView,2);
     seisScrl   = new MyScrollArea(&seisView,3);
@@ -353,6 +378,23 @@ MainWindow::MainWindow(QWidget *parent) :
     hlabView. setFixedHeight  (63);
     timeScrl->setMaximumWidth (62);
     timeRightScrl->setMaximumWidth(62);
+
+    VerticalTimeLabel* timeLabel = new VerticalTimeLabel(timeScrl->viewport());
+    timeLabel->move(2, 4);
+    timeLabel->show();
+
+    // 创建 QFont 对象
+    QFont monoFont("Courier New");
+    // 使用样式提示让系统自动选择等宽字体
+    // monoFont.setStyleHint(QFont::Monospace);
+    monoFont.setStyleHint(QFont::Courier);
+    // 设置字体大小（可选）
+    monoFont.setPixelSize(11);
+
+    // 应用到 QPlainTextEdit
+    ui->InfoTxt->setFont(monoFont);
+
+    ui->TxtHdrEdit->setFont(monoFont);
 
     myEventCatcher* ef;
 
@@ -588,11 +630,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timeScrl->setFixedWidth(50);
     timeRightScrl->setFixedWidth(50);
     hlabView. setFixedWidth(50);
-
-    VerticalTimeLabel* timeLabel = new VerticalTimeLabel(timeScrl->viewport());
-    timeLabel->move(2, 4);
-    timeLabel->show();
-
+    
     seisLayout->setMargin (0);
     seisLayout->setSpacing(0);
 

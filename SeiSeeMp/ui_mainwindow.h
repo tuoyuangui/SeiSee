@@ -398,10 +398,6 @@ public:
         verticalLayout_13->setContentsMargins(0, 0, 0, 0);
         InfoTxt = new QPlainTextEdit(SumPg);
         InfoTxt->setObjectName(QString::fromUtf8("InfoTxt"));
-        QFont font1;
-        font1.setFamily(QString::fromUtf8("Courier New"));
-        font1.setPointSize(9);
-        InfoTxt->setFont(font1);
         InfoTxt->setLineWrapMode(QPlainTextEdit::NoWrap);
         InfoTxt->setReadOnly(true);
 
@@ -429,7 +425,6 @@ public:
         verticalLayout_15->setContentsMargins(2, 2, 2, 2);
         TxtHdrEdit = new QPlainTextEdit(TxtHdrTab);
         TxtHdrEdit->setObjectName(QString::fromUtf8("TxtHdrEdit"));
-        TxtHdrEdit->setFont(font1);
         TxtHdrEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 
         verticalLayout_15->addWidget(TxtHdrEdit);
@@ -1593,7 +1588,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1282, 21));
+        menuBar->setGeometry(QRect(0, 0, 1282, 22));
         menu_File = new QMenu(menuBar);
         menu_File->setObjectName(QString::fromUtf8("menu_File"));
         menu_Help = new QMenu(menuBar);

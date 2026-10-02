@@ -290,12 +290,6 @@
             </property>
             <item>
              <widget class="QPlainTextEdit" name="InfoTxt">
-              <property name="font">
-               <font>
-                <family>Courier New</family>
-                <pointsize>9</pointsize>
-               </font>
-              </property>
               <property name="lineWrapMode">
                <enum>QPlainTextEdit::NoWrap</enum>
               </property>
@@ -362,12 +356,6 @@
                 </property>
                 <item>
                  <widget class="QPlainTextEdit" name="TxtHdrEdit">
-                  <property name="font">
-                   <font>
-                    <family>Courier New</family>
-                    <pointsize>9</pointsize>
-                   </font>
-                  </property>
                   <property name="lineWrapMode">
                    <enum>QPlainTextEdit::NoWrap</enum>
                   </property>
@@ -3084,7 +3072,7 @@
      <x>0</x>
      <y>0</y>
      <width>1282</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

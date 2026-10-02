@@ -5,6 +5,8 @@
 
 #include <QFont>
 #include <QFontMetrics>
+#include <QFontDatabase>
+#include <QStringList> 
 #include <QDebug>
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
@@ -271,7 +273,20 @@ Gfx::Gfx()
 
     // QFont font("MS Sans Serif");
     // font.setPointSize(8);
-    _font.setFamily(QString::fromUtf8("Courier New"));
+    // _font.setFamily(QString::fromUtf8("Courier New"));
+    QFont font("Courier New");
+    _font = font;
+    int font_Id = QFontDatabase::addApplicationFont(":/fonts/TIMES.TTF");
+    QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
+//    qDebug()<<font_Id;
+//    qDebug()<<font_list;
+    if(!font_list.isEmpty())
+    {
+        QFont f;
+        f.setFamily(font_list[0]);
+        _font = f;
+    }
+
     _font.setStyleHint(QFont::Courier);
     _font.setPixelSize(m_size);
 
@@ -1470,10 +1485,15 @@ void Gfx::SetPalette(QList<QRgb> pal)
     }
 }
 
-void Gfx::SetGlobalFontSize(int size)
+void Gfx::SetFontSize(int size)
 {
     m_size = size;
     _font.setPointSize(size);
+}
+
+void Gfx::setFont(const QFont & font)
+{
+    _font = font;
 }
 
 int Gfx::GetPalColor(int cidx)

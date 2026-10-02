@@ -97,9 +97,6 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         label_2 = new QLabel(groupBox);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        QFont font;
-        font.setPointSize(10);
-        label_2->setFont(font);
 
         horizontalLayout->addWidget(label_2);
 
@@ -110,9 +107,6 @@ public:
 
         label_3 = new QLabel(groupBox);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        QFont font1;
-        font1.setPointSize(8);
-        label_3->setFont(font1);
 
         horizontalLayout->addWidget(label_3);
 
@@ -123,7 +117,6 @@ public:
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         label_4 = new QLabel(groupBox);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setFont(font);
 
         horizontalLayout_2->addWidget(label_4);
 
@@ -134,7 +127,6 @@ public:
 
         label_5 = new QLabel(groupBox);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setFont(font1);
 
         horizontalLayout_2->addWidget(label_5);
 
@@ -145,7 +137,6 @@ public:
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         label_6 = new QLabel(groupBox);
         label_6->setObjectName(QString::fromUtf8("label_6"));
-        label_6->setFont(font);
 
         horizontalLayout_3->addWidget(label_6);
 
@@ -156,7 +147,6 @@ public:
 
         label_7 = new QLabel(groupBox);
         label_7->setObjectName(QString::fromUtf8("label_7"));
-        label_7->setFont(font1);
 
         horizontalLayout_3->addWidget(label_7);
 
@@ -167,7 +157,6 @@ public:
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         label_8 = new QLabel(groupBox);
         label_8->setObjectName(QString::fromUtf8("label_8"));
-        label_8->setFont(font);
 
         horizontalLayout_4->addWidget(label_8);
 
@@ -178,7 +167,6 @@ public:
 
         label_9 = new QLabel(groupBox);
         label_9->setObjectName(QString::fromUtf8("label_9"));
-        label_9->setFont(font1);
 
         horizontalLayout_4->addWidget(label_9);
 
@@ -204,7 +192,6 @@ public:
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         label_10 = new QLabel(groupBox_2);
         label_10->setObjectName(QString::fromUtf8("label_10"));
-        label_10->setFont(font1);
 
         gridLayout->addWidget(label_10, 0, 0, 1, 1);
 
@@ -216,13 +203,11 @@ public:
 
         label_11 = new QLabel(groupBox_2);
         label_11->setObjectName(QString::fromUtf8("label_11"));
-        label_11->setFont(font);
 
         gridLayout->addWidget(label_11, 0, 2, 1, 1);
 
         label_12 = new QLabel(groupBox_2);
         label_12->setObjectName(QString::fromUtf8("label_12"));
-        label_12->setFont(font1);
 
         gridLayout->addWidget(label_12, 1, 0, 1, 1);
 

@@ -169,7 +169,9 @@ public:
 
     void SetPixel(int v, int x, int y);
 
-    void SetGlobalFontSize(int size);
+    void SetFontSize(int size);
+
+    void setFont(const QFont & font);
 
     int GetTextWidth (QString str);
     int GetTextWidth (QString str, int size);

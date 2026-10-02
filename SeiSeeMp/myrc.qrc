@@ -47,5 +47,7 @@
         <file>images/Nexp.png</file>
         <file>images/stop.png</file>
         <file>images/OpenFile.png</file>
+        <file>fonts/Roboto-Regular-14.ttf</file>
+        <file>fonts/TIMES.TTF</file>
     </qresource>
 </RCC>
