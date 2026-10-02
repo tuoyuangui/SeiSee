@@ -51,6 +51,7 @@ protected:
         painter.setRenderHint(QPainter::TextAntialiasing);
 
         QFont font = painter.font();
+        font.setFamily(QString::fromUtf8("Courier New"));
         font.setPixelSize(11);
         font.setStyleHint(QFont::Courier);
         painter.setFont(font);

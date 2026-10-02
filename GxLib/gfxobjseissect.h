@@ -9,34 +9,34 @@
 class GfxObjSeisSect : public GfxObjSeis
 {
 protected:
+    int m_SelTr; // Selected trace index
 
-    int         m_SelTr;              // Selected trace index
+    int *_si;
+    int *_sj;
+    int _nj;
+    int _ns;
 
-    int*   _si;
-    int*   _sj;
-    int    _nj;
-    int    _ns;
-
-    double m_Ti;                      // Increment for time lines
-    bool   m_Tl;                      // Show Time Lines
+    double m_Ti; // Increment for time lines
+    bool m_Tl;   // Show Time Lines
 
 public:
-
     GfxObjSeisSect(QObject *parent = 0);
 
     virtual ~GfxObjSeisSect();
 
-    virtual void   DoDraw()  ;
-    virtual void   DoPreset();
+    virtual void DoDraw();
+    virtual void DoPreset();
 
-    void  setTi(double v)
+    void setTi(double v)
     {
-        m_Ti=v; Update();
+        m_Ti = v;
+        Update();
     }
 
-    void  setTl(double v)
+    void setTl(double v)
     {
-        m_Tl=v; Update();
+        m_Tl = v;
+        Update();
     }
 
     bool Tl()
@@ -44,10 +44,10 @@ public:
         return m_Tl;
     }
 
-
-    void  setSelTr(int v)
+    void setSelTr(int v)
     {
-        m_SelTr=v; Update();
+        m_SelTr = v;
+        Update();
     }
 
     int selTr()
@@ -55,9 +55,7 @@ public:
         return m_SelTr;
     }
 
-
     float getSelMaxAmp();
-
 };
 
 #endif // GFXOBJSEISSECT_H

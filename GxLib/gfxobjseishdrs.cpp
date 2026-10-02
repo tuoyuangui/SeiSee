@@ -126,7 +126,7 @@ void GfxObjSeisHdrs::DoDraw()
             if(iv==v) sprintf(lab,"%d", iv);
             else      sprintf(lab, "%g", v);
 
-            int textWidth = gfx->GetTextWidth(lab,11);
+            int textWidth = gfx->GetTextWidth(lab);
             int textX = xc - textWidth/2;
             int baseline = m_bottomSide
                 ? axisY + labelGap + labelAscent + nh * (ht + 2)

@@ -26,6 +26,7 @@
 #include "gfxsrcfile.h"
 #include "myobjptrlist.h"
 #include "gfxobjhsrslab.h"
+#include "gfxobjtimelab.h"
 
 #include "mystringtable.h"
 #include "mxstringtable.h"
@@ -401,6 +402,7 @@ private:
     GfxView           hdrsBottomView;
     GfxView           seisView;
     GfxView           hlabView;
+    GfxView           tlabView;
 
     MyScrollArea*     hdrsScrl;
     MyScrollArea*     hdrsBottomScrl;

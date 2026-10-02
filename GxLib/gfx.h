@@ -72,6 +72,9 @@ protected:
 
     int z;
 
+    // 地震数据显示区域坐标轴统一字体和字号
+    int  m_size = 11;  // 绝对像素大小而非点大小setPixelSize not setPointSizesetPointSize
+
     int    _cy[SZ];
     int    _cv[SZ];
 
@@ -156,7 +159,7 @@ public:
                              int xc, int ll2, int* yy2, float *vv2,
                              int xa, int xb, int ya, int yb);
 
-    void DrawText(int x, int y, QString str, int color=0, double rotate=0, int size=11, bool fill_bg = true);
+    void DrawText(int x, int y, QString str, int color=0, double rotate=0, int size=-1, bool fill_bg = true);
 
     int Xo() { return m_x; }
     int Yo() { return m_y; }
@@ -166,9 +169,12 @@ public:
 
     void SetPixel(int v, int x, int y);
 
+    void SetGlobalFontSize(int size);
+
     int GetTextWidth (QString str);
     int GetTextWidth (QString str, int size);
     int GetTextHeight();
+    int GetTextHeight(int size);
 
     void SetTrim(int x1, int x2, int y1, int y2);
     void ClrTrim();
