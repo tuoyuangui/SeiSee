@@ -8,6 +8,8 @@
 #include <QPainter>
 #include <QRgb>
 
+#include "gfxstyle.h"
+
 int Bresenham(int x0, int y0, int x1, int y1, int *x, int *y);
 
 class Ttr {
@@ -67,9 +69,11 @@ class Gfx {
 
     int z;
 
-    // 地震数据显示区域坐标轴统一字体和字号
-    int m_size =
-        11; // 绝对像素大小而非点大小setPixelSize not setPointSizesetPointSize
+    // 地震数据显示区域坐标轴统一字体和字号（point）
+    double m_size = GfxStyle::LabelFontPointSize;
+
+    int m_dpiX;
+    int m_dpiY;
 
     int _cy[SZ];
     int _cv[SZ];
@@ -84,11 +88,17 @@ class Gfx {
     QRgb _pal[256];
 
     void mSetPixel(int c, int x, int y);
+    int StrokeToPixel(int logicalWidth) const;
+    int ScaleByDpiX(double logicalValue) const;
+    int ScaleByDpiY(double logicalValue) const;
+    int ScaleByDpi(double logicalValue) const;
+    void ApplyFontPointSize(double pointSize);
 
   public:
     explicit Gfx();
 
-    void SetViewPort(QPainter *p, QRect *r);
+    void SetViewPort(QPainter *p, QRect *r, int dpiX = 0, int dpiY = 0);
+    void SetDpi(int dpiX, int dpiY);
 
     void Paint();
 
@@ -147,6 +157,10 @@ class Gfx {
 
     void DrawText(int x, int y, QString str, int color = 0, double rotate = 0,
                   int size = -1, bool fill_bg = true);
+
+    int ScaleX(int logicalValue) const;
+    int ScaleY(int logicalValue) const;
+    int Scale(int logicalValue) const;
 
     int Xo()
     {

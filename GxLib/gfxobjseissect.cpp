@@ -1,5 +1,6 @@
 #include "gfxobjseissect.h"
 #include "gfx.h"
+#include "gfxstyle.h"
 #include "gfxutil.h"
 #include "util2.h"
 
@@ -329,7 +330,9 @@ void GfxObjSeisSect::DoDraw()
     xp = x2fpix(s_src->Tp(n1));
     xc = x2fpix(s_src->Tp(n1 + 1));
 
-    int step = 4 / fabs(xp - xc);
+    int desiredTraceSpacing =
+        gfx->ScaleX(GfxStyle::HeaderAxisMinTickSpacing);
+    int step = desiredTraceSpacing / fabs(xp - xc);
     if (step < 1)
         step = 1;
 

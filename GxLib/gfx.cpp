@@ -247,25 +247,25 @@ Gfx::Gfx()
 
     z = 0;
 
-    m_size = 11;
+    m_size = GfxStyle::LabelFontPointSize;
+    m_dpiX = GfxStyle::ReferenceDpi;
+    m_dpiY = GfxStyle::ReferenceDpi;
+    _img = QImage(1, 1, QImage::Format_RGB32);
+    SetDpi(m_dpiX, m_dpiY);
 
-    // QFont font("MS Sans Serif");
-    // font.setPointSize(8);
-    // _font.setFamily(QString::fromUtf8("Courier New"));
-    QFont font("Courier New");
+    QFont font(GfxStyle::LabelFontFamily);
     _font = font;
-    int font_Id = QFontDatabase::addApplicationFont(":/fonts/TIMES.TTF");
+    int font_Id =
+        QFontDatabase::addApplicationFont(GfxStyle::LabelFontResource);
     QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
-    //    qDebug()<<font_Id;
-    //    qDebug()<<font_list;
     if (!font_list.isEmpty()) {
         QFont f;
         f.setFamily(font_list[0]);
         _font = f;
     }
 
-    _font.setStyleHint(QFont::Courier);
-    _font.setPixelSize(m_size);
+    _font.setStyleHint(GfxStyle::LabelFontStyleHint);
+    ApplyFontPointSize(m_size);
 
     _vpainter = NULL;
     _trim = false;
@@ -277,7 +277,7 @@ Gfx::Gfx()
     }
 }
 
-void Gfx::SetViewPort(QPainter *p, QRect *r)
+void Gfx::SetViewPort(QPainter *p, QRect *r, int dpiX, int dpiY)
 {
     int x = r->left();
     int y = r->top();
@@ -285,6 +285,12 @@ void Gfx::SetViewPort(QPainter *p, QRect *r)
     int h = r->height();
 
     _vpainter = p;
+    if (dpiX <= 0)
+        dpiX = p && p->device() ? p->device()->logicalDpiX()
+                                : GfxStyle::ReferenceDpi;
+    if (dpiY <= 0)
+        dpiY = p && p->device() ? p->device()->logicalDpiY()
+                                : GfxStyle::ReferenceDpi;
 
     if (_ipainter.isActive())
         _ipainter.end();
@@ -298,10 +304,58 @@ void Gfx::SetViewPort(QPainter *p, QRect *r)
         _img = QImage(m_w, m_h, QImage::Format_RGB32);
     }
 
+    SetDpi(dpiX, dpiY);
     _img.fill(QColor(255, 255, 255).rgb());
     _ipainter.begin(&_img);
 
     _ipainter.setFont(_font);
+}
+
+void Gfx::SetDpi(int dpiX, int dpiY)
+{
+    m_dpiX = dpiX > 0 ? dpiX : GfxStyle::ReferenceDpi;
+    m_dpiY = dpiY > 0 ? dpiY : GfxStyle::ReferenceDpi;
+    _img.setDotsPerMeterX(
+        Round(m_dpiX * GfxStyle::MillimetersPerMeter /
+              GfxStyle::MillimetersPerInch));
+    _img.setDotsPerMeterY(
+        Round(m_dpiY * GfxStyle::MillimetersPerMeter /
+              GfxStyle::MillimetersPerInch));
+}
+
+int Gfx::ScaleByDpiX(double logicalValue) const
+{
+    return Round(logicalValue * m_dpiX / GfxStyle::ReferenceDpi);
+}
+
+int Gfx::ScaleByDpiY(double logicalValue) const
+{
+    return Round(logicalValue * m_dpiY / GfxStyle::ReferenceDpi);
+}
+
+int Gfx::ScaleByDpi(double logicalValue) const
+{
+    return Round(logicalValue * (m_dpiX + m_dpiY) /
+                 (2.0 * GfxStyle::ReferenceDpi));
+}
+
+int Gfx::StrokeToPixel(int logicalWidth) const
+{
+    if (logicalWidth <= 1)
+        return GfxStyle::AxisLineWidthPixels;
+
+    int width = ScaleByDpi(logicalWidth);
+    if (width < 1)
+        width = GfxStyle::AxisLineWidthPixels;
+    return width;
+}
+
+void Gfx::ApplyFontPointSize(double pointSize)
+{
+    if (pointSize <= 0)
+        pointSize = m_size;
+
+    _font.setPointSizeF(pointSize);
 }
 
 void Gfx::mSetPixel(int c, int x, int y)
@@ -403,8 +457,10 @@ void Gfx::DrawLine(int x0, int y0, int x1, int y1, int cidx)
 
 void Gfx::DrawLine(int x0, int y0, int x1, int y1, int cidx, int w, int wc)
 {
+    w = StrokeToPixel(w);
+
     if (w < 2)
-        DrawLine(x0, y0, x1, y1, cidx);
+        return DrawLine(x0, y0, x1, y1, cidx);
 
     int dx = abs(x0 - x1);
     int dy = abs(y0 - y1);
@@ -581,6 +637,8 @@ void Gfx::FillRect(int x1, int y1, int x2, int y2, int cidx)
 
 void Gfx::DrawHLine(int y, int x0, int x1, int w, int cidx)
 {
+    w = StrokeToPixel(w);
+
     int x, y1, y2;
     int w2 = w >> 1;
 
@@ -611,6 +669,8 @@ void Gfx::DrawHLine(int y, int x0, int x1, int w, int cidx)
 
 void Gfx::DrawVLine(int x, int y0, int y1, int w, int cidx)
 {
+    w = StrokeToPixel(w);
+
     int y, x1, x2;
     int w2 = w >> 1;
 
@@ -1281,8 +1341,9 @@ void Gfx::DrawText(int x, int y, QString str, int color, double rotate,
 {
     // QFont font;
     if (size < 0)
-        size = m_size;
-    _font.setPixelSize(size);
+        ApplyFontPointSize(m_size);
+    else
+        ApplyFontPointSize(size);
     // font.setStyleHint(QFont::Courier);
 
     y -= m_y;
@@ -1308,37 +1369,37 @@ void Gfx::DrawText(int x, int y, QString str, int color, double rotate,
 
 int Gfx::GetTextWidth(QString str)
 {
-    QFontMetrics fm = _ipainter.fontMetrics();
+    QFontMetrics fm(_font, &_img);
     return fm.width(QString(str));
 }
 
 int Gfx::GetTextWidth(QString str, int size)
 {
     // QFont font;
-    _font.setPixelSize(size);
+    ApplyFontPointSize(size);
     // font.setStyleHint(QFont::Courier);
 
-    QFontMetrics fm(_font);
+    QFontMetrics fm(_font, &_img);
     return fm.width(str);
 }
 
 int Gfx::GetTextHeight()
 {
-    QFontMetrics fm = _ipainter.fontMetrics();
+    QFontMetrics fm(_font, &_img);
     return fm.height();
 }
 
 int Gfx::GetTextHeight(int size)
 {
-    _font.setPixelSize(size);
+    ApplyFontPointSize(size);
 
-    QFontMetrics fm(_font);
+    QFontMetrics fm(_font, &_img);
     return fm.height();
 }
 
 QFontMetrics Gfx::GetFontMetrics()
 {
-    return _ipainter.fontMetrics();
+    return QFontMetrics(_font, &_img);
 }
 
 void Gfx::SetTrim(int x1, int x2, int y1, int y2)
@@ -1384,7 +1445,22 @@ void Gfx::SetPalette(QList<QRgb> pal)
 void Gfx::SetFontSize(int size)
 {
     m_size = size;
-    _font.setPointSize(size);
+    ApplyFontPointSize(m_size);
+}
+
+int Gfx::ScaleX(int logicalValue) const
+{
+    return ScaleByDpiX(logicalValue);
+}
+
+int Gfx::ScaleY(int logicalValue) const
+{
+    return ScaleByDpiY(logicalValue);
+}
+
+int Gfx::Scale(int logicalValue) const
+{
+    return ScaleByDpi(logicalValue);
 }
 
 void Gfx::setFont(const QFont &font)
@@ -1429,15 +1505,17 @@ void Gfx::DrawPLine(int *x, int *y, int *cidx, int *w, int n, int wc)
 
 void Gfx::DrawCircle(int xCenter, int yCenter, int r, int cidx, int w, int wc)
 {
+    w = StrokeToPixel(w);
+
     int rr;
-    int ww = w > 1;
+    int ww = w >> 1;
 
     if (wc != -1) {
         DrawCircle(xCenter, yCenter, r - ww - 1, wc);
         DrawCircle(xCenter, yCenter, r + ww + 1, wc);
     }
 
-    if (w < 3)
+    if (w < 2)
         DrawCircle(xCenter, yCenter, r, cidx);
     else
         for (rr = r - ww; rr <= r + ww; rr++)

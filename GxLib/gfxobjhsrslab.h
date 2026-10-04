@@ -16,6 +16,8 @@ class GfxObjHsrsLab : public GfxObj {
     GfxObjHsrsLab(QObject *parent = 0);
     ~GfxObjHsrsLab();
 
+    int TextStartX() const;
+
     void setHdrList(QList<QString> v);
 };
 

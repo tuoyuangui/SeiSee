@@ -1,21 +1,30 @@
 #include <QApplication>
 #include <QDebug>
 #include <QDesktopWidget>
+#include <QEvent>
+#include <QTimer>
 
 #include "gfx.h"
 #include "gfxview.h"
+#include "gfxstyle.h"
 
 GfxView::GfxView(QWidget *parent)
     : QWidget(parent)
 {
     setFixedSize(5000, 5000);
+    m_dpiOverride = GfxStyle::UseScreenDpi;
+    m_trackedWindow = nullptr;
+    m_trackedScreen = nullptr;
 
     QDesktopWidget desk;
 
     int dpix = desk.logicalDpiX();
     int dpiy = desk.logicalDpiY();
-    m_Xpmm = dpix / 25.5;
-    m_Ypmm = dpiy / 25.5;
+    m_dpiX = dpix;
+    m_dpiY = dpiy;
+    m_Xpmm = dpix / GfxStyle::MillimetersPerInch;
+    m_Ypmm = dpiy / GfxStyle::MillimetersPerInch;
+    m_gfx.SetDpi(dpix, dpiy);
 
     m_Xs = 1;
     m_Ys = 1;
@@ -30,6 +39,105 @@ GfxView::~GfxView()
         m_links[n]->setView(NULL);
 }
 // ----------------------------------------------------------------------
+
+void GfxView::setDpiOverride(int dpi)
+{
+    if (dpi < GfxStyle::UseScreenDpi)
+        dpi = GfxStyle::UseScreenDpi;
+    if (m_dpiOverride == dpi)
+        return;
+
+    m_dpiOverride = dpi;
+    RefreshScreenDpi();
+    update();
+}
+
+bool GfxView::event(QEvent *event)
+{
+    bool result = QWidget::event(event);
+
+    if (event->type() == QEvent::Show ||
+        event->type() == QEvent::WinIdChange ||
+        event->type() == QEvent::ScreenChangeInternal) {
+        QTimer::singleShot(0, this, &GfxView::TrackWindowScreen);
+    }
+
+    return result;
+}
+
+void GfxView::TrackWindowScreen()
+{
+    QWidget *topLevelWidget = window();
+    QWindow *window = topLevelWidget ? topLevelWidget->windowHandle() : nullptr;
+    if (window != m_trackedWindow) {
+        if (m_trackedWindow)
+            disconnect(m_trackedWindow, nullptr, this, nullptr);
+
+        m_trackedWindow = window;
+        if (m_trackedWindow) {
+            connect(m_trackedWindow, &QWindow::screenChanged, this,
+                    [this](QScreen *screen) {
+                        TrackScreen(screen);
+                        RefreshScreenDpi();
+                    });
+        }
+    }
+
+    if (m_trackedWindow)
+        TrackScreen(m_trackedWindow->screen());
+    else
+        TrackScreen(screen());
+
+    RefreshScreenDpi();
+}
+
+void GfxView::TrackScreen(QScreen *screen)
+{
+    if (screen == m_trackedScreen)
+        return;
+
+    disconnect(m_screenDpiConnection);
+
+    m_trackedScreen = screen;
+    if (m_trackedScreen) {
+        m_screenDpiConnection =
+            connect(m_trackedScreen, &QScreen::logicalDotsPerInchChanged, this,
+                    [this](qreal) { RefreshScreenDpi(); });
+    }
+}
+
+void GfxView::RefreshScreenDpi()
+{
+    int dpiX = m_trackedScreen ? qRound(m_trackedScreen->logicalDotsPerInchX())
+                               : m_dpiX;
+    int dpiY = m_trackedScreen ? qRound(m_trackedScreen->logicalDotsPerInchY())
+                               : m_dpiY;
+    if (m_dpiOverride > GfxStyle::UseScreenDpi) {
+        dpiX = m_dpiOverride;
+        dpiY = m_dpiOverride;
+    }
+
+    ApplyDpi(dpiX, dpiY);
+}
+
+void GfxView::ApplyDpi(int dpiX, int dpiY)
+{
+    if (dpiX <= 0)
+        dpiX = GfxStyle::ReferenceDpi;
+    if (dpiY <= 0)
+        dpiY = GfxStyle::ReferenceDpi;
+
+    if (m_dpiX == dpiX && m_dpiY == dpiY)
+        return;
+
+    m_dpiX = dpiX;
+    m_dpiY = dpiY;
+    m_Xpmm = dpiX / GfxStyle::MillimetersPerInch;
+    m_Ypmm = dpiY / GfxStyle::MillimetersPerInch;
+    m_gfx.SetDpi(dpiX, dpiY);
+    Preset();
+    emit dpiChanged();
+}
 
 void GfxView::RegisterLink(GfxObj *v)
 {
@@ -85,15 +193,28 @@ void GfxView::paintEvent(QPaintEvent *pe)
 
     engine = painter.paintEngine();
 
-    int dpix = engine->paintDevice()->logicalDpiX();
-    int dpiy = engine->paintDevice()->logicalDpiY();
+    int deviceDpiX = engine->paintDevice()->logicalDpiX();
+    int deviceDpiY = engine->paintDevice()->logicalDpiY();
+    int screenDpiX = m_trackedScreen
+                         ? qRound(m_trackedScreen->logicalDotsPerInchX())
+                         : deviceDpiX;
+    int screenDpiY = m_trackedScreen
+                         ? qRound(m_trackedScreen->logicalDotsPerInchY())
+                         : deviceDpiY;
+    int dpix = m_dpiOverride > GfxStyle::UseScreenDpi
+                   ? m_dpiOverride
+                   : screenDpiX;
+    int dpiy = m_dpiOverride > GfxStyle::UseScreenDpi
+                   ? m_dpiOverride
+                   : screenDpiY;
 
-    m_Xpmm = dpix / 25.5;
-    m_Ypmm = dpiy / 25.5;
+    bool dpiWasChanged = dpix != m_dpiX || dpiy != m_dpiY;
+    if (dpiWasChanged)
+        ApplyDpi(dpix, dpiy);
 
     //   qDebug() << "m_Ypmm:" << m_Ypmm;
 
-    m_gfx.SetViewPort(&painter, &r);
+    m_gfx.SetViewPort(&painter, &r, dpix, dpiy);
 
     int rc = receivers(SIGNAL(OnPrevDraw(GfxView *)));
     if (rc > 0) {

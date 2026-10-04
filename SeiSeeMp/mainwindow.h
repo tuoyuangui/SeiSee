@@ -125,6 +125,8 @@ class myTextEditEventCatcher : public QObject {
   public slots:
 };
 
+class VerticalTimeLabel;
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -405,6 +407,7 @@ class MainWindow : public QMainWindow {
     MyScrollArea *seisScrl;
     QScrollBar *horizontalAxisScrollBar;
     QScrollBar *verticalAxisScrollBar;
+    VerticalTimeLabel *timeLabel = nullptr;
 
     GfxSrcFile seisSrc;
     GfxObjSeisSect seisSct;

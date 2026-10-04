@@ -6,7 +6,10 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFontMetrics>
+#include <QDesktopWidget>
+#include <QInputDialog>
 #include <QMessageBox>
+#include <QMenu>
 #include <QPainter>
 #include <QScrollBar>
 #include <QSettings>
@@ -23,6 +26,7 @@
 #include <sys/types.h>
 
 #include "gfxobj.h"
+#include "gfxstyle.h"
 #include "gfxsrcseismemsegd.h"
 #include "sgyfile.h"
 
@@ -37,33 +41,59 @@ class VerticalTimeLabel : public QWidget {
     explicit VerticalTimeLabel(QWidget *parent = nullptr)
         : QWidget(parent)
     {
-        setFixedSize(16, 38);
-        int font_Id = QFontDatabase::addApplicationFont(":/fonts/TIMES.TTF");
+        int font_Id = QFontDatabase::addApplicationFont(
+            GfxStyle::LabelFontResource);
         QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
 
         // 初始化默认字体（与原 paintEvent 中的设置一致）
-        m_font.setFamily(QStringLiteral("Courier New"));
+        m_font.setFamily(QString::fromLatin1(GfxStyle::LabelFontFamily));
 
         if (!font_list.isEmpty()) {
             m_font.setFamily(font_list[0]);
         }
 
-        m_font.setPixelSize(11);
-        m_font.setStyleHint(QFont::Courier);
+        m_font.setPointSizeF(GfxStyle::LabelFontPointSize);
+        m_font.setStyleHint(GfxStyle::LabelFontStyleHint);
+        refreshSize();
     }
 
     // 设置完整字体（自动触发重绘）
     void setFont(const QFont &font)
     {
         m_font = font;
+        refreshSize();
         update(); // 刷新界面
     }
 
-    // 设置字体像素大小（自动触发重绘）
+    // 设置字体点大小（自动触发重绘）
     void SetFontSize(int size)
     {
-        m_font.setPixelSize(size);
+        m_font.setPointSizeF(size);
+        refreshSize();
         update();
+    }
+
+    void setDisplayDpi(int dpiY)
+    {
+        m_displayDpiY = qMax(1, dpiY);
+        refreshFontSize();
+        refreshSize();
+        update();
+    }
+
+    void refreshSize()
+    {
+        QFontMetrics metrics(m_font, this);
+        const int padding = GfxStyle::TimeLabelPadding;
+        setFixedSize(metrics.height() + padding,
+                     metrics.horizontalAdvance(
+                         QString::fromLatin1(GfxStyle::TimeLabelText)) +
+                         padding);
+    }
+
+    int rotatedTextWidth() const
+    {
+        return QFontMetrics(m_font, this).height();
     }
 
   protected:
@@ -75,17 +105,31 @@ class VerticalTimeLabel : public QWidget {
         // 使用成员字体 m_font
         painter.setFont(m_font);
 
-        QFontMetrics metrics(m_font);
-        painter.translate(width() / 2.0, height() / 2.0);
+        QFontMetrics metrics(m_font, this);
+        painter.translate(
+            metrics.ascent(),
+            (height() + metrics.horizontalAdvance(
+                            QString::fromLatin1(GfxStyle::TimeLabelText))) /
+                2.0);
         painter.rotate(-90);
-        painter.drawText(
-            QPointF(-metrics.horizontalAdvance(QStringLiteral("Time")) / 2.0,
-                    (metrics.ascent() - metrics.descent()) / 2.0),
-            QStringLiteral("Time"));
+        painter.drawText(QPointF(0, 0),
+                         QString::fromLatin1(GfxStyle::TimeLabelText));
     }
 
   private:
+    void refreshFontSize()
+    {
+        QScreen *currentScreen = screen();
+        const int screenDpiY =
+            qMax(1, currentScreen
+                        ? qRound(currentScreen->logicalDotsPerInchY())
+                        : QApplication::desktop()->logicalDpiY());
+        m_font.setPointSizeF(GfxStyle::LabelFontPointSize * m_displayDpiY /
+                             screenDpiY);
+    }
+
     QFont m_font; // 存储当前使用的字体
+    int m_displayDpiY = GfxStyle::ReferenceDpi;
 };
 
 #ifdef _MSC_VER
@@ -119,6 +163,63 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setLibraryPaths(paths);
 
     ui->setupUi(this);
+
+    QSettings appearanceSettings("PSI", "SeiSeeMp");
+    int appearanceDpi =
+        appearanceSettings.value("appearance/dpi", GfxStyle::UseScreenDpi)
+            .toInt();
+    timeView.setDpiOverride(appearanceDpi);
+    timeRightView.setDpiOverride(appearanceDpi);
+    hdrsView.setDpiOverride(appearanceDpi);
+    hdrsBottomView.setDpiOverride(appearanceDpi);
+    seisView.setDpiOverride(appearanceDpi);
+    hlabView.setDpiOverride(appearanceDpi);
+
+    QMenu *appearanceMenu = ui->menuView->addMenu(tr("Appearance"));
+    QAction *dpiAction = appearanceMenu->addAction(tr("Display DPI..."));
+    connect(dpiAction, &QAction::triggered, this, [this]() {
+        QScreen *currentScreen = timeView.screen();
+        const int screenDpi =
+            currentScreen ? qRound(currentScreen->logicalDotsPerInchX())
+                          : QApplication::desktop()->logicalDpiX();
+        QStringList options;
+        QList<int> dpiValues;
+        options.append(tr("Screen default (%1 DPI)").arg(screenDpi));
+        dpiValues.append(GfxStyle::UseScreenDpi);
+        for (int i = 0; i < GfxStyle::CommonDisplayDpiCount; ++i) {
+            int dpi = GfxStyle::CommonDisplayDpis[i];
+            options.append(tr("%1 DPI").arg(dpi));
+            dpiValues.append(dpi);
+        }
+
+        int currentIndex = dpiValues.indexOf(timeView.dpiOverride());
+        if (currentIndex < 0)
+            currentIndex = 0;
+        bool accepted = false;
+        QString selected = QInputDialog::getItem(
+            this, tr("Display DPI"), tr("Select display DPI:"), options,
+            currentIndex, false, &accepted);
+        if (!accepted)
+            return;
+
+        int selectedIndex = options.indexOf(selected);
+        if (selectedIndex < 0 || selectedIndex >= dpiValues.size())
+            return;
+
+        int dpi = dpiValues.at(selectedIndex);
+        timeView.setDpiOverride(dpi);
+        timeRightView.setDpiOverride(dpi);
+        hdrsView.setDpiOverride(dpi);
+        hdrsBottomView.setDpiOverride(dpi);
+        seisView.setDpiOverride(dpi);
+        hlabView.setDpiOverride(dpi);
+        timeLabel->setDisplayDpi(timeView.dpiY());
+
+        QSettings settings("PSI", "SeiSeeMp");
+        settings.setValue("appearance/dpi", dpi);
+        if (ui->seisFrame->isVisible())
+            ArrangeSections();
+    });
 
     eExpIdx = 0;
 
@@ -379,23 +480,26 @@ MainWindow::MainWindow(QWidget *parent)
     connect(verticalAxisScrollBar, SIGNAL(valueChanged(int)),
             seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
-    hdrsScrl->setFixedHeight(63);
-    hdrsBottomScrl->setFixedHeight(63);
-    hlabView.setFixedHeight(63);
-    timeScrl->setMaximumWidth(62);
-    timeRightScrl->setMaximumWidth(62);
-
-    VerticalTimeLabel *timeLabel = new VerticalTimeLabel(timeScrl->viewport());
-    timeLabel->move(2, 4);
+    timeLabel = new VerticalTimeLabel(timeScrl->viewport());
+    timeLabel->setDisplayDpi(timeView.dpiY());
+    auto arrangeOnDpiChange = [this]() {
+        timeLabel->setDisplayDpi(timeView.dpiY());
+        QTimer::singleShot(0, this, [this]() {
+            if (ui && ui->seisFrame->isVisible())
+                ArrangeSections();
+        });
+    };
+    connect(&timeView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
+    connect(&timeRightView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
     timeLabel->show();
 
     // 创建 QFont 对象
-    QFont monoFont("Courier New");
+    QFont monoFont(GfxStyle::LabelFontFamily);
     // 使用样式提示让系统自动选择等宽字体
     // monoFont.setStyleHint(QFont::Monospace);
-    monoFont.setStyleHint(QFont::Courier);
+    monoFont.setStyleHint(GfxStyle::LabelFontStyleHint);
     // 设置字体大小（可选）
-    monoFont.setPixelSize(11);
+    monoFont.setPixelSize(GfxStyle::TextEditorFontPixelSize);
 
     // 应用到 QPlainTextEdit
     ui->InfoTxt->setFont(monoFont);
@@ -508,10 +612,6 @@ MainWindow::MainWindow(QWidget *parent)
     QGridLayout *seisLayout;
 
     seisLayout = new QGridLayout;
-
-    timeScrl->setFixedWidth(50);
-    timeRightScrl->setFixedWidth(50);
-    hlabView.setFixedWidth(50);
 
     seisLayout->setMargin(0);
     seisLayout->setSpacing(0);
@@ -1629,16 +1729,12 @@ void MainWindow::ArrangeSections()
 
     int nh = hdrAxisCk.List().count();
 
-    // QFont headerFont;
-    // headerFont.setPixelSize(11);
-    // headerFont.setStyleHint(QFont::Courier);
-    // QFontMetrics fm(headerFont);
+    int ht = timeView.getGfx()->GetTextHeight();
 
-    // int ht = fm.height();
-
-    int ht = hlabView.getGfx()->GetTextHeight();
-
-    int h = nh * (ht + 2) + 12;
+    int rowGap = timeView.getGfx()->ScaleY(GfxStyle::HeaderLabelRowGap);
+    int verticalPadding =
+        timeView.getGfx()->ScaleY(GfxStyle::HeaderRowsBottomPadding);
+    int h = nh * (ht + rowGap) + verticalPadding;
 
     hdrsScrl->setFixedHeight(h); //(nh+1)*13);
     hdrsBottomScrl->setFixedHeight(h);
@@ -1653,14 +1749,30 @@ void MainWindow::ArrangeSections()
     hdrsAxis.setXo(x);
     hdrsBottomAxis.setXo(x);
     x += (seisSct.X2() - seisSct.X1());
-    w += seisSct.WidthView() + 1;
+    w += seisSct.WidthView() + GfxStyle::AxisLineWidthPixels;
 
     seisView.setFixedWidth(w);
     int axisWidth = qMax(static_cast<int>(w), seisScrl->viewport()->width());
     hdrsView.setFixedWidth(axisWidth);
     hdrsBottomView.setFixedWidth(axisWidth);
-    timeView.setFixedWidth(50);
-    timeRightView.setFixedWidth(50);
+
+    timeLabel->refreshSize();
+    Gfx *timeGfx = timeView.getGfx();
+    int headerTextStart = hdrsLab.TextStartX();
+    int timeLabelGap =
+        timeGfx->ScaleX(GfxStyle::TimeLabelToAxisGap); // Time 与刻度值的间隔
+    int labelAndTicksWidth =
+        qMax(timeAxis.RequiredWidth(), timeRightAxis.RequiredWidth());
+    int timeAxisWidth =
+        headerTextStart + timeLabel->rotatedTextWidth() + timeLabelGap +
+        labelAndTicksWidth;
+    timeScrl->setFixedWidth(timeAxisWidth);
+    timeRightScrl->setFixedWidth(timeAxisWidth);
+    hlabView.setFixedWidth(timeAxisWidth);
+    timeView.setFixedWidth(timeAxisWidth);
+    timeRightView.setFixedWidth(timeAxisWidth);
+    timeLabel->move(headerTextStart,
+                    timeGfx->ScaleY(GfxStyle::TimeLabelTopOffset));
 
     syncHorizontalAxisScrollBar(seisScrl->horizontalScrollBar()->minimum(),
                                 seisScrl->horizontalScrollBar()->maximum());

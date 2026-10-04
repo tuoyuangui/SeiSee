@@ -5,7 +5,11 @@
 #include <QPaintEngine>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QMetaObject>
+#include <QPointer>
+#include <QScreen>
 #include <QWidget>
+#include <QWindow>
 
 #include <math.h>
 
@@ -23,6 +27,12 @@ class GfxView : public QWidget {
     double m_Ypmm;
     double m_Xs;
     double m_Ys;
+    int m_dpiX;
+    int m_dpiY;
+    int m_dpiOverride;
+    QPointer<QWindow> m_trackedWindow;
+    QPointer<QScreen> m_trackedScreen;
+    QMetaObject::Connection m_screenDpiConnection;
 
     int _preset;
     int _nlinks;
@@ -32,8 +42,13 @@ class GfxView : public QWidget {
     virtual void mousePressEvent(QMouseEvent *event);
 
     virtual void wheelEvent(QWheelEvent *event);
+    virtual bool event(QEvent *event);
 
     void Preset(void);
+    void TrackWindowScreen();
+    void TrackScreen(QScreen *screen);
+    void RefreshScreenDpi();
+    void ApplyDpi(int dpiX, int dpiY);
 
     //  GfxObj* ObjHit(int x, int y);
 
@@ -51,6 +66,11 @@ class GfxView : public QWidget {
         return m_Ypmm;
     }
 
+    int dpiY() const
+    {
+        return m_dpiY;
+    }
+
     double Xs()
     {
         return m_Xs;
@@ -59,6 +79,13 @@ class GfxView : public QWidget {
     {
         return m_Ys;
     }
+
+    int dpiOverride() const
+    {
+        return m_dpiOverride;
+    }
+
+    void setDpiOverride(int dpi);
 
     void setXs(double v)
     {
@@ -86,6 +113,7 @@ class GfxView : public QWidget {
     }
 
   signals:
+    void dpiChanged();
     void OnPrevDraw(GfxView *view);
     void OnPostDraw(GfxView *view);
     void mouseEvent(QMouseEvent *event);

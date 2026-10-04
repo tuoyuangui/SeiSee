@@ -44,6 +44,7 @@ HEADERS += \
     furlib.h \
     myobjptrlist.h \
     gfx.h \
+    gfxstyle.h \
     gfxobj.h \
     gfxobjseis.h \
     gfxobjseishdrs.h \

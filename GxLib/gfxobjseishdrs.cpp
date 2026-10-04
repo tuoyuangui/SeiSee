@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "gfxobjseishdrs.h"
+#include "gfxstyle.h"
 #include "gfxview.h"
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
@@ -48,17 +49,13 @@ void GfxObjSeisHdrs::DoDraw()
     int y2 = m_view->height(); //   y2pix(Y2);
 
     //  gfx->DrawRect(x1,y1,x2-1,y2-1,0);
-    int axisY = m_bottomSide ? y1 : y2 - 1;
+    int axisY = m_bottomSide ? y1 : y2 - GfxStyle::AxisLineWidthPixels;
 
-    gfx->DrawLine(x1, axisY, m_view->width() - 1, axisY, 0);
+    gfx->DrawLine(x1, axisY,
+                  m_view->width() - GfxStyle::AxisLineWidthPixels, axisY, 0);
 
     if (!s_src || s_src->Nt() < 1)
         return;
-
-    // QFont labelFont;
-    // labelFont.setPixelSize(11);
-    // labelFont.setStyleHint(QFont::Courier);
-    // QFontMetrics labelMetrics(labelFont);
 
     int ht = gfx->GetFontMetrics().height();
     int labelAscent = gfx->GetFontMetrics().ascent();
@@ -114,7 +111,8 @@ void GfxObjSeisHdrs::DoDraw()
     if (pixelsPerTrace == 0)
         return;
 
-    int tickStep = max(1, int(4 / pixelsPerTrace));
+    int minTickSpacing = gfx->ScaleX(GfxStyle::HeaderAxisMinTickSpacing);
+    int tickStep = max(1, int(minTickSpacing / pixelsPerTrace));
     int labelStep = max(1, int(ceil(wto / pixelsPerTrace)));
     labelStep =
         max(tickStep, ((labelStep + tickStep - 1) / tickStep) * tickStep);
@@ -123,7 +121,9 @@ void GfxObjSeisHdrs::DoDraw()
     int lastTick = (nr / tickStep + 10) * tickStep;
     int tickDirection = m_bottomSide ? 1 : -1;
     int Nh = m_hdrs.count();
-    int labelGap = 8;
+    int labelGap = gfx->ScaleY(GfxStyle::HeaderAxisLabelGap);
+    int tickLength = gfx->ScaleY(GfxStyle::HeaderAxisTickLength);
+    int lineGap = gfx->ScaleY(GfxStyle::HeaderAxisLineGap);
 
     char lab[1024];
     for (nc = firstTick; nc <= lastTick; nc += tickStep) {
@@ -137,7 +137,7 @@ void GfxObjSeisHdrs::DoDraw()
         if (nc == traceCount - 1)
             continue;
 
-        gfx->DrawVLine(xc, axisY, axisY + tickDirection * 6, 0, 0);
+        gfx->DrawVLine(xc, axisY, axisY + tickDirection * tickLength, 0, 0);
 
         for (int nh = 0; nh < Nh; nh++) {
             QString hname = m_hdrs[Nh - nh - 1];
@@ -152,8 +152,8 @@ void GfxObjSeisHdrs::DoDraw()
             int textWidth = gfx->GetTextWidth(lab);
             int textX = xc - textWidth / 2;
             int baseline =
-                m_bottomSide ? axisY + labelGap + labelAscent + nh * (ht + 2)
-                             : axisY - labelGap - labelDescent - nh * (ht + 2);
+                m_bottomSide ? axisY + labelGap + labelAscent + nh * (ht + lineGap)
+                             : axisY - labelGap - labelDescent - nh * (ht + lineGap);
 
             if (textX > x1 && textX + textWidth < x2)
                 gfx->DrawText(textX, baseline, lab);

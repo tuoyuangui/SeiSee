@@ -1,4 +1,5 @@
 #include "gfxobjtaxis.h"
+#include "gfxstyle.h"
 #include "gfxview.h"
 #include "math.h"
 #include "stdio.h"
@@ -11,6 +12,20 @@ GfxObjTAxis::GfxObjTAxis(QObject *parent)
 {
     m_Ti = 0.1;
     m_rightSide = false;
+}
+
+int GfxObjTAxis::RequiredWidth() const
+{
+    if (!m_view)
+        return 0;
+
+    Gfx *axisGfx = m_view->getGfx();
+    int labelWidth =
+        axisGfx->GetTextWidth(QString::fromLatin1(GfxStyle::TimeAxisWidthSample));
+    int labelGap = axisGfx->ScaleX(GfxStyle::TimeAxisLabelGap);
+
+    // 刻度线位于 labelGap 预留的区间内；轴线本身占一个物理像素。
+    return labelWidth + labelGap + GfxStyle::AxisLineWidthPixels;
 }
 
 void GfxObjTAxis::DoDraw()
@@ -29,10 +44,13 @@ void GfxObjTAxis::DoDraw()
     int y2 = y2pix(Y2);
 
     //  gfx->DrawRect(x1,y1,x2,y2,0);
-    int axisX = m_rightSide ? x1 : x2 - 1;
+    int axisX = m_rightSide ? x1 : x2 - GfxStyle::AxisLineWidthPixels;
     int tickDir = m_rightSide ? 1 : -1;
+    int tickLength = gfx->ScaleX(GfxStyle::TimeAxisTickLength);
+    int labelGap = gfx->ScaleX(GfxStyle::TimeAxisLabelGap);
+    int labelYOffset = gfx->ScaleY(GfxStyle::TimeAxisLabelYOffset);
 
-    int axisBottom = m_view->height() - 1;
+    int axisBottom = m_view->height() - GfxStyle::AxisLineWidthPixels;
     gfx->DrawLine(axisX, y1, axisX, axisBottom, 0);
 
     double t, i;
@@ -67,8 +85,8 @@ void GfxObjTAxis::DoDraw()
         sprintf(lab, "%d", tt);
         int wt = gfx->GetTextWidth(lab);
 
-        int labelX = m_rightSide ? x + 8 : x - wt - 8;
-        gfx->DrawText(labelX, s + ht2 - 2, lab);
-        gfx->DrawHLine(s, x, x + tickDir * 6, 0, 0);
+        int labelX = m_rightSide ? x + labelGap : x - wt - labelGap;
+        gfx->DrawText(labelX, s + ht2 - labelYOffset, lab);
+        gfx->DrawHLine(s, x, x + tickDir * tickLength, 0, 0);
     }
 }

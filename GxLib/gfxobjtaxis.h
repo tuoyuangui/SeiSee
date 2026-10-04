@@ -30,6 +30,8 @@ class GfxObjTAxis : public GfxObj {
         return m_Ti;
     }
 
+    int RequiredWidth() const;
+
     virtual double X1()
     {
         return 0;

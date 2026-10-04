@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include <QApplication>
 
+#include "gfxstyle.h"
+
 void setDefaultFont(QApplication *app)
 {
     int loadedFontId =
@@ -14,7 +16,7 @@ void setDefaultFont(QApplication *app)
 
             // 设置字体大小格式为pixel，字体占用固定像素。相同像素的大小屏，不会发生字体遮挡现象
             defaultFont.setFamily(sansCNFamily);
-            defaultFont.setPixelSize(13);
+            defaultFont.setPixelSize(GfxStyle::MainWindowDefaultFontPixelSize);
             (app)->setFont(defaultFont);
         }
 
