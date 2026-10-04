@@ -17,5 +17,6 @@
     "files.associations": {
         "*.ui": "xml",
         "*.rc": "cpp"
-    }
+    },
+    "qt-core.customWidgetsDesignerExePath": "C:/Qt/5.15.2/mingw81_64/bin/designer.exe"
 }

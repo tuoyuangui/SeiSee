@@ -388,7 +388,7 @@ public:
 
     void retranslateUi(QDialog *EditHdrDialog)
     {
-        EditHdrDialog->setWindowTitle(QCoreApplication::translate("EditHdrDialog", "Dialog", nullptr));
+        EditHdrDialog->setWindowTitle(QCoreApplication::translate("EditHdrDialog", "Header Editor", nullptr));
         groupBox_5->setTitle(QString());
         label_6->setText(QCoreApplication::translate("EditHdrDialog", "Table:", nullptr));
         cbSet->setItemText(0, QCoreApplication::translate("EditHdrDialog", "SEG-Y / SU", nullptr));

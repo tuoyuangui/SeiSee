@@ -28,6 +28,7 @@ public:
     QLabel *label_3;
     QLabel *label_rev;
     QLabel *label;
+    QLabel *label_ww;
     QDialogButtonBox *buttonBox;
 
     void setupUi(QDialog *AboutDialog)
@@ -68,8 +69,15 @@ public:
 
         label = new QLabel(AboutDialog);
         label->setObjectName(QString::fromUtf8("label"));
+        label->setFont(font);
 
         verticalLayout->addWidget(label);
+
+        label_ww = new QLabel(AboutDialog);
+        label_ww->setObjectName(QString::fromUtf8("label_ww"));
+        label_ww->setFont(font);
+
+        verticalLayout->addWidget(label_ww);
 
         buttonBox = new QDialogButtonBox(AboutDialog);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
@@ -88,11 +96,12 @@ public:
 
     void retranslateUi(QDialog *AboutDialog)
     {
-        AboutDialog->setWindowTitle(QCoreApplication::translate("AboutDialog", "Dialog", nullptr));
+        AboutDialog->setWindowTitle(QCoreApplication::translate("AboutDialog", "About", nullptr));
         label_2->setText(QString());
         label_3->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600; color:#00007f;\">SeiSee</span></p><p align=\"center\"><span style=\" font-size:10pt; font-weight:600; color:#00007f;\">MultiPlatform</span></p><p align=\"center\"><span style=\" font-size:12pt; font-weight:600; color:#00007f;\">SEG-Y Viewer</span></p></body></html>", nullptr));
-        label_rev->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt;\">Rev: </span></p></body></html>", nullptr));
-        label->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt;\">Segrey Pavlukhin </span></p><p align=\"center\"><span style=\" font-size:11pt; color:#0000ff;\">(psi@dmng.ru)</span></p></body></html>", nullptr));
+        label_rev->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\">Rev: </p></body></html>", nullptr));
+        label->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\">Auther: Segrey Pavlukhin <span style=\" color:#0000ff;\">(psi@dmng.ru)</span></p></body></html>", nullptr));
+        label_ww->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\">Modify: Wang Wei <span style=\" color:#0000ff;\">(ww_geophy@126.com)</span></p></body></html>", nullptr));
     } // retranslateUi
 
 };

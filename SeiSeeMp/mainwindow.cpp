@@ -1847,12 +1847,14 @@ void MainWindow::ArrangeSections()
 
     int nh=hdrAxisCk.List().count();
 
-    QFont headerFont;
-    headerFont.setPixelSize(11);
-    headerFont.setStyleHint(QFont::Courier);
-    QFontMetrics fm(headerFont);
+    // QFont headerFont;
+    // headerFont.setPixelSize(11);
+    // headerFont.setStyleHint(QFont::Courier);
+    // QFontMetrics fm(headerFont);
 
-    int ht = fm.height();
+    // int ht = fm.height();
+
+    int ht = hlabView.getGfx()->GetTextHeight();
 
     int h = nh * (ht + 2) + 12;
 
