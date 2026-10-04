@@ -3,175 +3,162 @@
 
 #include <stdint.h>
 
-#include <QColor>
-#include <QTableView>
 #include <QAbstractTableModel>
-#include <QVector>
+#include <QColor>
+#include <QDebug>
 #include <QHeaderView>
+#include <QPainter>
 #include <QResizeEvent>
 #include <QStyledItemDelegate>
-#include <QPainter>
-#include <QDebug>
+#include <QTableView>
+#include <QVector>
 
 class MxStringTable;
 
-class XHeaderView : public QHeaderView
-{
-private:
+class XHeaderView : public QHeaderView {
+  private:
+    virtual void paintSection(QPainter *painter, const QRect &rect,
+                              int logicalIndex) const;
 
-    virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const;
-
-public:
-      XHeaderView(QWidget *parent=0);
-      ~XHeaderView(){}
+  public:
+    XHeaderView(QWidget *parent = 0);
+    ~XHeaderView() {}
 };
 
-class MxStringTableDelegate : public QStyledItemDelegate
-{
+class MxStringTableDelegate : public QStyledItemDelegate {
     Q_OBJECT
-private:
-    MxStringTable* _parent;
+  private:
+    MxStringTable *_parent;
 
-public:
+  public:
     explicit MxStringTableDelegate(MxStringTable *parent = 0)
-        : QStyledItemDelegate((QObject*)parent)
+        : QStyledItemDelegate((QObject *)parent)
     {
         _parent = parent;
     }
 
     // чтобы управлять отрисовкой нужно переопределить этот метод
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const;
 };
 
-class MxStringTableCell
-{
-public:
+class MxStringTableCell {
+  public:
     QString text;
     QString imgnm;
-    QIcon   icon;
-    int     check;
+    QIcon icon;
+    int check;
     int64_t tag;
-    QColor  color;  // background color
-    QColor  textc;  // text color
-    bool    edit;   // editable
+    QColor color; // background color
+    QColor textc; // text color
+    bool edit;    // editable
     QString data;
 
     explicit MxStringTableCell()
     {
-        check  = 0;
-        tag    = 0;
-        edit   = false;
+        check = 0;
+        tag = 0;
+        edit = false;
     }
 };
 
-class MxStringTableRow
-{
-public:
-    bool    sel;
-    QColor  color;
-    QColor  textc;  // text color
+class MxStringTableRow {
+  public:
+    bool sel;
+    QColor color;
+    QColor textc; // text color
     QString label;
-    QColor  labbg;
+    QColor labbg;
 
     QVector<MxStringTableCell> cells;
 
-    explicit MxStringTableRow()
-    {
-        sel = false;
-    }
+    explicit MxStringTableRow() { sel = false; }
 };
 
-class MxStringTableCol
-{
-public:
-    bool    chkbx;   // show check
+class MxStringTableCol {
+  public:
+    bool chkbx; // show check
     QString label;
-    QColor  labbg;
+    QColor labbg;
     QString imgnm;
-    int     width;
-    bool    edit;
+    int width;
+    bool edit;
 
     explicit MxStringTableCol()
     {
-        chkbx    = false;
-        width    = 0;
-        edit     = false;
+        chkbx = false;
+        width = 0;
+        edit = false;
     }
 };
-
 
 class MxStringTable;
 class MxStringTableModel;
 
-
-class MxStringTableModel : public QAbstractTableModel
-{
+class MxStringTableModel : public QAbstractTableModel {
     Q_OBJECT
 
-friend class MxStringTable;
+    friend class MxStringTable;
 
-protected:
+  protected:
+    MxStringTable *_tab;
 
-    MxStringTable* _tab;
+  public:
+    explicit MxStringTableModel(MxStringTable *parent);
 
-public:
-    explicit MxStringTableModel(MxStringTable* parent);
+    virtual int rowCount(const QModelIndex &) const;
+    virtual int columnCount(const QModelIndex &) const;
 
-    virtual int      rowCount   (const QModelIndex &) const;
-    virtual int      columnCount(const QModelIndex &) const;
+    virtual QVariant data(const QModelIndex &, int) const;
 
-    virtual QVariant data       (const QModelIndex &,int) const;
-
-    virtual bool setData    (const QModelIndex &index, const QVariant &value, int role);
-    virtual bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role);
+    virtual bool setData(const QModelIndex &index, const QVariant &value,
+                         int role);
+    virtual bool setHeaderData(int section, Qt::Orientation orientation,
+                               const QVariant &value, int role);
     virtual Qt::ItemFlags flags(const QModelIndex & /*index*/) const;
 
-    virtual QVariant headerData( int section, Qt::Orientation orientation, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
+                                int role) const;
 
+  signals:
 
-signals:
-
-
-public slots:
-
+  public slots:
 };
 
-
-class MxStringTable : public QTableView
-{
+class MxStringTable : public QTableView {
     Q_OBJECT
 
-friend class MxStringTableModel;
+    friend class MxStringTableModel;
 
-protected:
-
-//  QVector<MxStringTableRow> _rows;
-//  QVector<MxStringTableCol> _cols;
+  protected:
+    //  QVector<MxStringTableRow> _rows;
+    //  QVector<MxStringTableCol> _cols;
 
     int _nrows;
     int _ncols;
 
-    QColor  _color;  // background color
-    QColor  _textc;  // text color
+    QColor _color; // background color
+    QColor _textc; // text color
 
-    QColor   _selcolor;
-    bool     _hidefoc;
+    QColor _selcolor;
+    bool _hidefoc;
 
-    bool    _changed;
+    bool _changed;
 
-    virtual void resizeEvent  (QResizeEvent* event);
-    virtual void keyPressEvent(QKeyEvent*    event);
+    virtual void resizeEvent(QResizeEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
 
-    virtual void mouseDoubleClickEvent(QMouseEvent * event);
-    virtual void mousePressEvent      (QMouseEvent * event);
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
 
-    virtual void editorDestroyed ( QObject * editor );
+    virtual void editorDestroyed(QObject *editor);
 
-    virtual void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
+    virtual void selectionChanged(const QItemSelection &selected,
+                                  const QItemSelection &deselected);
 
-    virtual QSize	sizeHint() const;
+    virtual QSize sizeHint() const;
 
-    void setColumnWidth(int c, int w) { QTableView::setColumnWidth(c,w); }
+    void setColumnWidth(int c, int w) { QTableView::setColumnWidth(c, w); }
 
     void paintEvent(QPaintEvent *event);
     /*
@@ -183,107 +170,101 @@ protected:
     }
     */
 
-public:
+  public:
+    MxStringTableModel *_model;
 
-    MxStringTableModel*       _model;
+    explicit MxStringTable(QWidget *parent = 0);
 
-    explicit MxStringTable(QWidget *parent=0);
+    void setIndexWidget(int r, int c, QWidget *w);
 
-    void setIndexWidget(int r, int c,  QWidget* w);
+    void delRow(int row, bool reset = true);
 
-    void    delRow(int row, bool reset=true);
+    QColor SelColor();
+    void setSelColor(QColor v);
 
-    QColor  SelColor();
-    void    setSelColor(QColor v);
+    bool HideFoc();
+    void setHideFoc(bool v);
 
-    bool    HideFoc();
-    void    setHideFoc(bool  v);
+    int RowCount();
+    void setRowCount(int v, bool reset = true);
 
-    int     RowCount();
-    void    setRowCount(int v, bool reset=true);
+    int ColCount();
+    void setColCount(int v, bool reset = true);
 
-    int     ColCount();
-    void    setColCount(int v, bool reset=true);
+    QColor RowColor(int r);
+    void setRowColor(int r, QColor v);
 
-    QColor  RowColor(int r);
-    void    setRowColor(int r, QColor v);
-
-    QColor  RowTextc(int r);
-    void    setRowTextc(int r, QColor v);
+    QColor RowTextc(int r);
+    void setRowTextc(int r, QColor v);
 
     QString RowLabel(int r);
-    void    setRowLabel(int r, QString v);
+    void setRowLabel(int r, QString v);
 
-    bool    ColChkbx(int c);
-    void    setColChkbx(int c, bool);
+    bool ColChkbx(int c);
+    void setColChkbx(int c, bool);
 
-    void    setColCheck(int c, int v);
+    void setColCheck(int c, int v);
 
-    void    setColEdit (int c, bool v);
-    bool       ColEdit (int c);
+    void setColEdit(int c, bool v);
+    bool ColEdit(int c);
 
-    bool      CellEdit  (int r, int c);
-    void    setCellEdit (int r, int c, bool v);
+    bool CellEdit(int r, int c);
+    void setCellEdit(int r, int c, bool v);
 
-    int     ColWidth(int c);
-    void    setColWidth(int c, int);
+    int ColWidth(int c);
+    void setColWidth(int c, int);
 
     QString ColLabel(int c);
-    void    setColLabel(int c, QString);
-    void    setColLabBg(int c, QColor  v = QColor());
+    void setColLabel(int c, QString);
+    void setColLabBg(int c, QColor v = QColor());
 
-    QColor  Color() { return _color; }
-    void    setColor(QColor);
+    QColor Color() { return _color; }
+    void setColor(QColor);
 
-    QColor  Textc() { return _textc; }
-    void    setTextc(QColor);
+    QColor Textc() { return _textc; }
+    void setTextc(QColor);
 
-    QString  Cell     (int r, int c);
-    void     setCell  (int r, int c, QString v);
+    QString Cell(int r, int c);
+    void setCell(int r, int c, QString v);
 
-    QString  ImgName   (int r, int c);
-    void     setImgName(int r, int c, QString v);
+    QString ImgName(int r, int c);
+    void setImgName(int r, int c, QString v);
 
-    QIcon    ImgIcon   (int r, int c);
-    void     setImgIcon(int r, int c, QIcon);
+    QIcon ImgIcon(int r, int c);
+    void setImgIcon(int r, int c, QIcon);
 
-    int      Check(int r, int c);
-    void     setCheck(int r, int c, int v);
+    int Check(int r, int c);
+    void setCheck(int r, int c, int v);
 
-    int64_t  Tag   (int r, int c);
-    void     setTag(int r, int c, int64_t v);
+    int64_t Tag(int r, int c);
+    void setTag(int r, int c, int64_t v);
 
-    QString  Data(int r, int c);
-    void     setData(int r, int c, QString v);
+    QString Data(int r, int c);
+    void setData(int r, int c, QString v);
 
-    QColor   CellColor(int r, int c);
-    void     setCellColor(int r, int c, QColor v);
+    QColor CellColor(int r, int c);
+    void setCellColor(int r, int c, QColor v);
 
-    void     setCurCell(int r, int c=0);
+    void setCurCell(int r, int c = 0);
 
-    int      curRow();
-    int      curCol();
+    int curRow();
+    int curCol();
 
-    void     setTextChanged(bool v);
+    void setTextChanged(bool v);
 
-signals:
+  signals:
 
     void hHeaderEvent(int col);
 
     void rowEvent(int row, int mode);
 
-    void cellDataRequest(int row, int col, QString& data);
+    void cellDataRequest(int row, int col, QString &data);
 
     void textChanged();
 
+  public slots:
 
-public slots:
-
-    void hHeaderPressed(int logicalIndex)
-    {
-        emit hHeaderEvent(logicalIndex);
-    }
+    void hHeaderPressed(int logicalIndex) { emit hHeaderEvent(logicalIndex); }
 };
-
 
 #endif // MxStringTable_H

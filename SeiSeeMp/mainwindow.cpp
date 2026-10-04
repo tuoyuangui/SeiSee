@@ -1,26 +1,26 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
-#include <QStandardItemModel>
-#include <QWidget>
-#include <QDir>
-#include <QSettings>
-#include <QScrollBar>
-#include <QSignalBlocker>
-#include <QTimer>
-#include <QFileDialog>
-#include <QMessageBox>
 #include <QComboBox>
-#include <QTextCodec>
-#include <QUuid>
-#include <QPainter>
+#include <QDebug>
+#include <QDir>
+#include <QFileDialog>
 #include <QFontMetrics>
+#include <QMessageBox>
+#include <QPainter>
+#include <QScrollBar>
+#include <QSettings>
+#include <QSignalBlocker>
+#include <QStandardItemModel>
+#include <QTextCodec>
+#include <QTimer>
+#include <QUuid>
+#include <QWidget>
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "gfxobj.h"
 #include "gfxsrcseismemsegd.h"
@@ -28,15 +28,13 @@
 
 #include "seistrexpr.h"
 
+#include "furlib.h"
 #include "util2.h"
 #include "util2qt.h"
-#include "furlib.h"
 
-
-class VerticalTimeLabel : public QWidget
-{
-public:
-    explicit VerticalTimeLabel(QWidget* parent = nullptr) 
+class VerticalTimeLabel : public QWidget {
+  public:
+    explicit VerticalTimeLabel(QWidget *parent = nullptr)
         : QWidget(parent)
     {
         setFixedSize(16, 38);
@@ -46,8 +44,7 @@ public:
         // 初始化默认字体（与原 paintEvent 中的设置一致）
         m_font.setFamily(QStringLiteral("Courier New"));
 
-        if(!font_list.isEmpty())
-        {
+        if (!font_list.isEmpty()) {
             m_font.setFamily(font_list[0]);
         }
 
@@ -56,10 +53,10 @@ public:
     }
 
     // 设置完整字体（自动触发重绘）
-    void setFont(const QFont& font)
+    void setFont(const QFont &font)
     {
         m_font = font;
-        update();   // 刷新界面
+        update(); // 刷新界面
     }
 
     // 设置字体像素大小（自动触发重绘）
@@ -69,8 +66,8 @@ public:
         update();
     }
 
-protected:
-    void paintEvent(QPaintEvent*) override
+  protected:
+    void paintEvent(QPaintEvent *) override
     {
         QPainter painter(this);
         painter.setRenderHint(QPainter::TextAntialiasing);
@@ -81,25 +78,25 @@ protected:
         QFontMetrics metrics(m_font);
         painter.translate(width() / 2.0, height() / 2.0);
         painter.rotate(-90);
-        painter.drawText(QPointF(-metrics.horizontalAdvance(QStringLiteral("Time")) / 2.0,
-                                 (metrics.ascent() - metrics.descent()) / 2.0),
-                         QStringLiteral("Time"));
+        painter.drawText(
+            QPointF(-metrics.horizontalAdvance(QStringLiteral("Time")) / 2.0,
+                    (metrics.ascent() - metrics.descent()) / 2.0),
+            QStringLiteral("Time"));
     }
 
-private:
-    QFont m_font;   // 存储当前使用的字体
+  private:
+    QFont m_font; // 存储当前使用的字体
 };
 
-
 #ifdef _MSC_VER
-//#include <vld.h>
-#pragma warning( push )
-    #pragma warning( disable : 4267 4100 4068 )
+// #include <vld.h>
+#pragma warning(push)
+#pragma warning(disable : 4267 4100 4068)
 #endif
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
 
 #if QT_VERSION < 0x050000
@@ -108,11 +105,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     qRegisterMetaType<DirList>("DirList");
 
-    busy         = false;
+    busy = false;
     expu_running = false;
 
     QString dir = QDir::tempPath();
-    undofn =  dir + "/" + QUuid::createUuid().toString()+".tmp";
+    undofn = dir + "/" + QUuid::createUuid().toString() + ".tmp";
 
     QStringList paths = QCoreApplication::libraryPaths();
     paths.append(".");
@@ -134,15 +131,15 @@ MainWindow::MainWindow(QWidget *parent) :
     m_statTime = new QLabel("Time=", this);
     m_statTime->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
-//  m_statAmp  = new QLabel("Amp=", this);
-    m_statAmp  = new QLabel("", this);
-    m_statAmp ->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    //  m_statAmp  = new QLabel("Amp=", this);
+    m_statAmp = new QLabel("", this);
+    m_statAmp->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
-//  m_statFfid  = new QLabel("FFID=", this);
-    m_statFfid  = new QLabel("", this);
+    //  m_statFfid  = new QLabel("FFID=", this);
+    m_statFfid = new QLabel("", this);
     m_statFfid->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
-//  m_statSp = new QLabel("SP=", this);
+    //  m_statSp = new QLabel("SP=", this);
     m_statSp = new QLabel("", this);
     m_statSp->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
@@ -170,27 +167,27 @@ MainWindow::MainWindow(QWidget *parent) :
     chsSel.resize(1000);
     chsSel.fill(false);
 
-    _f1=10;
-    _f2=20;
-    _f3=500;
-    _f4=1000;
+    _f1 = 10;
+    _f2 = 20;
+    _f3 = 500;
+    _f4 = 1000;
 
     _agcw = 1000;
 
-    _dly_min=0;
-    _dly_max=0;
+    _dly_min = 0;
+    _dly_max = 0;
 
     //----------------------------------------------------------
     dirGrid.setRowCount(0);
     dirGrid.setColCount(2);
     dirGrid.verticalHeader()->setVisible(false);
 
-    dirGrid.setColLabel   (0,"Name");
-    dirGrid.setColLabel   (1,"Type");
-    dirGrid.setColWidth(1,50);
+    dirGrid.setColLabel(0, "Name");
+    dirGrid.setColLabel(1, "Type");
+    dirGrid.setColWidth(1, 50);
 
-    QVBoxLayout* dirGridLayout = new QVBoxLayout;
-    dirGridLayout->setMargin (1);
+    QVBoxLayout *dirGridLayout = new QVBoxLayout;
+    dirGridLayout->setMargin(1);
     dirGridLayout->setSpacing(1);
     dirGridLayout->addWidget(&dirGrid);
     ui->dirFrame->setLayout(dirGridLayout);
@@ -199,15 +196,15 @@ MainWindow::MainWindow(QWidget *parent) :
     binHdrGrid.setRowCount(0);
     binHdrGrid.setColCount(3);
     binHdrGrid.verticalHeader()->setVisible(false);
-    binHdrGrid.setColLabel   (0,"Value");
-    binHdrGrid.setColLabel   (1,"Description");
-    binHdrGrid.setColLabel   (2,"Bytes");
-    binHdrGrid.setColWidth(0,70);
-    binHdrGrid.setColWidth(1,0);
-    binHdrGrid.setColWidth(2,65);
+    binHdrGrid.setColLabel(0, "Value");
+    binHdrGrid.setColLabel(1, "Description");
+    binHdrGrid.setColLabel(2, "Bytes");
+    binHdrGrid.setColWidth(0, 70);
+    binHdrGrid.setColWidth(1, 0);
+    binHdrGrid.setColWidth(2, 65);
 
-    QVBoxLayout* binHdrLayout = new QVBoxLayout;
-    binHdrLayout->setMargin (1);
+    QVBoxLayout *binHdrLayout = new QVBoxLayout;
+    binHdrLayout->setMargin(1);
     binHdrLayout->setSpacing(1);
     binHdrLayout->addWidget(&binHdrGrid);
     ui->binHdrFrame->setLayout(binHdrLayout);
@@ -216,15 +213,15 @@ MainWindow::MainWindow(QWidget *parent) :
     trcHdrGrid.setRowCount(0);
     trcHdrGrid.setColCount(3);
     trcHdrGrid.verticalHeader()->setVisible(false);
-    trcHdrGrid.setColLabel   (0,"Value");
-    trcHdrGrid.setColLabel   (1,"Description");
-    trcHdrGrid.setColLabel   (2,"Bytes");
-    trcHdrGrid.setColWidth(0,70);
-    trcHdrGrid.setColWidth(1,0);
-    trcHdrGrid.setColWidth(2,60);
+    trcHdrGrid.setColLabel(0, "Value");
+    trcHdrGrid.setColLabel(1, "Description");
+    trcHdrGrid.setColLabel(2, "Bytes");
+    trcHdrGrid.setColWidth(0, 70);
+    trcHdrGrid.setColWidth(1, 0);
+    trcHdrGrid.setColWidth(2, 60);
 
-    QVBoxLayout* trcHdrLayout = new QVBoxLayout;
-    trcHdrLayout->setMargin (1);
+    QVBoxLayout *trcHdrLayout = new QVBoxLayout;
+    trcHdrLayout->setMargin(1);
     trcHdrLayout->setSpacing(1);
     trcHdrLayout->addWidget(&trcHdrGrid);
     ui->trcHdrFrame->setLayout(trcHdrLayout);
@@ -233,15 +230,15 @@ MainWindow::MainWindow(QWidget *parent) :
     trcDatGrid.setRowCount(0);
     trcDatGrid.setColCount(3);
     trcDatGrid.verticalHeader()->setVisible(false);
-    trcDatGrid.setColLabel   (0,"Index");
-    trcDatGrid.setColLabel   (1,"Time");
-    trcDatGrid.setColLabel   (2,"Sample");
-    trcDatGrid.setColWidth(0,80);
-    trcDatGrid.setColWidth(1,80);
-    trcDatGrid.setColWidth(2,0);
+    trcDatGrid.setColLabel(0, "Index");
+    trcDatGrid.setColLabel(1, "Time");
+    trcDatGrid.setColLabel(2, "Sample");
+    trcDatGrid.setColWidth(0, 80);
+    trcDatGrid.setColWidth(1, 80);
+    trcDatGrid.setColWidth(2, 0);
 
-    QVBoxLayout* trcDatLayout = new QVBoxLayout;
-    trcDatLayout->setMargin (1);
+    QVBoxLayout *trcDatLayout = new QVBoxLayout;
+    trcDatLayout->setMargin(1);
     trcDatLayout->setSpacing(1);
     trcDatLayout->addWidget(&trcDatGrid);
     ui->trcDatFrame->setLayout(trcDatLayout);
@@ -250,16 +247,16 @@ MainWindow::MainWindow(QWidget *parent) :
     hdrListCkGrid.setRowCount(0);
     hdrListCkGrid.setColCount(3);
     hdrListCkGrid.verticalHeader()->setVisible(false);
-    hdrListCkGrid.setColLabel   (0,"");
-    hdrListCkGrid.setColLabel   (1,"Bytes");
-    hdrListCkGrid.setColLabel   (2,"Description");
-    hdrListCkGrid.setColWidth(0,20);
-    hdrListCkGrid.setColWidth(1,60);
-    hdrListCkGrid.setColWidth(2,0);
-    hdrListCkGrid.setColChkbx(0,true);
+    hdrListCkGrid.setColLabel(0, "");
+    hdrListCkGrid.setColLabel(1, "Bytes");
+    hdrListCkGrid.setColLabel(2, "Description");
+    hdrListCkGrid.setColWidth(0, 20);
+    hdrListCkGrid.setColWidth(1, 60);
+    hdrListCkGrid.setColWidth(2, 0);
+    hdrListCkGrid.setColChkbx(0, true);
 
-    QVBoxLayout* hdrListCkLayout = new QVBoxLayout;
-    hdrListCkLayout->setMargin (1);
+    QVBoxLayout *hdrListCkLayout = new QVBoxLayout;
+    hdrListCkLayout->setMargin(1);
     hdrListCkLayout->setSpacing(1);
     hdrListCkLayout->addWidget(&hdrListCkGrid);
     ui->hdrListCkFrame->setLayout(hdrListCkLayout);
@@ -267,16 +264,16 @@ MainWindow::MainWindow(QWidget *parent) :
     hdrElstCkGrid.setRowCount(0);
     hdrElstCkGrid.setColCount(3);
     hdrElstCkGrid.verticalHeader()->setVisible(false);
-    hdrElstCkGrid.setColLabel   (0,"");
-    hdrElstCkGrid.setColLabel   (1,"Bytes");
-    hdrElstCkGrid.setColLabel   (2,"Description");
-    hdrElstCkGrid.setColWidth(0,20);
-    hdrElstCkGrid.setColWidth(1,60);
-    hdrElstCkGrid.setColWidth(2,0);
-    hdrElstCkGrid.setColChkbx(0,true);
+    hdrElstCkGrid.setColLabel(0, "");
+    hdrElstCkGrid.setColLabel(1, "Bytes");
+    hdrElstCkGrid.setColLabel(2, "Description");
+    hdrElstCkGrid.setColWidth(0, 20);
+    hdrElstCkGrid.setColWidth(1, 60);
+    hdrElstCkGrid.setColWidth(2, 0);
+    hdrElstCkGrid.setColChkbx(0, true);
 
-    QVBoxLayout* hdrElstCkLayout = new QVBoxLayout;
-    hdrElstCkLayout->setMargin (1);
+    QVBoxLayout *hdrElstCkLayout = new QVBoxLayout;
+    hdrElstCkLayout->setMargin(1);
     hdrElstCkLayout->setSpacing(1);
     hdrElstCkLayout->addWidget(&hdrElstCkGrid);
     ui->hdrElstCkFrame->setLayout(hdrElstCkLayout);
@@ -285,26 +282,25 @@ MainWindow::MainWindow(QWidget *parent) :
 
     hdrListDtGrid.setRowCount(0);
     hdrListDtGrid.setColCount(1);
-    hdrListDtGrid.setColLabel   (0,"Trace#");
-    hdrListDtGrid.setColWidth   (0,60);
+    hdrListDtGrid.setColLabel(0, "Trace#");
+    hdrListDtGrid.setColWidth(0, 60);
 
-    QVBoxLayout* hdrListDtLayout = new QVBoxLayout;
-    hdrListDtLayout->setMargin (1);
+    QVBoxLayout *hdrListDtLayout = new QVBoxLayout;
+    hdrListDtLayout->setMargin(1);
     hdrListDtLayout->setSpacing(1);
     hdrListDtLayout->addWidget(&hdrListDtGrid);
     ui->hdrListDtFrame->setLayout(hdrListDtLayout);
 
     hdrElstDtGrid.setRowCount(0);
     hdrElstDtGrid.setColCount(1);
-    hdrElstDtGrid.setColLabel   (0,"Trace#");
-    hdrElstDtGrid.setColWidth   (0,60);
+    hdrElstDtGrid.setColLabel(0, "Trace#");
+    hdrElstDtGrid.setColWidth(0, 60);
 
-    QVBoxLayout* hdrElstDtLayout = new QVBoxLayout;
-    hdrElstDtLayout->setMargin (1);
+    QVBoxLayout *hdrElstDtLayout = new QVBoxLayout;
+    hdrElstDtLayout->setMargin(1);
     hdrElstDtLayout->setSpacing(1);
     hdrElstDtLayout->addWidget(&hdrElstDtGrid);
     ui->hdrElstDtFrame->setLayout(hdrElstDtLayout);
-
 
     //----------------------------------------------------------
 
@@ -318,8 +314,8 @@ MainWindow::MainWindow(QWidget *parent) :
     timeRightAxis.setView(&timeRightView);
     hdrsAxis.setView(&hdrsView);
     hdrsBottomAxis.setView(&hdrsBottomView);
-    seisSct .setView(&seisView);
-    hdrsLab. setView(&hlabView);
+    seisSct.setView(&seisView);
+    hdrsLab.setView(&hlabView);
 
     timeRightAxis.setRightSide(true);
     hdrsBottomAxis.setBottomSide(true);
@@ -329,7 +325,7 @@ MainWindow::MainWindow(QWidget *parent) :
     hdrsBottomAxis.setTrim(false);
     hdrsLab.setTrim(false);
 
-    seisSct .setSrc(&seisSrc);
+    seisSct.setSrc(&seisSrc);
     hdrsAxis.setSrc(&seisSrc);
     hdrsBottomAxis.setSrc(&seisSrc);
 
@@ -350,36 +346,46 @@ MainWindow::MainWindow(QWidget *parent) :
     timeRightAxis.setYs(10);
     timeRightAxis.setTi(0.1);
 
-    seisSct. setTi(0.1);
+    seisSct.setTi(0.1);
 
-    hdrsScrl   = new MyScrollArea(&hdrsView,2);
-    hdrsBottomScrl = new MyScrollArea(&hdrsBottomView,2);
-    seisScrl   = new MyScrollArea(&seisView,3);
-    timeScrl   = new MyScrollArea(&timeView,1);
-    timeRightScrl = new MyScrollArea(&timeRightView,1);
-        horizontalAxisScrollBar = new QScrollBar(Qt::Horizontal, this);
-        verticalAxisScrollBar = new QScrollBar(Qt::Vertical, this);
+    hdrsScrl = new MyScrollArea(&hdrsView, 2);
+    hdrsBottomScrl = new MyScrollArea(&hdrsBottomView, 2);
+    seisScrl = new MyScrollArea(&seisView, 3);
+    timeScrl = new MyScrollArea(&timeView, 1);
+    timeRightScrl = new MyScrollArea(&timeRightView, 1);
+    horizontalAxisScrollBar = new QScrollBar(Qt::Horizontal, this);
+    verticalAxisScrollBar = new QScrollBar(Qt::Vertical, this);
 
-        connect(seisScrl->horizontalScrollBar(), SIGNAL(rangeChanged(int,int)),
-            this, SLOT(syncHorizontalAxisScrollBar(int,int)));
-        connect(seisScrl->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
-            this, SLOT(syncVerticalAxisScrollBar(int,int)));
-        connect(seisScrl->horizontalScrollBar(), SIGNAL(valueChanged(int)),
+    // 设置滚动条策略，使其在隐藏时仍保留空间，目的是避免zoomALLBtn、zoomHallBtn、zoomVallBtn三个按钮执行时发生bug,在底部和右侧产生白条
+    QSizePolicy horizontalScrollBarPolicy =
+        horizontalAxisScrollBar->sizePolicy();
+    horizontalScrollBarPolicy.setRetainSizeWhenHidden(true);
+    horizontalAxisScrollBar->setSizePolicy(horizontalScrollBarPolicy);
+
+    QSizePolicy verticalScrollBarPolicy = verticalAxisScrollBar->sizePolicy();
+    verticalScrollBarPolicy.setRetainSizeWhenHidden(true);
+    verticalAxisScrollBar->setSizePolicy(verticalScrollBarPolicy);
+
+    connect(seisScrl->horizontalScrollBar(), SIGNAL(rangeChanged(int, int)),
+            this, SLOT(syncHorizontalAxisScrollBar(int, int)));
+    connect(seisScrl->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this,
+            SLOT(syncVerticalAxisScrollBar(int, int)));
+    connect(seisScrl->horizontalScrollBar(), SIGNAL(valueChanged(int)),
             horizontalAxisScrollBar, SLOT(setValue(int)));
-        connect(horizontalAxisScrollBar, SIGNAL(valueChanged(int)),
+    connect(horizontalAxisScrollBar, SIGNAL(valueChanged(int)),
             seisScrl->horizontalScrollBar(), SLOT(setValue(int)));
-        connect(seisScrl->verticalScrollBar(), SIGNAL(valueChanged(int)),
+    connect(seisScrl->verticalScrollBar(), SIGNAL(valueChanged(int)),
             verticalAxisScrollBar, SLOT(setValue(int)));
-        connect(verticalAxisScrollBar, SIGNAL(valueChanged(int)),
+    connect(verticalAxisScrollBar, SIGNAL(valueChanged(int)),
             seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
-    hdrsScrl->setFixedHeight  (63);
+    hdrsScrl->setFixedHeight(63);
     hdrsBottomScrl->setFixedHeight(63);
-    hlabView. setFixedHeight  (63);
-    timeScrl->setMaximumWidth (62);
+    hlabView.setFixedHeight(63);
+    timeScrl->setMaximumWidth(62);
     timeRightScrl->setMaximumWidth(62);
 
-    VerticalTimeLabel* timeLabel = new VerticalTimeLabel(timeScrl->viewport());
+    VerticalTimeLabel *timeLabel = new VerticalTimeLabel(timeScrl->viewport());
     timeLabel->move(2, 4);
     timeLabel->show();
 
@@ -396,254 +402,130 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->TxtHdrEdit->setFont(monoFont);
 
-    myEventCatcher* ef;
+    myEventCatcher *ef;
 
     ef = new myEventCatcher(1, this);
     ui->edGn->installEventFilter(ef);
 
-    connect
-            (
-                ef,
-                SIGNAL(whellEvent(int, QWheelEvent*)),
-                this,
-                SLOT(edWhellEvent(int, QWheelEvent*))
-                );
+    connect(ef, SIGNAL(whellEvent(int, QWheelEvent *)), this,
+            SLOT(edWhellEvent(int, QWheelEvent *)));
 
-    ef = new myEventCatcher(2,this);
+    ef = new myEventCatcher(2, this);
     ui->edTm->installEventFilter(ef);
 
-    connect
-            (
-                ef,
-                SIGNAL(whellEvent(int, QWheelEvent*)),
-                this,
-                SLOT(edWhellEvent(int, QWheelEvent*))
-                );
+    connect(ef, SIGNAL(whellEvent(int, QWheelEvent *)), this,
+            SLOT(edWhellEvent(int, QWheelEvent *)));
 
-    ef = new myEventCatcher(3,this);
+    ef = new myEventCatcher(3, this);
     ui->edTr->installEventFilter(ef);
 
-    myTextEditEventCatcher* tf = new myTextEditEventCatcher(1,this);
+    myTextEditEventCatcher *tf = new myTextEditEventCatcher(1, this);
     ui->TxtHdrEdit->installEventFilter(tf);
 
-    connect
-            (
-                tf,
-                SIGNAL(keyEvent(int, QKeyEvent*)),
-                this,
-                SLOT(txtEditKeyEvent(int,QKeyEvent*))
-                );
+    connect(tf, SIGNAL(keyEvent(int, QKeyEvent *)), this,
+            SLOT(txtEditKeyEvent(int, QKeyEvent *)));
 
-    connect
-            (
-                ui->TxtHdrEdit,
-                SIGNAL(textChanged()),
-                this,
-                SLOT(txtEditChanged())
-                );
+    connect(ui->TxtHdrEdit, SIGNAL(textChanged()), this,
+            SLOT(txtEditChanged()));
 
-    connect
-            (
-                &binHdrGrid,
-                SIGNAL(textChanged()),
-                this,
-                SLOT(binHdrGridChangedEvent())
-                );
+    connect(&binHdrGrid, SIGNAL(textChanged()), this,
+            SLOT(binHdrGridChangedEvent()));
 
-    connect
-            (
-                ef,
-                SIGNAL(whellEvent(int, QWheelEvent*)),
-                this,
-                SLOT(edWhellEvent(int, QWheelEvent*))
-                );
+    connect(ef, SIGNAL(whellEvent(int, QWheelEvent *)), this,
+            SLOT(edWhellEvent(int, QWheelEvent *)));
 
-    connect
-            (
-                seisScrl,
-                SIGNAL(mouseEvent(QMouseEvent*)),
-                this,
-                SLOT(viewMouseEvent(QMouseEvent*))
-                );
+    connect(seisScrl, SIGNAL(mouseEvent(QMouseEvent *)), this,
+            SLOT(viewMouseEvent(QMouseEvent *)));
 
-    connect
-            (
-                seisScrl,
-                SIGNAL(zoomW(QRect)),
-                this,
-                SLOT(winZoom(QRect))
-                );
+    connect(seisScrl, SIGNAL(zoomW(QRect)), this, SLOT(winZoom(QRect)));
 
-    connect
-            (
-                seisScrl,
-                SIGNAL(zoomChanged(double,double,int,int)),
-                this,
-                SLOT(sclZoom(double,double,int,int))
-                );
+    connect(seisScrl, SIGNAL(zoomChanged(double, double, int, int)), this,
+            SLOT(sclZoom(double, double, int, int)));
 
-    connect
-            (
-                timeScrl,
-                SIGNAL(zoomChanged(double,double,int,int)),
-                this,
-                SLOT(sclZoomV(double,double,int,int))
-                );
+    connect(timeScrl, SIGNAL(zoomChanged(double, double, int, int)), this,
+            SLOT(sclZoomV(double, double, int, int)));
 
-    connect
-            (
-                timeRightScrl,
-                SIGNAL(zoomChanged(double,double,int,int)),
-                this,
-                SLOT(sclZoomV(double,double,int,int))
-                );
+    connect(timeRightScrl, SIGNAL(zoomChanged(double, double, int, int)), this,
+            SLOT(sclZoomV(double, double, int, int)));
 
-    connect
-            (
-                hdrsScrl,
-                SIGNAL(zoomChanged(double,double,int,int)),
-                this,
-                SLOT(sclZoomH(double,double,int,int))
-                );
+    connect(hdrsScrl, SIGNAL(zoomChanged(double, double, int, int)), this,
+            SLOT(sclZoomH(double, double, int, int)));
 
-    connect
-            (
-                hdrsBottomScrl,
-                SIGNAL(zoomChanged(double,double,int,int)),
-                this,
-                SLOT(sclZoomH(double,double,int,int))
-                );
+    connect(hdrsBottomScrl, SIGNAL(zoomChanged(double, double, int, int)), this,
+            SLOT(sclZoomH(double, double, int, int)));
 
-    connect
-            (
-                &dirGrid,
-                SIGNAL(rowEvent(int, int)),
-                this,
-                SLOT(dirGridEvent(int, int))
-                );
+    connect(&dirGrid, SIGNAL(rowEvent(int, int)), this,
+            SLOT(dirGridEvent(int, int)));
 
-    connect
-            (
-                &hdrListCkGrid,
-                SIGNAL(rowEvent(int, int)),
-                this,
-                SLOT(hdrListCkEvent(int, int))
-                );
+    connect(&hdrListCkGrid, SIGNAL(rowEvent(int, int)), this,
+            SLOT(hdrListCkEvent(int, int)));
 
-    connect
-            (
-                &hdrElstCkGrid,
-                SIGNAL(rowEvent(int, int)),
-                this,
-                SLOT(hdrElstCkEvent(int, int))
-                );
+    connect(&hdrElstCkGrid, SIGNAL(rowEvent(int, int)), this,
+            SLOT(hdrElstCkEvent(int, int)));
 
-    connect
-            (
-                &hdrListDtGrid,
-                SIGNAL(rowEvent(qint64,int)),
-                this,
-                SLOT(hdrListDtGridEvent(qint64,int))
-                );
+    connect(&hdrListDtGrid, SIGNAL(rowEvent(qint64, int)), this,
+            SLOT(hdrListDtGridEvent(qint64, int)));
 
-    connect
-            (
-                &hdrListDtGrid,
-                SIGNAL(cellDataRequest(int, int, QString&)),
-                this,
-                SLOT(hdrListDtGridDataEvent(int, int, QString&))
-                );
+    connect(&hdrListDtGrid, SIGNAL(cellDataRequest(int, int, QString &)), this,
+            SLOT(hdrListDtGridDataEvent(int, int, QString &)));
 
-    connect
-            (
-                &hdrElstDtGrid,
-                SIGNAL(cellDataRequest(int, int, QString&)),
-                this,
-                SLOT(hdrElstDtGridDataEvent(int, int, QString&))
-                );
+    connect(&hdrElstDtGrid, SIGNAL(cellDataRequest(int, int, QString &)), this,
+            SLOT(hdrElstDtGridDataEvent(int, int, QString &)));
 
-    connect
-            (
-                &hdrElstDtGrid,
-                SIGNAL(headerEvent(int)),
-                this,
-                SLOT(hdrElstDtGridHeaderEvent(int))
-                );
+    connect(&hdrElstDtGrid, SIGNAL(headerEvent(int)), this,
+            SLOT(hdrElstDtGridHeaderEvent(int)));
 
-    connect
-            (
-                &ProcParmDlg,
-                SIGNAL(changedEvent()),
-                this,
-                SLOT(procParmEvent())
-                );
+    connect(&ProcParmDlg, SIGNAL(changedEvent()), this, SLOT(procParmEvent()));
 
-    connect
-            (
-                &AxisDlg,
-                SIGNAL(changedEvent()),
-                this,
-                SLOT(axesDlgEvent())
-                );
+    connect(&AxisDlg, SIGNAL(changedEvent()), this, SLOT(axesDlgEvent()));
 
-    connect
-            (
-                &EdHdrDlg,
-                SIGNAL(changedEvent()),
-                this,
-                SLOT(hdreDlgEvent())
-                );
+    connect(&EdHdrDlg, SIGNAL(changedEvent()), this, SLOT(hdreDlgEvent()));
 
-    connect
-            (
-                &hdrListDtGrid,
-                SIGNAL(headerEvent(int)),
-                this,
-                SLOT(hdrListDtGridHeaderEvent(int))
-                );
+    connect(&hdrListDtGrid, SIGNAL(headerEvent(int)), this,
+            SLOT(hdrListDtGridHeaderEvent(int)));
 
-/*
-    connect
-            (
-                &seisSct,
-                SIGNAL(epers(int)),
-                this,
-                SLOT(x_pers(int))
-                );
-*/
+    /*
+        connect
+                (
+                    &seisSct,
+                    SIGNAL(epers(int)),
+                    this,
+                    SLOT(x_pers(int))
+                    );
+    */
 
     hdrsScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    hdrsScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    hdrsScrl->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     timeScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    timeScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    timeScrl->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     timeRightScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    timeRightScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    timeRightScrl->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     hdrsBottomScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    hdrsBottomScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    hdrsBottomScrl->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     seisScrl->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    seisScrl->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
+    seisScrl->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    QGridLayout*      seisLayout;
+    QGridLayout *seisLayout;
 
     seisLayout = new QGridLayout;
 
     timeScrl->setFixedWidth(50);
     timeRightScrl->setFixedWidth(50);
-    hlabView. setFixedWidth(50);
-    
-    seisLayout->setMargin (0);
+    hlabView.setFixedWidth(50);
+
+    seisLayout->setMargin(0);
     seisLayout->setSpacing(0);
 
-    seisLayout->addWidget(&hlabView,0,0);
-    seisLayout->addWidget(timeScrl, 1,0);
-    seisLayout->addWidget(hdrsScrl, 0,1);
-    seisLayout->addWidget(seisScrl, 1,1);
-    seisLayout->addWidget(hdrsBottomScrl, 2,1);
-    seisLayout->addWidget(timeRightScrl, 1,2);
-    seisLayout->addWidget(horizontalAxisScrollBar, 3,0,1,3);
-    seisLayout->addWidget(verticalAxisScrollBar, 0,3,3,1);
-    seisLayout->setColumnStretch(1,1);
-    seisLayout->setRowStretch(1,1);
+    seisLayout->addWidget(&hlabView, 0, 0);
+    seisLayout->addWidget(timeScrl, 1, 0);
+    seisLayout->addWidget(hdrsScrl, 0, 1);
+    seisLayout->addWidget(seisScrl, 1, 1);
+    seisLayout->addWidget(hdrsBottomScrl, 2, 1);
+    seisLayout->addWidget(timeRightScrl, 1, 2);
+    seisLayout->addWidget(horizontalAxisScrollBar, 3, 0, 1, 3);
+    seisLayout->addWidget(verticalAxisScrollBar, 0, 3, 3, 1);
+    seisLayout->setColumnStretch(1, 1);
+    seisLayout->setRowStretch(1, 1);
 
     ui->seisFrame->setLayout(seisLayout);
     ui->seisFrame->setMouseTracking(true);
@@ -652,12 +534,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowTitle(QString("SeiSeeMp (") + QString(__DATE__) + QString(")"));
 
-    //double   v[3] = {-1,0,1};
-    QRgb     c[3];
+    // double   v[3] = {-1,0,1};
+    QRgb c[3];
 
-    c[0]=QColor(   0,   0,  255).rgb();
-    c[1]=QColor( 255, 255,  255).rgb();
-    c[2]=QColor( 255,   0,    0).rgb();
+    c[0] = QColor(0, 0, 255).rgb();
+    c[1] = QColor(255, 255, 255).rgb();
+    c[2] = QColor(255, 0, 0).rgb();
 
     checkTxtHdrChange();
     checkBinHdrChange();
@@ -666,195 +548,178 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->seisFrame->setVisible(false);
 
-//    exprList["CDP"] = SeisTrExpr("H(21,4)");
-//    exprList["SP" ] = SeisTrExpr("L-N+1");
+    //    exprList["CDP"] = SeisTrExpr("H(21,4)");
+    //    exprList["SP" ] = SeisTrExpr("L-N+1");
 
     // CreatePalette24(c,v,-1,1,rgb,3); !!!
 }
 
-void MainWindow::hdrListDtGridDataEvent(int r, int c, QString& v)
+void MainWindow::hdrListDtGridDataEvent(int r, int c, QString &v)
 {
     int itm = hdrListDtGrid.colTag(c);
 
-////
+    ////
 
-    double val = seisSrc.Th(r,itm);
+    double val = seisSrc.Th(r, itm);
 
     int ival = val;
-    if(ival==val) v.sprintf("%d",ival);
-    else          v.sprintf("%g", val);
-
+    if (ival == val)
+        v.sprintf("%d", ival);
+    else
+        v.sprintf("%g", val);
 }
 
-void MainWindow::hdrElstDtGridDataEvent(int r, int c, QString& v)
+void MainWindow::hdrElstDtGridDataEvent(int r, int c, QString &v)
 {
     int itm = hdrElstDtGrid.colTag(c);
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
     double val;
-    bool   err=false;
+    bool err = false;
 
-    if(c==0)
-    {
-        val = r+1;
-    }
-    else if (c&1)
-    {
-        val = seisSrc.Th(r,itm);
-    }
-    else
-    {
-      int n = (c - 1)>>1;
+    if (c == 0) {
+        val = r + 1;
+    } else if (c & 1) {
+        val = seisSrc.Th(r, itm);
+    } else {
+        int n = (c - 1) >> 1;
 
-      QString name = hdrElstDtGrid.colLabel(n*2+1);
+        QString name = hdrElstDtGrid.colLabel(n * 2 + 1);
 
-      val = 0;
+        val = 0;
 
-      if(exprList.contains(name))
-      {
-          SeisTrExpr* expr = &exprList[name];
-          val = sf->Re(r,expr);
-          if(expr->Error()) err=true;
-      }
-      else
-      {
-          val = 0;
-          err=true;
-      }
+        if (exprList.contains(name)) {
+            SeisTrExpr *expr = &exprList[name];
+            val = sf->Re(r, expr);
+            if (expr->Error())
+                err = true;
+        } else {
+            val = 0;
+            err = true;
+        }
     }
 
-    if(err)
-    {
-        v="";
-    }
-    else
-    {
+    if (err) {
+        v = "";
+    } else {
         int ival = val;
-        if(ival==val) v.sprintf("%d",ival);
-        else          v.sprintf("%g", val);
+        if (ival == val)
+            v.sprintf("%d", ival);
+        else
+            v.sprintf("%g", val);
     }
-
 }
 
-void MainWindow::txtEditChanged ()
-{
-    checkTxtHdrChange();
-}
+void MainWindow::txtEditChanged() { checkTxtHdrChange(); }
 
-
-void MainWindow::txtEditKeyEvent(int tag, QKeyEvent* event)
+void MainWindow::txtEditKeyEvent(int tag, QKeyEvent *event)
 {
-//    qDebug() << "key=" << event->key();
+    //    qDebug() << "key=" << event->key();
 
     Q_UNUSED(tag);
 
     bool ins = ui->TxtHdrEdit->overwriteMode();
 
-    if(event->key()==Qt::Key_Insert) ui->TxtHdrEdit->setOverwriteMode(!ins);
+    if (event->key() == Qt::Key_Insert)
+        ui->TxtHdrEdit->setOverwriteMode(!ins);
 
-    if(ui->TxtHdrEdit->overwriteMode()) ui->txtIns->setText("OVR");
-    else                                ui->txtIns->setText("INS");
+    if (ui->TxtHdrEdit->overwriteMode())
+        ui->txtIns->setText("OVR");
+    else
+        ui->txtIns->setText("INS");
 }
 
-void MainWindow::edWhellEvent(int tag, QWheelEvent* event)
+void MainWindow::edWhellEvent(int tag, QWheelEvent *event)
 {
     double xs, ys;
-    int    xo, yo;
+    int xo, yo;
     double d = event->delta();
     double z;
 
-    if(tag==1)
-    {
-        z = 1+0.01*fabs(d); if(d<0) z = 1/z;
+    if (tag == 1) {
+        z = 1 + 0.01 * fabs(d);
+        if (d < 0)
+            z = 1 / z;
         //      double g = seisSct.Gw()*z;
-        double g = seisSct.Gw()*z;
+        double g = seisSct.Gw() * z;
         seisSct.setGc(g);
         seisSct.setGw(g);
         FillEdits();
-    }
-    else if(tag==2)
-    {
-        GetZoom(xs,ys,xo,yo);
-        z = 1+0.002*fabs(d); if(d<0) z = 1/z;
-        ys = ys*z;
-        SetZoomC(xs,ys,0,0);
-    }
-    else if(tag==3)
-    {
-        GetZoom(xs,ys,xo,yo);
-        z = 1+0.002*fabs(d); if(d<0) z = 1/z;
-        xs = xs*z;
-        SetZoomC(xs,ys,0,0);
+    } else if (tag == 2) {
+        GetZoom(xs, ys, xo, yo);
+        z = 1 + 0.002 * fabs(d);
+        if (d < 0)
+            z = 1 / z;
+        ys = ys * z;
+        SetZoomC(xs, ys, 0, 0);
+    } else if (tag == 3) {
+        GetZoom(xs, ys, xo, yo);
+        z = 1 + 0.002 * fabs(d);
+        if (d < 0)
+            z = 1 / z;
+        xs = xs * z;
+        SetZoomC(xs, ys, 0, 0);
     }
 }
 
-
-void MainWindow::execProc(SeisFile* sf, int ns, double si, float* smp)
+void MainWindow::execProc(SeisFile *sf, int ns, double si, float *smp)
 {
     Q_UNUSED(sf);
 
-    int   n;
+    int n;
     float maxa;
 
     int rc = 0;
 
-    if(ui->ckFilt->isChecked())
-        BandPassFilter(smp, smp,  _f1, _f2, _f3, _f4, si, ns);
+    if (ui->ckFilt->isChecked())
+        BandPassFilter(smp, smp, _f1, _f2, _f3, _f4, si, ns);
 
-    if(ui->ckAgc->isChecked())
-    {
-        try
-        {
-            n = round(_agcw*1e-3/si);
-            if(n>ns) n=ns;
-        }
-        catch (...)
-        {
-            n=-1;
+    if (ui->ckAgc->isChecked()) {
+        try {
+            n = round(_agcw * 1e-3 / si);
+            if (n > ns)
+                n = ns;
+        } catch (...) {
+            n = -1;
         }
 
-        if(n>0)
-        {
+        if (n > 0) {
             maxa = MaxAmp(smp, ns);
-            Normalize(smp,maxa,ns);
+            Normalize(smp, maxa, ns);
             Agc(smp, n, ns);
             maxa = MaxAmp(smp, ns);
-            Normalize(smp,maxa,ns);
+            Normalize(smp, maxa, ns);
         }
-    }
-    else if(ui->ckNorm->isChecked())
-    {
+    } else if (ui->ckNorm->isChecked()) {
         maxa = MaxAmp(smp, ns);
-        Normalize(smp,maxa,ns);
+        Normalize(smp, maxa, ns);
     }
 
-    rc=1;
+    rc = 1;
 }
-
 
 MainWindow::~MainWindow()
 {
-/*
-    if(WorkThread)
-    {
-        if(WorkThread->isRunning())
+    /*
+        if(WorkThread)
         {
-            WorkThread->Stop();
-            WorkThread->wait();
+            if(WorkThread->isRunning())
+            {
+                WorkThread->Stop();
+                WorkThread->wait();
+            }
+            delete WorkThread;
         }
-        delete WorkThread;
-    }
-*/
+    */
     delete ui;
 }
 
-
-void MainWindow::SetZoomC(double xs,  double ys, int xc, int yc)
+void MainWindow::SetZoomC(double xs, double ys, int xc, int yc)
 {
     double xsp, ysp;
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xsp,ysp,xo,yo);
+    GetZoom(xsp, ysp, xo, yo);
 
     int x = xc + xo;
     int y = yc + yo;
@@ -868,18 +733,17 @@ void MainWindow::SetZoomC(double xs,  double ys, int xc, int yc)
     xo = x - xc;
     yo = y - yc;
 
-    SetZoom(xs,ys,xo,yo);
+    SetZoom(xs, ys, xo, yo);
 }
 
-
-void MainWindow::sclZoomV(double,  double zy, int xc, int yc)
+void MainWindow::sclZoomV(double, double zy, int xc, int yc)
 {
-    sclZoom(1,zy,xc,yc);
+    sclZoom(1, zy, xc, yc);
 }
 
-void MainWindow::sclZoomH(double zx,  double, int xc, int yc)
+void MainWindow::sclZoomH(double zx, double, int xc, int yc)
 {
-    sclZoom(zx,1,xc,yc);
+    sclZoom(zx, 1, xc, yc);
 }
 
 void MainWindow::winZoom(QRect r)
@@ -892,9 +756,9 @@ void MainWindow::winZoom(QRect r)
     //  int y2 = r.bottom();
 
     double xsp, ysp;
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xsp,ysp,xo,yo);
+    GetZoom(xsp, ysp, xo, yo);
 
     int x = x1 + xo;
     int y = y1 + yo;
@@ -902,14 +766,14 @@ void MainWindow::winZoom(QRect r)
     double xa = x / xsp;
     double ya = y / ysp;
 
-    double  ws = seisScrl->width ();
-    double  hs = seisScrl->height();
+    double ws = seisScrl->width();
+    double hs = seisScrl->height();
 
-    double  wr = r.width();
-    double  hr = r.height();
+    double wr = r.width();
+    double hr = r.height();
 
-    double  xz = ws/wr;
-    double  yz = hs/hr;
+    double xz = ws / wr;
+    double yz = hs / hr;
 
     double xs = xsp * xz;
     double ys = ysp * yz;
@@ -920,19 +784,18 @@ void MainWindow::winZoom(QRect r)
     xo = x;
     yo = y;
 
-    SetZoom(xs,ys,xo,yo);
+    SetZoom(xs, ys, xo, yo);
 }
 
-void MainWindow::sclZoom(double zx,  double zy, int xc, int yc)
+void MainWindow::sclZoom(double zx, double zy, int xc, int yc)
 {
     double xs, ys;
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xs,ys,xo,yo);
+    GetZoom(xs, ys, xo, yo);
 
-    SetZoomC(xs*zx,ys*zy,xc,yc);
+    SetZoomC(xs * zx, ys * zy, xc, yc);
 }
-
 
 void MainWindow::ChangeDataDir(QString Dname, QString Find)
 {
@@ -940,20 +803,22 @@ void MainWindow::ChangeDataDir(QString Dname, QString Find)
 
     curDir = Dname;
 
-    find=Find;
+    find = Find;
 
-    QThread* thread = new QThread;
-    DirScanWorker* worker = new DirScanWorker(Dname);
+    QThread *thread = new QThread;
+    DirScanWorker *worker = new DirScanWorker(Dname);
     worker->moveToThread(thread);
-    connect(thread, SIGNAL(started()),          worker, SLOT(process()));
-    connect(worker, SIGNAL(finished()),         thread, SLOT(quit()));
-    connect(worker, SIGNAL(finished()),         worker, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()),         thread, SLOT(deleteLater()));
-    connect(worker, SIGNAL(edir(DirList)),      this,   SLOT(x_dir(DirList)));
-    connect(worker, SIGNAL(eprogr(int,QString)),this,   SLOT(x_progr(int,QString)));
-    connect(worker, SIGNAL(efin(QString)),      this,   SLOT(x_fin(QString)));
+    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(worker, SIGNAL(edir(DirList)), this, SLOT(x_dir(DirList)));
+    connect(worker, SIGNAL(eprogr(int, QString)), this,
+            SLOT(x_progr(int, QString)));
+    connect(worker, SIGNAL(efin(QString)), this, SLOT(x_fin(QString)));
 
-    connect(this,   SIGNAL(stop_dirs()), worker, SLOT(stop()), Qt::DirectConnection);
+    connect(this, SIGNAL(stop_dirs()), worker, SLOT(stop()),
+            Qt::DirectConnection);
 
     thread->start();
 }
@@ -961,194 +826,165 @@ void MainWindow::ChangeDataDir(QString Dname, QString Find)
 void MainWindow::x_dir(DirList dlist)
 {
     FillDirGrid(dlist);
-    ShowProgress("",-1);
+    ShowProgress("", -1);
 }
 
-void MainWindow::x_delay  (int dmin, int dmax)
+void MainWindow::x_delay(int dmin, int dmax)
 {
     qDebug() << dmin << dmax;
-    _dly_min=dmin;
-    _dly_max=dmax;
+    _dly_min = dmin;
+    _dly_max = dmax;
 
     InitSeisView();
 }
 
-void MainWindow::x_progr(int pers, QString mess)
-{
-    ShowProgress(mess,pers);
-}
+void MainWindow::x_progr(int pers, QString mess) { ShowProgress(mess, pers); }
 
-void MainWindow::x_fin(QString mess)
-{
-    ShowProgress(mess,-1);
-}
-
+void MainWindow::x_fin(QString mess) { ShowProgress(mess, -1); }
 
 void MainWindow::ScanLtod()
 {
-/*
-    if(WorkThread)
-    {
-        if(WorkThread->isRunning())
+    /*
+        if(WorkThread)
         {
-            WorkThread->Stop();
-            WorkThread->wait();
+            if(WorkThread->isRunning())
+            {
+                WorkThread->Stop();
+                WorkThread->wait();
+            }
+            delete WorkThread;
         }
-        delete WorkThread;
-    }
 
-    ShowProgress("Scanning LTOD tape image ...", 0);
+        ShowProgress("Scanning LTOD tape image ...", 0);
 
-    LtdScanThread* LtdScaner = new LtdScanThread();
+        LtdScanThread* LtdScaner = new LtdScanThread();
 
-    WorkThread = LtdScaner;
+        WorkThread = LtdScaner;
 
-    LtdScaner->Read(curFileName, this);
-*/
+        LtdScaner->Read(curFileName, this);
+    */
 }
-
 
 void MainWindow::FillDirGrid(QList<DirItem> list)
 {
-    int  ni, nr;
+    int ni, nr;
 
-    dlist=list;
+    dlist = list;
 
     ni = dlist.count();
 
     dirGrid.setRowCount(ni);
 
-    for(nr=0;nr<ni;nr++)
-    {
+    for (nr = 0; nr < ni; nr++) {
         DirItem di = dlist[nr];
 
-        if(di.ftype==0)      //DIR
+        if (di.ftype == 0) // DIR
         {
-            dirGrid.setCell   (nr,0,di.fname);
-            dirGrid.setImgName(nr,0,":/images/Dir.png");
-            //dirGrid.setCell(nr,1,"");
-            dirGrid.setCell(nr,1,"DIR");
-            dirGrid.setTag (nr,0,0);
-        }
-        else if(di.ftype==10) //SeisFile
+            dirGrid.setCell(nr, 0, di.fname);
+            dirGrid.setImgName(nr, 0, ":/images/Dir.png");
+            // dirGrid.setCell(nr,1,"");
+            dirGrid.setCell(nr, 1, "DIR");
+            dirGrid.setTag(nr, 0, 0);
+        } else if (di.ftype == 10) // SeisFile
         {
             int type = di.type;
 
-            if(type)
-            {
+            if (type) {
                 QString fn = di.fname;
-                type       = di.type;
+                type = di.type;
 
-                dirGrid.setTag    (nr,0,1);
-                dirGrid.setTag    (nr,1,type);
+                dirGrid.setTag(nr, 0, 1);
+                dirGrid.setTag(nr, 1, type);
 
                 dirGrid.setCell(nr, 0, fn);
-                //dirGrid.setCell(nr, 1, "");
+                // dirGrid.setCell(nr, 1, "");
 
-                if     (type==1)
-                {
-                    dirGrid.setImgName(nr,0,":/images/segyfile.png");
-                    dirGrid.setCell(nr,1,"SEG-Y");
-                }
-                else if(type==2)
-                {
-                    dirGrid.setImgName(nr,0,":/images/sufile.png");
-                    dirGrid.setCell(nr,1,"SU");
-                }
-                else if(type==3)
-                {
-                    dirGrid.setImgName(nr,0,":/images/cstfile.png");
-                    dirGrid.setCell(nr,1,"CST");
+                if (type == 1) {
+                    dirGrid.setImgName(nr, 0, ":/images/segyfile.png");
+                    dirGrid.setCell(nr, 1, "SEG-Y");
+                } else if (type == 2) {
+                    dirGrid.setImgName(nr, 0, ":/images/sufile.png");
+                    dirGrid.setCell(nr, 1, "SU");
+                } else if (type == 3) {
+                    dirGrid.setImgName(nr, 0, ":/images/cstfile.png");
+                    dirGrid.setCell(nr, 1, "CST");
                 }
             }
         }
-
     }
 
-    int nf=-1;
+    int nf = -1;
 
-    if(find!="")
-    {
-        for(nr=0;nr<ni;nr++)
-        {
-            QString name = dirGrid.Cell(nr,0);
-            if(name==find)
-            {
-                nf=nr;
+    if (find != "") {
+        for (nr = 0; nr < ni; nr++) {
+            QString name = dirGrid.Cell(nr, 0);
+            if (name == find) {
+                nf = nr;
                 break;
             }
         }
 
-        if(nf>=0)
-        {
+        if (nf >= 0) {
             dirGrid.setCurCell(nf);
-        }
-        else
-        {
+        } else {
             return;
         }
     }
 
-    dirGrid.setCurCell(0 );
-//  dirGrid.setCurCell(nf);
+    dirGrid.setCurCell(0);
+    //  dirGrid.setCurCell(nf);
 }
-
 
 void MainWindow::SelectTrace(int it)
 {
-    if(it>=0 && it<seisSrc.Nt())
-    {
-        int trcn = seisSrc.Th(it,0);
+    if (it >= 0 && it < seisSrc.Nt()) {
+        int trcn = seisSrc.Th(it, 0);
 
         char s[2048];
 
-        sprintf(s,"Trace# %d",trcn);
+        sprintf(s, "Trace# %d", trcn);
 
         m_statTrcn->setText(s);
-        ui->InfoTab->setTabText(2,s);
+        ui->InfoTab->setTabText(2, s);
 
-        seisSct.setSLcolor(QColor(0,0,255).rgb());
+        seisSct.setSLcolor(QColor(0, 0, 255).rgb());
         seisSct.setSelTr(it);
 
-        for(int i=0;i<trcHdrGrid.RowCount();i++)
-        {
-            int val = seisSrc.Th(it,i+1);
-            QString v; v.sprintf("%d",val);
+        for (int i = 0; i < trcHdrGrid.RowCount(); i++) {
+            int val = seisSrc.Th(it, i + 1);
+            QString v;
+            v.sprintf("%d", val);
 
-            trcHdrGrid.setCell(i,0,v);
+            trcHdrGrid.setCell(i, 0, v);
         }
 
         trcDatGrid.setRowCount(seisSrc.Ns());
 
-        SeisFile* sf = seisSrc.Sfile();
-        float* smp = sf->Rs(it);
+        SeisFile *sf = seisSrc.Sfile();
+        float *smp = sf->Rs(it);
 
-        if(smp)
-            for(int i=0;i<trcDatGrid.RowCount();i++)
-            {
+        if (smp)
+            for (int i = 0; i < trcDatGrid.RowCount(); i++) {
                 double val = smp[i];
 
-                QString v; v.sprintf("%10.2f",val);
+                QString v;
+                v.sprintf("%10.2f", val);
 
-                trcDatGrid.setCell(i,0,QString::number(i));
-                trcDatGrid.setCell(i,1,QString::number(i*sf->Si()*1000.));
-                trcDatGrid.setCell(i,2,v);
+                trcDatGrid.setCell(i, 0, QString::number(i));
+                trcDatGrid.setCell(i, 1, QString::number(i * sf->Si() * 1000.));
+                trcDatGrid.setCell(i, 2, v);
             }
 
         busy = true;
-//      hdrListDtGrid.setCurCell(it);
-        hdrListDtGrid.setCurRow (it);
+        //      hdrListDtGrid.setCurCell(it);
+        hdrListDtGrid.setCurRow(it);
 
         busy = false;
-
-    }
-    else
-    {
+    } else {
         seisSct.setSelTr(-1);
-        for(int i=0;i<trcHdrGrid.RowCount();i++)
-        {
-            trcHdrGrid.setCell(i,0,"");
-            ui->InfoTab->setTabText(2,"Trace");
+        for (int i = 0; i < trcHdrGrid.RowCount(); i++) {
+            trcHdrGrid.setCell(i, 0, "");
+            ui->InfoTab->setTabText(2, "Trace");
             hdrListDtGrid.setCurCell(-1);
         }
     }
@@ -1156,99 +992,93 @@ void MainWindow::SelectTrace(int it)
     SetTrEdCurVal();
 }
 
-void MainWindow::viewMouseEvent(QMouseEvent* event)
+void MainWindow::viewMouseEvent(QMouseEvent *event)
 {
-    if(event->type() == QEvent::MouseMove)
-    {
-        int x = event->x() - seisView.x();;
+    if (event->type() == QEvent::MouseMove) {
+        int x = event->x() - seisView.x();
+        ;
         int y = event->y() - seisView.y();
 
-        double t  = round(seisSct.pix2y(y)*1000);
+        double t = round(seisSct.pix2y(y) * 1000);
         double it = round(seisSct.pix2x(x));
 
-        m_statTime->setText(Tprintf("Time= %g",t));
+        m_statTime->setText(Tprintf("Time= %g", t));
 
-        if(it>=0 && it<seisSrc.Nt())
-        {
-            int trcn = seisSrc.Th(it,0);
-            m_statTrcn->setText(Tprintf("Trace# %d",trcn));
-        }
-        else
-        {
+        if (it >= 0 && it < seisSrc.Nt()) {
+            int trcn = seisSrc.Th(it, 0);
+            m_statTrcn->setText(Tprintf("Trace# %d", trcn));
+        } else {
             m_statTrcn->setText(Tprintf("Trace# "));
         }
-    }
-    else if(event->type() == QEvent::MouseButtonPress && event->button()== Qt::LeftButton)
-    {
-        int x = event->x() - seisView.x();;
+    } else if (event->type() == QEvent::MouseButtonPress &&
+               event->button() == Qt::LeftButton) {
+        int x = event->x() - seisView.x();
+        ;
 
-        int xa=0;
+        int xa = 0;
         int xb;
-        //int n;
+        // int n;
 
-        xb = xa+seisSct.WidthView();
+        xb = xa + seisSct.WidthView();
 
-        if(x>=xa && x<=xb)
-        {
+        if (x >= xa && x <= xb) {
             int it = round(seisSct.pix2x(x));
 
             SelectTrace(it);
-        }
-        else
-        {
+        } else {
             SelectTrace(-1);
         }
     }
 }
 
-
 void MainWindow::SetHdrDatList()
 {
-    SeisFile* sf = seisSrc.Sfile(); if(!sf) return;
+    SeisFile *sf = seisSrc.Sfile();
+    if (!sf)
+        return;
 
-    TrHdrDef* h;
-    QString   sidx;
-    int       sel = -1;
+    TrHdrDef *h;
+    QString sidx;
+    int sel = -1;
 
-    int i,j;
-    int l=0;
+    int i, j;
+    int l = 0;
 
     sidx = ui->cbSidx->currentText();
 
-    if(sidx=="Trace#") sel=0;
+    if (sidx == "Trace#")
+        sel = 0;
 
     hdrListCk.clear();
     ui->cbSidx->clear();
 
     ui->cbSidx->addItem("Trace#");
 
-    for(i=0;i<hdrListCkGrid.RowCount();i++)
-    {
-        if(hdrListCkGrid.Check(i,0))
-        {
-         l++;
+    for (i = 0; i < hdrListCkGrid.RowCount(); i++) {
+        if (hdrListCkGrid.Check(i, 0)) {
+            l++;
         }
     }
 
-    hdrListDtGrid.setColCount(l+1);
+    hdrListDtGrid.setColCount(l + 1);
 
-    if(sel>=0) ui->cbSidx->setCurrentIndex(sel);
+    if (sel >= 0)
+        ui->cbSidx->setCurrentIndex(sel);
     hdrListDtGrid.setRowCount(sf->Nt());
 
-    for(i=0,j=1;i<hdrListCkGrid.RowCount();i++)
-    {
-        if(hdrListCkGrid.Check(i,0))
-        {
-            h = sf->THdef(i+1);
+    for (i = 0, j = 1; i < hdrListCkGrid.RowCount(); i++) {
+        if (hdrListCkGrid.Check(i, 0)) {
+            h = sf->THdef(i + 1);
 
             QString name = h->name;
 
-            hdrListDtGrid.setColLabel   (j,name);
-            hdrListDtGrid.setColWidth   (j,60);
-            hdrListDtGrid.setColTag     (j,i+1);
+            hdrListDtGrid.setColLabel(j, name);
+            hdrListDtGrid.setColWidth(j, 60);
+            hdrListDtGrid.setColTag(j, i + 1);
             hdrListCk.set(name);
             ui->cbSidx->addItem(name);
-            if(sidx==name) sel=j;
+            if (sidx == name)
+                sel = j;
             j++;
         }
     }
@@ -1256,76 +1086,73 @@ void MainWindow::SetHdrDatList()
 
 void MainWindow::SetHdrDatElst()
 {
-    SeisFile* sf = seisSrc.Sfile(); if(!sf) return;
+    SeisFile *sf = seisSrc.Sfile();
+    if (!sf)
+        return;
 
-    TrHdrDef* h;
-    QString   sidx;
-//  int       sel = -1;
+    TrHdrDef *h;
+    QString sidx;
+    //  int       sel = -1;
 
-    int i,j;
-    int l=0;
+    int i, j;
+    int l = 0;
 
-//  sidx = ui->cbSidx->currentText();
+    //  sidx = ui->cbSidx->currentText();
 
-//  if(sidx=="Trace#") sel=0;
+    //  if(sidx=="Trace#") sel=0;
 
     hdrElstCk.clear();
-//  ui->cbSidx->clear();
+    //  ui->cbSidx->clear();
 
-//  ui->cbSidx->addItem("Trace#");
+    //  ui->cbSidx->addItem("Trace#");
 
-    for(i=0;i<hdrElstCkGrid.RowCount();i++)
-    {
-        if(hdrElstCkGrid.Check(i,0))
-        {
-         l++;
+    for (i = 0; i < hdrElstCkGrid.RowCount(); i++) {
+        if (hdrElstCkGrid.Check(i, 0)) {
+            l++;
         }
     }
 
-    hdrElstDtGrid.setColCount(l*2+1);
+    hdrElstDtGrid.setColCount(l * 2 + 1);
 
-    //if(sel>=0) ui->cbSidx->setCurrentIndex(sel);
+    // if(sel>=0) ui->cbSidx->setCurrentIndex(sel);
     hdrElstDtGrid.setRowCount(sf->Nt());
 
-    for(i=0,j=1;i<hdrElstCkGrid.RowCount();i++)
-    {
-        if(hdrElstCkGrid.Check(i,0))
-        {
-            h = sf->THdef(i+1);
+    for (i = 0, j = 1; i < hdrElstCkGrid.RowCount(); i++) {
+        if (hdrElstCkGrid.Check(i, 0)) {
+            h = sf->THdef(i + 1);
 
             QString name = h->name;
 
-            hdrElstDtGrid.setColLabel   (j,name);
-            hdrElstDtGrid.setColWidth   (j,60);
-            hdrElstDtGrid.setColTag     (j,i+1);
+            hdrElstDtGrid.setColLabel(j, name);
+            hdrElstDtGrid.setColWidth(j, 60);
+            hdrElstDtGrid.setColTag(j, i + 1);
             hdrElstCk.set(name);
-//          ui->cbSidx->addItem(name);
-//          if(sidx==name) sel=j;
+            //          ui->cbSidx->addItem(name);
+            //          if(sidx==name) sel=j;
             j++;
 
             QString e = "";
-//          if(exprList.contains(name)) e=exprList[name].ExprString();
-            if(exprList.contains(name)) e=exprList[name].ExprString();
+            //          if(exprList.contains(name))
+            //          e=exprList[name].ExprString();
+            if (exprList.contains(name))
+                e = exprList[name].ExprString();
 
-            hdrElstDtGrid.setColLabel   (j,e);
-            hdrElstDtGrid.setColWidth   (j,60);
-            hdrElstDtGrid.setColTag     (j,i+1);
+            hdrElstDtGrid.setColLabel(j, e);
+            hdrElstDtGrid.setColWidth(j, 60);
+            hdrElstDtGrid.setColTag(j, i + 1);
             j++;
         }
     }
 
-//  if(sel>=0) ui->cbSidx->setCurrentIndex(sel);
-//  hdrElstDtGrid.setRowCount(sf->Nt());
-
+    //  if(sel>=0) ui->cbSidx->setCurrentIndex(sel);
+    //  hdrElstDtGrid.setRowCount(sf->Nt());
 }
-
 
 void MainWindow::hdrListCkEvent(int row, int mode)
 {
     Q_UNUSED(row);
 
-    if(mode!=4)
-    {
+    if (mode != 4) {
         return;
     }
 
@@ -1336,109 +1163,89 @@ void MainWindow::hdrElstCkEvent(int row, int mode)
 {
     Q_UNUSED(row);
 
-    if(mode!=4)
-    {
+    if (mode != 4) {
         return;
     }
 
     SetHdrDatElst();
 }
 
-
-
-
 void MainWindow::hdrListDtGridEvent(qint64 row, int mode)
 {
-    if(mode==1)
-    {
-        if(busy) return;
+    if (mode == 1) {
+        if (busy)
+            return;
 
         SelectTrace(row);
 
-        int x  = seisSct.x2fpix(row);
+        int x = seisSct.x2fpix(row);
 
         double xs, ys;
-        int    xo, yo;
+        int xo, yo;
 
-        GetZoom(xs,ys,xo,yo);
+        GetZoom(xs, ys, xo, yo);
 
-        double  ws = seisScrl->width () /2;
+        double ws = seisScrl->width() / 2;
 
-        SetZoom(xs,ys,x-ws, yo);
+        SetZoom(xs, ys, x - ws, yo);
     }
 }
 
-
 void MainWindow::dirGridEvent(int row, int mode)
 {
-    QString   name = dirGrid.Cell(row,0);
-    int       tag  = dirGrid.Tag (row,0);
-    int       frm  = dirGrid.Tag (row,1);
+    QString name = dirGrid.Cell(row, 0);
+    int tag = dirGrid.Tag(row, 0);
+    int frm = dirGrid.Tag(row, 1);
 
     m_statTime->setText("Time=");
-    //m_statAmp ->setText("Amp="  );
+    // m_statAmp ->setText("Amp="  );
 
-    if(mode==2)
-    {
-        //m_statFfid ->setText("FFID="  );
-        //m_statSp   ->setText("SP="  );
+    if (mode == 2) {
+        // m_statFfid ->setText("FFID="  );
+        // m_statSp   ->setText("SP="  );
 
-        curFn   = "";
+        curFn = "";
 
         setWindowTitle("");
-        if(tag==0)
-        {
-            if(name=="..")
-            {
+        if (tag == 0) {
+            if (name == "..") {
                 QDir dir(curDir);
 
                 QString name = dir.dirName();
 
                 dir.cdUp();
 
-                QString  dirname=dir.absolutePath();
+                QString dirname = dir.absolutePath();
 
                 ChangeDataDir(dirname, name);
-            }
-            else if(name==".")
-            {
+            } else if (name == ".") {
                 QDir dir(curDir);
 
                 QString name = QFileInfo(curFileName).fileName();
 
-                QString  dirname=dir.absolutePath();
+                QString dirname = dir.absolutePath();
 
                 ChangeDataDir(dirname, name);
+            } else {
+                ChangeDataDir(curDir + "/" + name);
             }
-            else
-            {
-                ChangeDataDir(curDir+"/"+name);
-            }
+        } else if (tag == 2) {
+            // curFileName = curDir+"/"+name;
+            // ScanLtod();
         }
-        else if(tag==2)
-        {
-            //curFileName = curDir+"/"+name;
-            //ScanLtod();
-        }
-    }
-    else if(mode==1 && tag==1)
-    {
+    } else if (mode == 1 && tag == 1) {
         setWindowTitle("");
-        curFileName = curDir+"/"+name;
+        curFileName = curDir + "/" + name;
 
         OpenSeisFile(frm);
-    }
-    else if(mode==1 && tag==3 && frm>0)
-    {
+    } else if (mode == 1 && tag == 3 && frm > 0) {
         setWindowTitle("");
-        //ReadSegdInLtod(row);
-    }
-    else if(mode==1)
-    {
-        //m_statFfid ->setText("FFID="  );
-        //m_statSp   ->setText("SP="  );
+        // ReadSegdInLtod(row);
+    } else if (mode == 1) {
+        // m_statFfid ->setText("FFID="  );
+        // m_statSp   ->setText("SP="  );
 
-        curFn   = "";
+        curFn = "";
 
         setWindowTitle(QString("Dir: ") + curDir);
 
@@ -1446,25 +1253,24 @@ void MainWindow::dirGridEvent(int row, int mode)
     }
 }
 
-
-void MainWindow::xprint (QPlainTextEdit* edit, QString str)
+void MainWindow::xprint(QPlainTextEdit *edit, QString str)
 {
-    edit->moveCursor (QTextCursor::End);
+    edit->moveCursor(QTextCursor::End);
     edit->insertPlainText(str);
-    edit->moveCursor (QTextCursor::End);
+    edit->moveCursor(QTextCursor::End);
 }
 
-int MainWindow::xprintf(QPlainTextEdit* edit, const char *fmt,  ...)
+int MainWindow::xprintf(QPlainTextEdit *edit, const char *fmt, ...)
 {
     char buffer[2048];
     va_list argptr;
     int cnt;
 
     va_start(argptr, fmt);
-    cnt = vsnprintf(buffer,2047, fmt, argptr);
+    cnt = vsnprintf(buffer, 2047, fmt, argptr);
     va_end(argptr);
 
-    xprint(edit,buffer);
+    xprint(edit, buffer);
 
     return cnt;
 }
@@ -1477,27 +1283,24 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::ShowProgress(QString mes, int pers)
 {
-    if(pers<0)
-    {
+    if (pers < 0) {
         progressBar->setValue(0);
-        //progressBar->setVisible(false);
+        // progressBar->setVisible(false);
         m_statMess->setStyleSheet("");
         m_statMess->setText(mes);
-    }
-    else
-    {
+    } else {
         progressBar->setValue(pers);
-        //if(!progressBar->isVisible()) progressBar->setVisible(true);
+        // if(!progressBar->isVisible()) progressBar->setVisible(true);
 
-        if(mes!="")
-            m_statMess->setStyleSheet("QLabel { background-color : lime; color : black; }");
+        if (mes != "")
+            m_statMess->setStyleSheet(
+                "QLabel { background-color : lime; color : black; }");
         else
             m_statMess->setStyleSheet("");
 
         m_statMess->setText(mes);
     }
 }
-
 
 int MainWindow::checkBinHdrChange()
 {
@@ -1507,10 +1310,9 @@ int MainWindow::checkBinHdrChange()
     //  1 - changed
 
     int nr = binHdrGrid.RowCount();
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if(sf==NULL || !sf->Active() || nr<1)
-    {
+    if (sf == NULL || !sf->Active() || nr < 1) {
         ui->btnBinRst->hide();
         ui->btnBinUpd->hide();
         return 0;
@@ -1522,21 +1324,18 @@ int MainWindow::checkBinHdrChange()
 
     QVector<QString> vals;
 
-    for(n=0;n<nr;n++)
-    {
-        QString s = binHdrGrid.Cell(n,0); vals.append(s);
+    for (n = 0; n < nr; n++) {
+        QString s = binHdrGrid.Cell(n, 0);
+        vals.append(s);
     }
 
     changed = sf->binHed()->check(vals);
 
-    if(changed==1)
-    {
-      ui->btnBinRst->show();
-      ui->btnBinUpd->show();
-      dirGrid.setEnabled(false);
-    }
-    else
-    {
+    if (changed == 1) {
+        ui->btnBinRst->show();
+        ui->btnBinUpd->show();
+        dirGrid.setEnabled(false);
+    } else {
         ui->btnBinRst->hide();
         ui->btnBinUpd->hide();
         dirGrid.setEnabled(true);
@@ -1547,10 +1346,9 @@ int MainWindow::checkBinHdrChange()
 
 void MainWindow::FillBinHdrGrid()
 {
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if(sf==NULL || !sf->Active())
-    {
+    if (sf == NULL || !sf->Active()) {
         binHdrGrid.setRowCount(0);
         return;
     }
@@ -1561,26 +1359,19 @@ void MainWindow::FillBinHdrGrid()
 
     binHdrGrid.setRowCount(sf->binHed()->count());
 
-    for(n=0;n<sf->binHed()->count();n++)
-    {
-        binHdrGrid.setCell(n,0,sf->binHed()->sval(n)); //->binHed->sval(n));
-        binHdrGrid.setCell(n,1,sf->binHed()->name(n));
-        binHdrGrid.setCell(n,2,sf->binHed()->bstr(n));
+    for (n = 0; n < sf->binHed()->count(); n++) {
+        binHdrGrid.setCell(n, 0, sf->binHed()->sval(n)); //->binHed->sval(n));
+        binHdrGrid.setCell(n, 1, sf->binHed()->name(n));
+        binHdrGrid.setCell(n, 2, sf->binHed()->bstr(n));
 
-        if(sf->binHed()->edit(n))
-        {
-            binHdrGrid.setCellEdit(n,0,true);
-        }
-        else
-        {
-            if(ui->ckTrEd->isChecked())
-            {
-                binHdrGrid.setCellColor(n,0,Qt::red);
-                binHdrGrid.setCellEdit(n,0,true);
-            }
-            else
-            {
-                binHdrGrid.setCellColor(n,0,Qt::lightGray);
+        if (sf->binHed()->edit(n)) {
+            binHdrGrid.setCellEdit(n, 0, true);
+        } else {
+            if (ui->ckTrEd->isChecked()) {
+                binHdrGrid.setCellColor(n, 0, Qt::red);
+                binHdrGrid.setCellEdit(n, 0, true);
+            } else {
+                binHdrGrid.setCellColor(n, 0, Qt::lightGray);
             }
         }
     }
@@ -1591,32 +1382,35 @@ int MainWindow::ScanDelay()
 {
     emit stop_dlys();
 
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    _dly_min=0;
-    _dly_max=0;
+    _dly_min = 0;
+    _dly_max = 0;
 
-    if(!sf) return 0;
+    if (!sf)
+        return 0;
 
-    if(sf->ThIdx("DELRECT")<0) return 0;
+    if (sf->ThIdx("DELRECT") < 0)
+        return 0;
 
-    QThread* thread = new QThread;
-    DelayScanWorker* worker = new DelayScanWorker(sf);
+    QThread *thread = new QThread;
+    DelayScanWorker *worker = new DelayScanWorker(sf);
     worker->moveToThread(thread);
-    connect(thread, SIGNAL(started()),          worker, SLOT(process()));
-    connect(worker, SIGNAL(finished()),         thread, SLOT(quit()));
-    connect(worker, SIGNAL(finished()),         worker, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()),         thread, SLOT(deleteLater()));
-    connect(worker, SIGNAL(edelay(int, int)),   this,   SLOT(x_delay(int,int)));
-    connect(worker, SIGNAL(eprogr(int,QString)),this,   SLOT(x_progr(int,QString)));
-    connect(worker, SIGNAL(efin(QString)),      this,   SLOT(x_fin(QString)));
-    connect(this,   SIGNAL(stop_dlys()), worker, SLOT(stop()), Qt::DirectConnection);
+    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(worker, SIGNAL(edelay(int, int)), this, SLOT(x_delay(int, int)));
+    connect(worker, SIGNAL(eprogr(int, QString)), this,
+            SLOT(x_progr(int, QString)));
+    connect(worker, SIGNAL(efin(QString)), this, SLOT(x_fin(QString)));
+    connect(this, SIGNAL(stop_dlys()), worker, SLOT(stop()),
+            Qt::DirectConnection);
 
-     thread->start();
+    thread->start();
 
     return 0;
 }
-
 
 int MainWindow::OpenSeisFile(int frm)
 {
@@ -1626,94 +1420,83 @@ int MainWindow::OpenSeisFile(int frm)
 
     ClrUndoE();
 
-    n=ui->InfoTab->currentIndex();
+    n = ui->InfoTab->currentIndex();
 
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
     seisSrc.setSfile(NULL);
 
-    if(sf) delete sf;
+    if (sf)
+        delete sf;
 
-    if(frm==1)
-    {
+    if (frm == 1) {
         sf = new SgyFile(this);
-        ui->InfoTab->setTabEnabled(1,true);
-    }
-    else if(frm==2)
-    {
+        ui->InfoTab->setTabEnabled(1, true);
+    } else if (frm == 2) {
         sf = new SuFile(this);
-        if(n==1) ui->InfoTab->setCurrentIndex(0);
-        ui->InfoTab->setTabEnabled(1,false);
-    }
-    else if(frm==3)
-    {
-        if(n==1) ui->InfoTab->setCurrentIndex(0);
+        if (n == 1)
+            ui->InfoTab->setCurrentIndex(0);
+        ui->InfoTab->setTabEnabled(1, false);
+    } else if (frm == 3) {
+        if (n == 1)
+            ui->InfoTab->setCurrentIndex(0);
         sf = new CstFile(this);
-        ui->InfoTab->setTabEnabled(1,false);
+        ui->InfoTab->setTabEnabled(1, false);
     }
 
-    connect(
-                sf,
-                SIGNAL(execProc(SeisFile*, int, double, float*)),
-                this,
-                SLOT  (execProc(SeisFile*, int, double, float*)),
-                 Qt::DirectConnection
-                );
+    connect(sf, SIGNAL(execProc(SeisFile *, int, double, float *)), this,
+            SLOT(execProc(SeisFile *, int, double, float *)),
+            Qt::DirectConnection);
 
     sf->setFname(curFileName);
     sf->setActive(true);
     ui->InfoTxt->clear();
 
-    xprintf(ui->InfoTxt,"Summary Information\n");
-    xprintf(ui->InfoTxt,"------------------------------\n");
-    xprintf(ui->InfoTxt,"File name:\n%s\n",q2s(curFileName));
+    xprintf(ui->InfoTxt, "Summary Information\n");
+    xprintf(ui->InfoTxt, "------------------------------\n");
+    xprintf(ui->InfoTxt, "File name:\n%s\n", q2s(curFileName));
 
     setWindowTitle(curFileName);
 
-    if(frm==1)
-    {
-        xprintf(ui->InfoTxt,"File type: SEG-Y\n\n");
+    if (frm == 1) {
+        xprintf(ui->InfoTxt, "File type: SEG-Y\n\n");
 
-        if(sf->TxtCode()==1)
-            xprintf(ui->InfoTxt,"Text header encoding: EBCDIC\n");
+        if (sf->TxtCode() == 1)
+            xprintf(ui->InfoTxt, "Text header encoding: EBCDIC\n");
         else
-            xprintf(ui->InfoTxt,"Text header encoding: ASCII\n");
+            xprintf(ui->InfoTxt, "Text header encoding: ASCII\n");
 
         hdrListCk.setListIdx(1);
         hdrAxisCk.setListIdx(1);
         TraceHdrsSet.setListIdx(1);
-
-    }
-    else if(frm==2)
-    {
-        xprintf(ui->InfoTxt,"File type: SU\n");
+    } else if (frm == 2) {
+        xprintf(ui->InfoTxt, "File type: SU\n");
         hdrListCk.setListIdx(1);
         hdrAxisCk.setListIdx(1);
         TraceHdrsSet.setListIdx(1);
-    }
-    else if(frm==3)
-    {
-        xprintf(ui->InfoTxt,"File type: CST\n");
+    } else if (frm == 3) {
+        xprintf(ui->InfoTxt, "File type: CST\n");
         hdrListCk.setListIdx(2);
         hdrAxisCk.setListIdx(2);
         TraceHdrsSet.setListIdx(2);
-        //ui->BinHdrTab->hide();
+        // ui->BinHdrTab->hide();
     }
 
-    if(sf->Swap()==1)
-        xprintf(ui->InfoTxt,"Byte order: Big endian\n");
+    if (sf->Swap() == 1)
+        xprintf(ui->InfoTxt, "Byte order: Big endian\n");
     else
-        xprintf(ui->InfoTxt,"Byte order: Little endian\n");
+        xprintf(ui->InfoTxt, "Byte order: Little endian\n");
 
-    xprintf(ui->InfoTxt,"\n");
-    xprintf(ui->InfoTxt,"# Traces            : %d\n", sf->Nt());
-    xprintf(ui->InfoTxt,"# Samples           : %d\n\n", sf->Ns());
-    xprintf(ui->InfoTxt,"Sample Format       : %d", sf->Format());
-    xprint (ui->InfoTxt," - " + sf->FormatName() + "\n");
-    xprintf(ui->InfoTxt,"Sample Interval (μs): %d\n", int(sf->Si()*1000000));
+    xprintf(ui->InfoTxt, "\n");
+    xprintf(ui->InfoTxt, "# Traces            : %d\n", sf->Nt());
+    xprintf(ui->InfoTxt, "# Samples           : %d\n\n", sf->Ns());
+    xprintf(ui->InfoTxt, "Sample Format       : %d", sf->Format());
+    xprint(ui->InfoTxt, " - " + sf->FormatName() + "\n");
+    xprintf(ui->InfoTxt, "Sample Interval (μs): %d\n", int(sf->Si() * 1000000));
 
-    if(sf->Jnk())
-        xprintf(ui->InfoTxt,"\nWarning: %d junk bytes at the end of file", sf->Jnk());
+    if (sf->Jnk())
+        xprintf(ui->InfoTxt, "\nWarning: %d junk bytes at the end of file",
+                sf->Jnk());
 
     ui->TxtHdrEdit->clear();
     ui->TxtHdrEdit->insertPlainText(sf->TxtHed());
@@ -1722,19 +1505,18 @@ int MainWindow::OpenSeisFile(int frm)
     checkBinHdrChange();
 
     QTextCursor tmpCursor = ui->TxtHdrEdit->textCursor();
-    tmpCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor,1);
+    tmpCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
     ui->TxtHdrEdit->setTextCursor(tmpCursor);
     on_TxtHdrEdit_cursorPositionChanged();
 
-    ui->InfoTab->setTabText(2,"Trace");
+    ui->InfoTab->setTabText(2, "Trace");
 
     seisSrc.setSfile(sf);
 
-    _dly_min=0;
-    _dly_max=0;
+    _dly_min = 0;
+    _dly_max = 0;
 
-    if(ui->ckDly->isChecked() && sf->ThIdx("DELRECT")>=0)
-    {
+    if (ui->ckDly->isChecked() && sf->ThIdx("DELRECT") >= 0) {
         ScanDelay();
 
         return 0;
@@ -1745,17 +1527,13 @@ int MainWindow::OpenSeisFile(int frm)
     return 0;
 }
 
-
 int MainWindow::InitSeisView()
 {
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if(ui->ckDly->isChecked())
-    {
+    if (ui->ckDly->isChecked()) {
         sf->setDly(1);
-    }
-    else
-    {
+    } else {
         sf->setDly(0);
     }
 
@@ -1772,32 +1550,29 @@ int MainWindow::InitSeisView()
 
     hdrsAxis.setHdrList(hdrAxisCk.List());
     hdrsBottomAxis.setHdrList(hdrAxisCk.List());
-    hdrsLab. setHdrList(hdrAxisCk.List());
+    hdrsLab.setHdrList(hdrAxisCk.List());
 
-    if(ui->rbDirRev->isChecked())
-    {
-        seisSct. setX1(sf->Nt());
-        seisSct. setX2(-1);
+    if (ui->rbDirRev->isChecked()) {
+        seisSct.setX1(sf->Nt());
+        seisSct.setX2(-1);
         hdrsAxis.setX1(sf->Nt());
         hdrsAxis.setX2(-1);
         hdrsBottomAxis.setX1(sf->Nt());
         hdrsBottomAxis.setX2(-1);
-    }
-    else
-    {
-        seisSct. setX1(-1);
-        seisSct. setX2(sf->Nt());
+    } else {
+        seisSct.setX1(-1);
+        seisSct.setX2(sf->Nt());
         hdrsAxis.setX1(-1);
         hdrsAxis.setX2(sf->Nt());
         hdrsBottomAxis.setX1(-1);
         hdrsBottomAxis.setX2(sf->Nt());
     }
 
-    double tmin = sf->Tmin()+_dly_min/1000.;
-    double tmax = sf->Tmax()+_dly_max/1000.;
+    double tmin = sf->Tmin() + _dly_min / 1000.;
+    double tmax = sf->Tmax() + _dly_max / 1000.;
 
-    seisSct. setY1(tmin);
-    seisSct. setY2(tmax); // !!!
+    seisSct.setY1(tmin);
+    seisSct.setY2(tmax); // !!!
     timeAxis.setY1(tmin);
     timeAxis.setY2(tmax); // !!!
     timeRightAxis.setY1(tmin);
@@ -1823,16 +1598,14 @@ void MainWindow::Clear()
     ui->TxtHdrEdit->clear();
 }
 
-
 int MainWindow::allSectWidth()
 {
-    double w=0;
+    double w = 0;
 
-    w = seisSct.WidthPix()+1;
+    w = seisSct.WidthPix() + 1;
 
     return w;
 }
-
 
 void MainWindow::ArrangeSections()
 {
@@ -1845,7 +1618,7 @@ void MainWindow::ArrangeSections()
     timeRightView.setFixedHeight(axisHeight);
     timeView.setFixedHeight(axisHeight);
 
-    int nh=hdrAxisCk.List().count();
+    int nh = hdrAxisCk.List().count();
 
     // QFont headerFont;
     // headerFont.setPixelSize(11);
@@ -1858,20 +1631,20 @@ void MainWindow::ArrangeSections()
 
     int h = nh * (ht + 2) + 12;
 
-    hdrsScrl->setFixedHeight  (h);//(nh+1)*13);
+    hdrsScrl->setFixedHeight(h); //(nh+1)*13);
     hdrsBottomScrl->setFixedHeight(h);
     hdrsView.setFixedHeight(h);
     hdrsBottomView.setFixedHeight(h);
-    hlabView. setFixedHeight  (h);//(nh+1)*13);
+    hlabView.setFixedHeight(h); //(nh+1)*13);
 
-    double x=0;
-    double w=0;
+    double x = 0;
+    double w = 0;
 
-    seisSct. setXo(x);
+    seisSct.setXo(x);
     hdrsAxis.setXo(x);
     hdrsBottomAxis.setXo(x);
-    x += (seisSct.X2()-seisSct.X1());
-    w += seisSct.WidthView()+1;
+    x += (seisSct.X2() - seisSct.X1());
+    w += seisSct.WidthView() + 1;
 
     seisView.setFixedWidth(w);
     int axisWidth = qMax(static_cast<int>(w), seisScrl->viewport()->width());
@@ -1890,12 +1663,15 @@ void MainWindow::ArrangeSections()
 
 void MainWindow::fitAxesToViewport()
 {
-    if(!ui || !ui->seisFrame->isVisible()) return;
+    if (!ui || !ui->seisFrame->isVisible())
+        return;
 
-    if(ui->seisFrame->layout()) ui->seisFrame->layout()->activate();
+    if (ui->seisFrame->layout())
+        ui->seisFrame->layout()->activate();
 
-    int axisHeight = qMax(timeAxis.HeightView(), seisScrl->viewport()->height());
-    int axisWidth = qMax(static_cast<int>(seisSct.WidthView()+1),
+    int axisHeight =
+        qMax(timeAxis.HeightView(), seisScrl->viewport()->height());
+    int axisWidth = qMax(static_cast<int>(seisSct.WidthView() + 1),
                          seisScrl->viewport()->width());
 
     timeView.setFixedHeight(axisHeight);
@@ -1904,15 +1680,16 @@ void MainWindow::fitAxesToViewport()
     hdrsBottomView.setFixedWidth(axisWidth);
 }
 
-void MainWindow::resizeEvent(QResizeEvent* event)
+void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-    if(ui && ui->seisFrame->isVisible()) ArrangeSections();
+    if (ui && ui->seisFrame->isVisible())
+        ArrangeSections();
 }
 
 void MainWindow::syncHorizontalAxisScrollBar(int minimum, int maximum)
 {
-    QScrollBar* source = seisScrl->horizontalScrollBar();
+    QScrollBar *source = seisScrl->horizontalScrollBar();
     QSignalBlocker blocker(horizontalAxisScrollBar);
     bool shouldShow = maximum > minimum;
     bool visibilityChanged = horizontalAxisScrollBar->isHidden() == shouldShow;
@@ -1923,13 +1700,13 @@ void MainWindow::syncHorizontalAxisScrollBar(int minimum, int maximum)
     horizontalAxisScrollBar->setValue(source->value());
     horizontalAxisScrollBar->setVisible(shouldShow);
 
-    if(visibilityChanged)
+    if (visibilityChanged)
         QTimer::singleShot(0, this, SLOT(fitAxesToViewport()));
 }
 
 void MainWindow::syncVerticalAxisScrollBar(int minimum, int maximum)
 {
-    QScrollBar* source = seisScrl->verticalScrollBar();
+    QScrollBar *source = seisScrl->verticalScrollBar();
     QSignalBlocker blocker(verticalAxisScrollBar);
     bool shouldShow = maximum > minimum;
     bool visibilityChanged = verticalAxisScrollBar->isHidden() == shouldShow;
@@ -1940,22 +1717,20 @@ void MainWindow::syncVerticalAxisScrollBar(int minimum, int maximum)
     verticalAxisScrollBar->setValue(source->value());
     verticalAxisScrollBar->setVisible(shouldShow);
 
-    if(visibilityChanged)
+    if (visibilityChanged)
         QTimer::singleShot(0, this, SLOT(fitAxesToViewport()));
 }
 
-
 void MainWindow::ResetSrc()
 {
-//    int n;
-  if(seisSrc.Sfile())
+    //    int n;
+    if (seisSrc.Sfile())
         seisSrc.Sfile()->Reset();
 }
 
-
 void MainWindow::on_ckAgc_toggled(bool checked)
 {
-    if(checked && ui->ckNorm->isChecked())
+    if (checked && ui->ckNorm->isChecked())
         ui->ckNorm->setChecked(false);
 
     ResetSrc();
@@ -1963,228 +1738,209 @@ void MainWindow::on_ckAgc_toggled(bool checked)
 
 void MainWindow::on_ckNorm_toggled(bool checked)
 {
-    if(checked && ui->ckAgc->isChecked())
+    if (checked && ui->ckAgc->isChecked())
         ui->ckAgc->setChecked(false);
 
     ResetSrc();
 }
 
-void MainWindow::on_ckFilt_toggled(bool)
-{
-    ResetSrc();
-}
+void MainWindow::on_ckFilt_toggled(bool) { ResetSrc(); }
 
 void MainWindow::on_ckWiggle_toggled(bool checked)
 {
     seisSct.setDispWig(checked);
 }
 
-
 void MainWindow::on_ckGray_toggled(bool checked)
 {
-    if(checked && ui->ckColor->isChecked())
+    if (checked && ui->ckColor->isChecked())
         ui->ckColor->setChecked(false);
 
     seisSct.setDispCol(checked);
 
     QList<QRgb> grpal;
 
-    if(ui->ckColor->isChecked()) seisSct.setPal(rgb);
-    else                         seisSct.setPal(grpal);
+    if (ui->ckColor->isChecked())
+        seisSct.setPal(rgb);
+    else
+        seisSct.setPal(grpal);
 }
 
 void MainWindow::on_ckColor_toggled(bool checked)
 {
-    if(checked && ui->ckGray->isChecked())
+    if (checked && ui->ckGray->isChecked())
         ui->ckGray->setChecked(false);
 
     seisSct.setDispCol(checked);
 
     QList<QRgb> grpal;
 
-    double   v[3] = {-1,0,1};
-    QRgb     c[3];
-    QList<QRgb>    pal;
+    double v[3] = {-1, 0, 1};
+    QRgb c[3];
+    QList<QRgb> pal;
 
-    c[0]=QColor( 255,   0,    0).rgb();
-    c[1]=QColor( 255, 255,  255).rgb();
-    c[2]=QColor(   0,   0,  255).rgb();
+    c[0] = QColor(255, 0, 0).rgb();
+    c[1] = QColor(255, 255, 255).rgb();
+    c[2] = QColor(0, 0, 255).rgb();
 
-    pal = CreatePalette24 (c, v, -1, 1, 3);
+    pal = CreatePalette24(c, v, -1, 1, 3);
 
-    if(ui->ckColor->isChecked()) seisSct.setPal(pal);
-    else                         seisSct.setPal(grpal);
-
+    if (ui->ckColor->isChecked())
+        seisSct.setPal(pal);
+    else
+        seisSct.setPal(grpal);
 }
 
 void MainWindow::on_rbNon_toggled(bool checked)
 {
-    if(checked)
+    if (checked)
         seisSct.setWFill(0);
 }
 
-
 void MainWindow::on_rbPos_toggled(bool checked)
 {
-    if(checked)
+    if (checked)
         seisSct.setWFill(1);
 }
 
-
 void MainWindow::on_rbNeg_toggled(bool checked)
 {
-    if(checked)
+    if (checked)
         seisSct.setWFill(-1);
 }
 
 void MainWindow::FillEdits()
 {
-    ui->edTr->setText(Tprintf("%g",10/seisView.Xs()));
-    ui->edTm->setText(Tprintf("%g",seisView.Ys()));
-    ui->edGn->setText(Tprintf("%g",seisSct.Gw ()));
+    ui->edTr->setText(Tprintf("%g", 10 / seisView.Xs()));
+    ui->edTm->setText(Tprintf("%g", seisView.Ys()));
+    ui->edGn->setText(Tprintf("%g", seisSct.Gw()));
 }
 
 void MainWindow::FillControls()
 {
     ui->ckWiggle->setChecked(seisSct.DispWig());
-    ui->ckColor->setChecked (seisSct.DispCol());
+    ui->ckColor->setChecked(seisSct.DispCol());
 
-    if(seisSct.DispCol())
-    {
-        if(seisSct.Pal())
-        {
-            ui->ckGray ->setChecked (false);
-            ui->ckColor->setChecked (true );
+    if (seisSct.DispCol()) {
+        if (seisSct.Pal()) {
+            ui->ckGray->setChecked(false);
+            ui->ckColor->setChecked(true);
+        } else {
+            ui->ckGray->setChecked(true);
+            ui->ckColor->setChecked(false);
         }
-        else
-        {
-            ui->ckGray ->setChecked (true);
-            ui->ckColor->setChecked (false);
-        }
-    }
-    else
-    {
-        ui->ckGray ->setChecked (false);
-        ui->ckColor->setChecked (false);
+    } else {
+        ui->ckGray->setChecked(false);
+        ui->ckColor->setChecked(false);
     }
 
     int v = seisSct.WFill();
 
     ui->rbNeg->setChecked((v == -1));
-    ui->rbNon->setChecked((v ==  0));
-    ui->rbPos->setChecked((v ==  1));
+    ui->rbNon->setChecked((v == 0));
+    ui->rbPos->setChecked((v == 1));
 
     ui->ckTimLines->setChecked(seisSct.Tl());
 }
 
-
-
 void MainWindow::GetRegInfo()
 {
-    QSettings settings("PSI","SeiSeeMp");
+    QSettings settings("PSI", "SeiSeeMp");
 
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    restoreState   (settings.value("mainWindowState").   toByteArray());
+    restoreState(settings.value("mainWindowState").toByteArray());
 
-    QString dir=settings.value("DataDir").toString();
+    QString dir = settings.value("DataDir").toString();
     ChangeDataDir(dir);
 
-    txtHdrDir=settings.value("TxtHdrDir").toString();
-    savDir   =settings.value("SaveDir"  ).toString();
+    txtHdrDir = settings.value("TxtHdrDir").toString();
+    savDir = settings.value("SaveDir").toString();
 
-    int  color_mode = settings.value("DispCol",1).toInt();
-    bool wigle_mode = settings.value("DispWig",false).toBool();
+    int color_mode = settings.value("DispCol", 1).toInt();
+    bool wigle_mode = settings.value("DispWig", false).toBool();
 
     QList<QRgb> grpal;
 
-    if(color_mode)
-    {
+    if (color_mode) {
         seisSct.setDispCol(true);
 
-        if(color_mode==1) seisSct.setPal(grpal);
-        else              seisSct.setPal(rgb);
-    }
-    else
-    {
-        if(!wigle_mode)
-        {
+        if (color_mode == 1)
+            seisSct.setPal(grpal);
+        else
+            seisSct.setPal(rgb);
+    } else {
+        if (!wigle_mode) {
             seisSct.setDispCol(true);
             seisSct.setPal(grpal);
-        }
-        else
-        {
+        } else {
             seisSct.setDispCol(false);
         }
     }
 
     seisSct.setDispWig(wigle_mode);
 
-    seisSct.setWFill(settings.value("WFill",-1).toInt());
+    seisSct.setWFill(settings.value("WFill", -1).toInt());
 
-    seisSct.setGc(settings.value("Gc",1).toDouble());
-    seisSct.setGw(settings.value("Gw",1).toDouble());
+    seisSct.setGc(settings.value("Gc", 1).toDouble());
+    seisSct.setGw(settings.value("Gw", 1).toDouble());
 
-    ui->ckFilt->setChecked(settings.value("Filt",false).toBool());
-    ui->ckAgc ->setChecked(settings.value("Agc" ,false).toBool());
-    ui->ckNorm->setChecked(settings.value("Norm",true ).toBool());
+    ui->ckFilt->setChecked(settings.value("Filt", false).toBool());
+    ui->ckAgc->setChecked(settings.value("Agc", false).toBool());
+    ui->ckNorm->setChecked(settings.value("Norm", true).toBool());
 
-    if(ui->ckNorm->isChecked() && ui->ckAgc->isChecked() ) ui->ckAgc->setChecked(false);
+    if (ui->ckNorm->isChecked() && ui->ckAgc->isChecked())
+        ui->ckAgc->setChecked(false);
 
-    ui->rbDirRev->setChecked(settings.value("Rev",false).toBool());
+    ui->rbDirRev->setChecked(settings.value("Rev", false).toBool());
 
-    ui->ckDly->setChecked(settings.value("Dly",false).toBool());
+    ui->ckDly->setChecked(settings.value("Dly", false).toBool());
 
-    _f1 = settings.value("F1",  10).toInt();
-    _f2 = settings.value("F2",  20).toInt();
+    _f1 = settings.value("F1", 10).toInt();
+    _f2 = settings.value("F2", 20).toInt();
     _f3 = settings.value("F3", 500).toInt();
-    _f4 = settings.value("F4",1000).toInt();
+    _f4 = settings.value("F4", 1000).toInt();
 
     _agcw = settings.value("AgcW", 1000).toInt();
 
     double xs = settings.value("Xs", 1.0).toDouble();
     double ys = settings.value("Ys", 1.0).toDouble();
 
-    const char*  h[2] = {"SgyHdrsTab","CstHdrsTab"};
+    const char *h[2] = {"SgyHdrsTab", "CstHdrsTab"};
 
-    QString     ck;
+    QString ck;
     QStringList hlist;
 
     int i, n;
 
-    for(n=0;n<2;n++)
-    {
-        hdrListCk.setListIdx(n+1);
+    for (n = 0; n < 2; n++) {
+        hdrListCk.setListIdx(n + 1);
 
         int size = settings.beginReadArray(h[n]);
 
-        for(i=0;i<size;i++)
-        {
+        for (i = 0; i < size; i++) {
             settings.setArrayIndex(i);
-            ck=settings.value("ck").toString();
+            ck = settings.value("ck").toString();
             hdrListCk.set(ck);
         }
 
         settings.endArray();
     }
 
-    const char*  a[2] = {"SgyHdrsAx","CstHdrsAx"};
+    const char *a[2] = {"SgyHdrsAx", "CstHdrsAx"};
 
-    for(n=0;n<2;n++)
-    {
+    for (n = 0; n < 2; n++) {
         hlist.clear();
-        hdrAxisCk.setListIdx(n+1);
+        hdrAxisCk.setListIdx(n + 1);
 
         int size = settings.beginReadArray(a[n]);
 
-        for(i=0;i<size;i++)
-        {
+        for (i = 0; i < size; i++) {
             settings.setArrayIndex(i);
-            ck=settings.value("ck").toString();
+            ck = settings.value("ck").toString();
             hlist.append(ck);
         }
 
-        if(hlist.count()==0)
-        {
+        if (hlist.count() == 0) {
             hlist.append("Tarce#");
         }
 
@@ -2193,16 +1949,14 @@ void MainWindow::GetRegInfo()
         settings.endArray();
     }
 
-    const char*  f[2] = {"SgyHdrsDef","CstHdrsDef"};
+    const char *f[2] = {"SgyHdrsDef", "CstHdrsDef"};
 
-    for(n=0;n<2;n++)
-    {
+    for (n = 0; n < 2; n++) {
         int size = settings.beginReadArray(f[n]);
 
-        TrHdrDefList* List = TraceHdrsSet.List(n+1);
+        TrHdrDefList *List = TraceHdrsSet.List(n + 1);
 
-        for(i=0;i<size;i++)
-        {
+        for (i = 0; i < size; i++) {
             TrHdrDef hdr;
 
             settings.setArrayIndex(i);
@@ -2212,11 +1966,10 @@ void MainWindow::GetRegInfo()
             hdr.name = settings.value("name").toString();
             hdr.desc = settings.value("desc").toString();
             hdr.frmt = settings.value("frmt").toInt();
-            hdr.pos  = settings.value("pos" ).toInt();
+            hdr.pos = settings.value("pos").toInt();
             hdr.edit = 2;
 
-            if(estr!="")
-            {
+            if (estr != "") {
                 hdr.expr.setExprString(estr);
             }
 
@@ -2234,11 +1987,11 @@ void MainWindow::GetRegInfo()
     timeRightView.setYs(ys);
 
     double ti = settings.value("Ti", "0.1").toDouble();
-    bool   tl = settings.value("Tl", "false").toBool();
+    bool tl = settings.value("Tl", "false").toBool();
 
     timeAxis.setTi(ti);
-    seisSct. setTi(ti);
-    seisSct. setTl(tl);
+    seisSct.setTi(ti);
+    seisSct.setTl(tl);
 
     ArrangeSections();
 
@@ -2248,64 +2001,61 @@ void MainWindow::GetRegInfo()
 
 void MainWindow::SaveRegInfo()
 {
-    QSettings settings("PSI","SeiSeeMp");
+    QSettings settings("PSI", "SeiSeeMp");
     settings.setValue("mainWindowGeometry", saveGeometry());
-    settings.setValue("mainWindowState",    saveState());
+    settings.setValue("mainWindowState", saveState());
 
-    settings.setValue("DataDir",   curDir);
-    settings.setValue("SaveDir",   savDir);
+    settings.setValue("DataDir", curDir);
+    settings.setValue("SaveDir", savDir);
     settings.setValue("TxtHdrDir", txtHdrDir);
 
-    if(seisSct.DispCol())
-    {
-        if(seisSct.Pal()) settings.setValue("DispCol", 2);
-        else              settings.setValue("DispCol", 1);
-    }
-    else
-    {
+    if (seisSct.DispCol()) {
+        if (seisSct.Pal())
+            settings.setValue("DispCol", 2);
+        else
+            settings.setValue("DispCol", 1);
+    } else {
         settings.setValue("DispCol", 0);
     }
 
     settings.setValue("DispWig", seisSct.DispWig());
 
-    settings.setValue("WFill",   seisSct.WFill());
+    settings.setValue("WFill", seisSct.WFill());
 
-    settings.setValue("Gc",      seisSct.Gc());
-    settings.setValue("Gw",      seisSct.Gw());
+    settings.setValue("Gc", seisSct.Gc());
+    settings.setValue("Gw", seisSct.Gw());
 
-    settings.setValue("Filt",   ui->ckFilt->isChecked());
-    settings.setValue("Agc",    ui->ckAgc ->isChecked());
-    settings.setValue("Norm",   ui->ckNorm->isChecked());
+    settings.setValue("Filt", ui->ckFilt->isChecked());
+    settings.setValue("Agc", ui->ckAgc->isChecked());
+    settings.setValue("Norm", ui->ckNorm->isChecked());
 
-    settings.setValue("Rev",    ui->rbDirRev->isChecked());       
+    settings.setValue("Rev", ui->rbDirRev->isChecked());
 
-    settings.setValue("Dly",    ui->ckDly->isChecked());
+    settings.setValue("Dly", ui->ckDly->isChecked());
 
-    settings.setValue("F1",    _f1);
-    settings.setValue("F2",    _f2);
-    settings.setValue("F3",    _f3);
-    settings.setValue("F4",    _f4);
+    settings.setValue("F1", _f1);
+    settings.setValue("F2", _f2);
+    settings.setValue("F3", _f3);
+    settings.setValue("F4", _f4);
 
-    settings.setValue("AgcW",  _agcw);
+    settings.setValue("AgcW", _agcw);
 
-    settings.setValue("Xs",  seisView.Xs());
-    settings.setValue("Ys",  seisView.Ys());
+    settings.setValue("Xs", seisView.Xs());
+    settings.setValue("Ys", seisView.Ys());
 
     QStringList Cks;
     int i, n;
 
-    const char*  h[2] = {"SgyHdrsTab","CstHdrsTab"};
+    const char *h[2] = {"SgyHdrsTab", "CstHdrsTab"};
 
-    for(n=0;n<2;n++)
-    {
-        hdrListCk.setListIdx(n+1);
-        Cks=hdrListCk.List();
+    for (n = 0; n < 2; n++) {
+        hdrListCk.setListIdx(n + 1);
+        Cks = hdrListCk.List();
 
         settings.remove(h[n]);
         settings.beginWriteArray(h[n]);
 
-        for(i=0;i<Cks.size();i++)
-        {
+        for (i = 0; i < Cks.size(); i++) {
             QString ck = Cks[i];
             settings.setArrayIndex(i);
             settings.setValue("ck", ck);
@@ -2314,18 +2064,16 @@ void MainWindow::SaveRegInfo()
         settings.endArray();
     }
 
-    const char*  a[2] = {"SgyHdrsAx","CstHdrsAx"};
+    const char *a[2] = {"SgyHdrsAx", "CstHdrsAx"};
 
-    for(n=0;n<2;n++)
-    {
-        hdrAxisCk.setListIdx(n+1);
-        Cks=hdrAxisCk.List();
+    for (n = 0; n < 2; n++) {
+        hdrAxisCk.setListIdx(n + 1);
+        Cks = hdrAxisCk.List();
 
         settings.remove(a[n]);
         settings.beginWriteArray(a[n]);
 
-        for(i=0;i<Cks.size();i++)
-        {
+        for (i = 0; i < Cks.size(); i++) {
             QString ck = Cks[i];
             settings.setArrayIndex(i);
             settings.setValue("ck", ck);
@@ -2334,28 +2082,25 @@ void MainWindow::SaveRegInfo()
         settings.endArray();
     }
 
-    const char*  f[2] = {"SgyHdrsDef","CstHdrsDef"};
+    const char *f[2] = {"SgyHdrsDef", "CstHdrsDef"};
 
-    for(n=0;n<2;n++)
-    {
-        TrHdrDefList* List = TraceHdrsSet.List(n+1);
-//      int l = List->count();
+    for (n = 0; n < 2; n++) {
+        TrHdrDefList *List = TraceHdrsSet.List(n + 1);
+        //      int l = List->count();
         int j;
 
         settings.remove(f[n]);
         settings.beginWriteArray(f[n]);
 
-        for(i=j=0;i<List->count();i++)
-        {
-            TrHdrDef* hdr = List->item(i);
+        for (i = j = 0; i < List->count(); i++) {
+            TrHdrDef *hdr = List->item(i);
 
-            if(hdr->edit)
-            {
+            if (hdr->edit) {
                 settings.setArrayIndex(j++);
                 settings.setValue("name", hdr->name);
                 settings.setValue("desc", hdr->desc);
                 settings.setValue("frmt", hdr->frmt);
-                settings.setValue("pos" , hdr->pos );
+                settings.setValue("pos", hdr->pos);
                 settings.setValue("expr", hdr->expr.ExprString());
             }
         }
@@ -2364,89 +2109,91 @@ void MainWindow::SaveRegInfo()
     }
 
     settings.setValue("Ti", timeAxis.Ti());
-    settings.setValue("Tl", seisSct. Tl());
+    settings.setValue("Tl", seisSct.Tl());
 }
 
 void MainWindow::on_zoomAllBtn_pressed()
 {
-    double  ws = seisScrl->width () - 2;
-    double  wv = allSectWidth();
-    double  hs = seisScrl->height() - 2;
-    double  hv = timeAxis.HeightPix();
+    double ws = seisScrl->width() - 2;
+    double wv = allSectWidth();
+    double hs = seisScrl->height() - 2;
+    double hv = timeAxis.HeightPix();
 
-    if(wv==0) return;
-    if(hv==0) return;
+    if (wv == 0)
+        return;
+    if (hv == 0)
+        return;
 
-    double  xs = ws/wv;
-    double  ys = hs/hv;
+    double xs = ws / wv;
+    double ys = hs / hv;
 
-    SetZoom(xs,ys,0,0);
+    SetZoom(xs, ys, 0, 0);
 }
-
 
 void MainWindow::on_zoomVallBtn_pressed()
 {
     double xs, ys;
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xs,ys,xo,yo);
+    GetZoom(xs, ys, xo, yo);
 
-    double  hs = seisScrl->viewport()->height() - 2;
-    double  hv = timeAxis.HeightPix();
+    double hs = seisScrl->viewport()->height() - 2;
+    double hv = timeAxis.HeightPix();
 
-    if(hv==0) return;
+    if (hv == 0)
+        return;
 
-    ys = hs/hv;
+    ys = hs / hv;
 
-    SetZoom(xs,ys,xo,0);
+    SetZoom(xs, ys, xo, 0);
 }
 
 void MainWindow::on_zoomHallBtn_pressed()
 {
     double xs, ys;
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xs,ys,xo,yo);
+    GetZoom(xs, ys, xo, yo);
 
-    double  ws = seisScrl->viewport()->width () - 2;
-    double  wv = allSectWidth();
+    double ws = seisScrl->viewport()->width() - 2;
+    double wv = allSectWidth();
 
-    if(wv==0) return;
+    if (wv == 0)
+        return;
 
-    xs = ws/wv;
+    xs = ws / wv;
 
-    SetZoom(xs,ys,0,yo);
+    SetZoom(xs, ys, 0, yo);
 }
 
-
-void MainWindow::GetZoom(double& xs,  double& ys, int& xo, int& yo)
+void MainWindow::GetZoom(double &xs, double &ys, int &xo, int &yo)
 {
     xs = seisView.Xs();
     ys = seisView.Ys();
 
     xo = seisScrl->horizontalScrollBar()->value();
-    yo = seisScrl->verticalScrollBar  ()->value();
+    yo = seisScrl->verticalScrollBar()->value();
 }
 
-
-void MainWindow::SetZoom(double xs,  double ys, int xo, int yo, bool push)
+void MainWindow::SetZoom(double xs, double ys, int xo, int yo, bool push)
 {
     double xsp, ysp;
-    int    xop, yop;
+    int xop, yop;
 
-    GetZoom(xsp,ysp,xop,yop);
+    GetZoom(xsp, ysp, xop, yop);
 
-    if(xs==0)
-    {
-        xs=xsp; xo=xop;
+    if (xs == 0) {
+        xs = xsp;
+        xo = xop;
     }
 
-    if(ys==0)
-    {
-        ys=ysp; yo=yop;
+    if (ys == 0) {
+        ys = ysp;
+        yo = yop;
     }
 
-    if(push) zstack.push(zdata(xsp,ysp,xop,yop));
+    if (push)
+        zstack.push(zdata(xsp, ysp, xop, yop));
 
     seisView.setXs(xs);
     seisView.setYs(ys);
@@ -2474,45 +2221,47 @@ void MainWindow::SetZoom(double xs,  double ys, int xo, int yo, bool push)
 void MainWindow::on_edTr_editingFinished()
 {
     double xs, ys;
-    int    xo, yo;
-    bool   ok;
+    int xo, yo;
+    bool ok;
 
-    GetZoom(xs,ys,xo,yo);
+    GetZoom(xs, ys, xo, yo);
 
     QString txt = ui->edTr->text();
 
     xs = txt.toFloat(&ok);
-    if(!ok) return;
+    if (!ok)
+        return;
 
-    xs = 10/xs;
+    xs = 10 / xs;
 
-    SetZoomC(xs,ys,0,0);
+    SetZoomC(xs, ys, 0, 0);
 }
-
 
 void MainWindow::on_edTm_editingFinished()
 {
     double xs, ys;
-    int    xo, yo;
-    bool   ok;
+    int xo, yo;
+    bool ok;
 
-    GetZoom(xs,ys,xo,yo);
+    GetZoom(xs, ys, xo, yo);
 
     QString txt = ui->edTm->text();
 
     ys = txt.toFloat(&ok);
-    if(!ok) return;
+    if (!ok)
+        return;
 
-    SetZoomC(xs,ys,0,0);
+    SetZoomC(xs, ys, 0, 0);
 }
 
 void MainWindow::on_edGn_editingFinished()
 {
-    bool   ok;
+    bool ok;
     double g;
 
     g = ui->edGn->text().toFloat(&ok);
-    if(!ok) return;
+    if (!ok)
+        return;
 
     seisSct.setGc(g);
     seisSct.setGw(g);
@@ -2524,41 +2273,42 @@ void MainWindow::on_zoomPreBtn_pressed()
 {
     zdata z;
 
-    if(zstack.isEmpty()) return;
+    if (zstack.isEmpty())
+        return;
 
     z = zstack.pop();
 
-    SetZoom(z.xs,z.ys,z.xo,z.yo,false);
+    SetZoom(z.xs, z.ys, z.xo, z.yo, false);
 }
 
 void MainWindow::on_zoomOutBtn_pressed()
 {
     double xs, ys;
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xs,ys,xo,yo);
+    GetZoom(xs, ys, xo, yo);
 
-    SetZoomC(xs/1.5,ys/1.5,0,0);
+    SetZoomC(xs / 1.5, ys / 1.5, 0, 0);
 }
 
 void MainWindow::on_zoomInBtn_pressed()
 {
     double xs, ys;
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xs,ys,xo,yo);
+    GetZoom(xs, ys, xo, yo);
 
-    SetZoomC(xs*1.5,ys*1.5,0,0);
+    SetZoomC(xs * 1.5, ys * 1.5, 0, 0);
 }
 
 void MainWindow::on_selDirBtn_pressed()
 {
     QString dir = QFileDialog::getExistingDirectory(
-                this, "Open Directory",
-                curDir,
-                QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        this, "Open Directory", curDir,
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-    if(dir=="")  return;
+    if (dir == "")
+        return;
     ChangeDataDir(dir);
 }
 
@@ -2566,18 +2316,15 @@ void MainWindow::on_refreshBtn_pressed()
 {
     int row = dirGrid.curRow();
 
-    if(row>=0)
-    {
-        QString   name = dirGrid.Cell(row,0);
-        int       tag  = dirGrid.Tag (row,0);
-//      int       frm  = dirGrid.Tag (row,1);
+    if (row >= 0) {
+        QString name = dirGrid.Cell(row, 0);
+        int tag = dirGrid.Tag(row, 0);
+        //      int       frm  = dirGrid.Tag (row,1);
 
-        if(name=="." || tag==3)
-        {
-            ScanLtod(); find=name;
-        }
-        else
-        {
+        if (name == "." || tag == 3) {
+            ScanLtod();
+            find = name;
+        } else {
             ChangeDataDir(curDir, name);
         }
     }
@@ -2585,28 +2332,27 @@ void MainWindow::on_refreshBtn_pressed()
 
 void MainWindow::on_procParmBtn_pressed()
 {
-    ProcParmDlg.f1   = _f1;
-    ProcParmDlg.f2   = _f2;
-    ProcParmDlg.f3   = _f3;
-    ProcParmDlg.f4   = _f4;
+    ProcParmDlg.f1 = _f1;
+    ProcParmDlg.f2 = _f2;
+    ProcParmDlg.f3 = _f3;
+    ProcParmDlg.f4 = _f4;
     ProcParmDlg.agcw = _agcw;
-    ProcParmDlg.agc  = ui->ckAgc ->isChecked();
+    ProcParmDlg.agc = ui->ckAgc->isChecked();
     ProcParmDlg.norm = ui->ckNorm->isChecked();
     ProcParmDlg.filt = ui->ckFilt->isChecked();
-
 
     ProcParmDlg.show();
 }
 
 void MainWindow::procParmEvent()
 {
-    _f1   = ProcParmDlg.f1;
-    _f2   = ProcParmDlg.f2;
-    _f3   = ProcParmDlg.f3;
-    _f4   = ProcParmDlg.f4;
+    _f1 = ProcParmDlg.f1;
+    _f2 = ProcParmDlg.f2;
+    _f3 = ProcParmDlg.f3;
+    _f4 = ProcParmDlg.f4;
     _agcw = ProcParmDlg.agcw;
 
-    ui->ckAgc ->setChecked(ProcParmDlg.agc);
+    ui->ckAgc->setChecked(ProcParmDlg.agc);
     ui->ckNorm->setChecked(ProcParmDlg.norm);
     ui->ckFilt->setChecked(ProcParmDlg.filt);
 
@@ -2665,66 +2411,50 @@ bool  MainWindow::event(QEvent *evt)
 }
 */
 
+void MainWindow::on_zoomWinBtn_pressed() { seisScrl->setZoomW(1); }
 
-void MainWindow::on_zoomWinBtn_pressed()
-{
-    seisScrl->setZoomW(1);
-}
+void MainWindow::on_actionOpen_Directory_triggered() { on_selDirBtn_pressed(); }
 
-void MainWindow::on_actionOpen_Directory_triggered()
-{
-    on_selDirBtn_pressed();
-}
-
-void MainWindow::on_actionAbout_triggered()
-{
-    AboutDlg.show();
-}
+void MainWindow::on_actionAbout_triggered() { AboutDlg.show(); }
 
 void MainWindow::on_TrSlider_valueChanged(int p)
 {
     double r;
 
-    if(p>0)
-    {
-        r = 1 + p/100.;
-        SetZoomC(xss*r,yss,0,0);
-    }
-    else
-    {
-        r = 1 - p/100.;
-        SetZoomC(xss/r,yss,0,0);
+    if (p > 0) {
+        r = 1 + p / 100.;
+        SetZoomC(xss * r, yss, 0, 0);
+    } else {
+        r = 1 - p / 100.;
+        SetZoomC(xss / r, yss, 0, 0);
     }
 }
 
 void MainWindow::on_TrSlider_sliderReleased()
 {
-    int    xo, yo;
-    GetZoom(xss,yss,xo,yo);
+    int xo, yo;
+    GetZoom(xss, yss, xo, yo);
     ui->TrSlider->setValue(0);
 }
 
 void MainWindow::on_TrSlider_sliderPressed()
 {
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xss,yss,xo,yo);
+    GetZoom(xss, yss, xo, yo);
 }
-
-
 
 void MainWindow::on_TmSlider_sliderPressed()
 {
-    int    xo, yo;
+    int xo, yo;
 
-    GetZoom(xss,yss,xo,yo);
+    GetZoom(xss, yss, xo, yo);
 }
-
 
 void MainWindow::on_TmSlider_sliderReleased()
 {
-    int    xo, yo;
-    GetZoom(xss,yss,xo,yo);
+    int xo, yo;
+    GetZoom(xss, yss, xo, yo);
     ui->TmSlider->setValue(0);
 }
 
@@ -2732,23 +2462,16 @@ void MainWindow::on_TmSlider_valueChanged(int p)
 {
     double r;
 
-    if(p>0)
-    {
-        r = 1 + p/100.;
-        SetZoomC(xss,yss*r,0,0);
-    }
-    else
-    {
-        r = 1 - p/100.;
-        SetZoomC(xss,yss/r,0,0);
+    if (p > 0) {
+        r = 1 + p / 100.;
+        SetZoomC(xss, yss * r, 0, 0);
+    } else {
+        r = 1 - p / 100.;
+        SetZoomC(xss, yss / r, 0, 0);
     }
 }
 
-
-void MainWindow::on_GnSlider_sliderPressed()
-{
-    gss = seisSct.Gw();
-}
+void MainWindow::on_GnSlider_sliderPressed() { gss = seisSct.Gw(); }
 
 void MainWindow::on_GnSlider_sliderReleased()
 {
@@ -2760,17 +2483,14 @@ void MainWindow::on_GnSlider_valueChanged(int p)
 {
     double r;
 
-    if(p>0)
-    {
-        r = 1 + p/100.;
-        seisSct.setGc(gss*r);
-        seisSct.setGw(gss*r);
-    }
-    else
-    {
-        r = 1 - p/100.;
-        seisSct.setGc(gss/r);
-        seisSct.setGw(gss/r);
+    if (p > 0) {
+        r = 1 + p / 100.;
+        seisSct.setGc(gss * r);
+        seisSct.setGw(gss * r);
+    } else {
+        r = 1 - p / 100.;
+        seisSct.setGc(gss / r);
+        seisSct.setGw(gss / r);
     }
     FillEdits();
 }
@@ -2779,8 +2499,8 @@ void MainWindow::on_TxtHdrEdit_cursorPositionChanged()
 {
     QTextCursor cursor = ui->TxtHdrEdit->textCursor();
 
-    int col = cursor.columnNumber()+1;
-    int row = cursor.blockNumber() +1;
+    int col = cursor.columnNumber() + 1;
+    int row = cursor.blockNumber() + 1;
 
     ui->txtCol->setText(QString("Col=%1").arg(col));
     ui->txtRow->setText(QString("Row=%1").arg(row));
@@ -2789,31 +2509,27 @@ void MainWindow::on_TxtHdrEdit_cursorPositionChanged()
 void MainWindow::on_axisBtn_pressed()
 {
     AxisDlg.ckList = &hdrAxisCk;
-    AxisDlg.dT = timeAxis.Ti()*1000;
-    AxisDlg.tL = seisSct. Tl();
+    AxisDlg.dT = timeAxis.Ti() * 1000;
+    AxisDlg.tL = seisSct.Tl();
 
     AxisDlg.show();
 }
 
-void MainWindow::on_actionAxes_Setup_triggered()
-{
-    on_axisBtn_pressed();
-}
-
+void MainWindow::on_actionAxes_Setup_triggered() { on_axisBtn_pressed(); }
 
 void MainWindow::axesDlgEvent()
 {
     hdrsAxis.setHdrList(hdrAxisCk.List());
     hdrsBottomAxis.setHdrList(hdrAxisCk.List());
-    hdrsLab. setHdrList(hdrAxisCk.List());
+    hdrsLab.setHdrList(hdrAxisCk.List());
 
-    double ti = AxisDlg.dT/1000.;
-    bool   tl = AxisDlg.tL;
+    double ti = AxisDlg.dT / 1000.;
+    bool tl = AxisDlg.tL;
 
     timeAxis.setTi(ti);
     timeRightAxis.setTi(ti);
-    seisSct .setTi(ti);
-    seisSct .setTl(tl);
+    seisSct.setTi(ti);
+    seisSct.setTl(tl);
 
     ui->ckTimLines->setChecked(tl);
     ArrangeSections();
@@ -2824,26 +2540,25 @@ void MainWindow::FillHdrListGrids()
     int n;
     int l;
 
-    TrHdrDefList* List = TraceHdrsSet.List();
+    TrHdrDefList *List = TraceHdrsSet.List();
 
     l = List->count();
 
-    hdrListCkGrid.setRowCount(l-1);
-    trcHdrGrid   .setRowCount(l-1);
+    hdrListCkGrid.setRowCount(l - 1);
+    trcHdrGrid.setRowCount(l - 1);
 
     trcDatGrid.setRowCount(0);
 
-    for(n=1;n<l;n++)
-    {
-        TrHdrDef* h = List->item(n);
+    for (n = 1; n < l; n++) {
+        TrHdrDef *h = List->item(n);
 
-        hdrListCkGrid.setTag(n-1,0,h->edit);
-        hdrListCkGrid.setCell(n-1,2,h->desc);
-        hdrListCkGrid.setCell(n-1,1,h->bytesStr());
-        hdrListCkGrid.setCheck(n-1,0,hdrListCk[h->name]);
-        trcHdrGrid   .setCell(n-1,1,h->desc);
-        trcHdrGrid   .setCell(n-1,2,h->bytesStr());
-        trcHdrGrid   .setCell(n-1,0,"");
+        hdrListCkGrid.setTag(n - 1, 0, h->edit);
+        hdrListCkGrid.setCell(n - 1, 2, h->desc);
+        hdrListCkGrid.setCell(n - 1, 1, h->bytesStr());
+        hdrListCkGrid.setCheck(n - 1, 0, hdrListCk[h->name]);
+        trcHdrGrid.setCell(n - 1, 1, h->desc);
+        trcHdrGrid.setCell(n - 1, 2, h->bytesStr());
+        trcHdrGrid.setCell(n - 1, 0, "");
     }
 
     SetHdrDatList();
@@ -2854,35 +2569,31 @@ void MainWindow::FillHdrElstGrids()
     int n;
     int l;
 
-    TrHdrDefList* List = TraceHdrsSet.List();
+    TrHdrDefList *List = TraceHdrsSet.List();
 
     l = List->count();
 
-    hdrElstCkGrid.setRowCount(l-1);
-    trcHdrGrid   .setRowCount(l-1);
+    hdrElstCkGrid.setRowCount(l - 1);
+    trcHdrGrid.setRowCount(l - 1);
 
     trcDatGrid.setRowCount(0);
 
-    for(n=1;n<l;n++)
-    {
-        TrHdrDef* h = List->item(n);
+    for (n = 1; n < l; n++) {
+        TrHdrDef *h = List->item(n);
 
-        hdrElstCkGrid.setTag(n-1,0,h->edit);
-        hdrElstCkGrid.setCell(n-1,2,h->desc);
-        hdrElstCkGrid.setCell(n-1,1,h->bytesStr());
-        hdrElstCkGrid.setCheck(n-1,0,hdrElstCk[h->name]);
-/*
-        trcHdrGrid   .setCell(n-1,1,h->desc);
-        trcHdrGrid   .setCell(n-1,2,h->bytesStr());
-        trcHdrGrid   .setCell(n-1,0,"");
-*/
+        hdrElstCkGrid.setTag(n - 1, 0, h->edit);
+        hdrElstCkGrid.setCell(n - 1, 2, h->desc);
+        hdrElstCkGrid.setCell(n - 1, 1, h->bytesStr());
+        hdrElstCkGrid.setCheck(n - 1, 0, hdrElstCk[h->name]);
+        /*
+                trcHdrGrid   .setCell(n-1,1,h->desc);
+                trcHdrGrid   .setCell(n-1,2,h->bytesStr());
+                trcHdrGrid   .setCell(n-1,0,"");
+        */
     }
 
     SetHdrDatElst();
 }
-
-
-
 
 void MainWindow::hdreDlgEvent()
 {
@@ -2890,108 +2601,96 @@ void MainWindow::hdreDlgEvent()
     FillHdrElstGrids();
 }
 
+void MainWindow::on_actionParameters_triggered() { on_procParmBtn_pressed(); }
 
-void MainWindow::on_actionParameters_triggered()
-{
-    on_procParmBtn_pressed();
-}
+void MainWindow::on_actionHeader_Editor_triggered() { on_btnEdHdr_clicked(); }
 
-
-void MainWindow::on_actionHeader_Editor_triggered()
-{
-    on_btnEdHdr_clicked();
-}
-
-void MainWindow::on_btnEdHdr_clicked()
-{
-    EdHdrDlg.show();
-}
+void MainWindow::on_btnEdHdr_clicked() { EdHdrDlg.show(); }
 
 void MainWindow::checkTxtHdrChange()
 {
     bool changed = false;
 
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
     QString etxt = ui->TxtHdrEdit->toPlainText();
 
-    if(sf && sf->Active())
-    {
-        if(etxt != sf->TxtHed()) changed=true;
+    if (sf && sf->Active()) {
+        if (etxt != sf->TxtHed())
+            changed = true;
     }
 
-    if(changed)
-    {
+    if (changed) {
         ui->btnTxtRst->show();
         ui->btnTxtUpd->show();
-    }
-    else
-    {
+    } else {
         ui->btnTxtRst->hide();
         ui->btnTxtUpd->hide();
     }
 }
 
-
 void MainWindow::loadTxtHdr()
 {
-    FILE* inpf;
+    FILE *inpf;
 
-    int   i,n;
-    char  s[128];
+    int i, n;
+    char s[128];
 
     QString S;
 
     ui->TxtHdrEdit->clear();
 
-    inpf=fopen_q(txtHdrFile,"r");
+    inpf = fopen_q(txtHdrFile, "r");
 
-    if(inpf==NULL)
-    {
-        QMessageBox::critical(this,"Error","Cannot open text file: " + txtHdrFile,
+    if (inpf == NULL) {
+        QMessageBox::critical(this, "Error",
+                              "Cannot open text file: " + txtHdrFile,
                               QMessageBox::Discard);
         return;
     }
 
-    for(n=0;n<40;n++)
-     {
-        if( fgets(s,80,inpf)==NULL) break;
+    for (n = 0; n < 40; n++) {
+        if (fgets(s, 80, inpf) == NULL)
+            break;
 
         int l = strlen(s);
 
-        for(i=0;i<l;i++)
-        {
-            if(s[i]<32) s[i]=' ';
+        for (i = 0; i < l; i++) {
+            if (s[i] < 32)
+                s[i] = ' ';
         }
 
-        for(i=l-1;i>=0;i++)
-        {
-            if(s[i]==' ') s[i]=0;
-            else          break;
+        for (i = l - 1; i >= 0; i++) {
+            if (s[i] == ' ')
+                s[i] = 0;
+            else
+                break;
         }
 
-        S=s;
-        ui->TxtHdrEdit->insertPlainText(S+"\n");
-     }
+        S = s;
+        ui->TxtHdrEdit->insertPlainText(S + "\n");
+    }
 
-//  Modified = CheckChanges();
+    //  Modified = CheckChanges();
     fclose(inpf);
 
     QTextCursor tmpCursor = ui->TxtHdrEdit->textCursor();
-    tmpCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor,1);
+    tmpCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
     ui->TxtHdrEdit->setTextCursor(tmpCursor);
     on_TxtHdrEdit_cursorPositionChanged();
 }
 
 void MainWindow::exportTxtHdr(QString fileName)
 {
-    SeisFile* sf = seisSrc.Sfile(); if(!sf || !sf->Active()) return;
+    SeisFile *sf = seisSrc.Sfile();
+    if (!sf || !sf->Active())
+        return;
 
     QFile file(fileName);
     bool ok = file.open(QIODevice::ReadWrite);
 
-    if(!ok)
-    {
-        QMessageBox::critical(this,"Error","Cannot create text file: " + fileName,
+    if (!ok) {
+        QMessageBox::critical(this, "Error",
+                              "Cannot create text file: " + fileName,
                               QMessageBox::Discard);
         return;
     }
@@ -3000,22 +2699,20 @@ void MainWindow::exportTxtHdr(QString fileName)
     stream << sf->TxtHed();
     file.close();
 
-//  Modified = CheckChanges();
+    //  Modified = CheckChanges();
 }
-
 
 void MainWindow::on_btnTxtRd_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Load Text Header from File",
-                                                    txtHdrDir,
-                                                    "Text File (*.txt);;All Files (*)");
-    if(fileName=="")
-    {
+    QString fileName = QFileDialog::getOpenFileName(
+        this, "Load Text Header from File", txtHdrDir,
+        "Text File (*.txt);;All Files (*)");
+    if (fileName == "") {
         return;
     }
 
     QFileInfo fi(fileName);
-    txtHdrDir  = fi.dir().absolutePath();
+    txtHdrDir = fi.dir().absolutePath();
     txtHdrFile = fi.absoluteFilePath();
 
     loadTxtHdr();
@@ -3028,32 +2725,28 @@ void MainWindow::on_actionLoad_Text_Header_from_File_triggered()
 
 void MainWindow::on_actionExport_Text_Header_to_File_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Export Text Header from File",
-                                                    txtHdrDir,
-                                                    "Text File (*.txt)");
-    if(fileName=="")
-    {
+    QString fileName = QFileDialog::getSaveFileName(
+        this, "Export Text Header from File", txtHdrDir, "Text File (*.txt)");
+    if (fileName == "") {
         return;
     }
 
     QFileInfo fi(fileName);
-    txtHdrDir  = fi.dir().absolutePath();
+    txtHdrDir = fi.dir().absolutePath();
 
     exportTxtHdr(fileName);
 }
 
 void MainWindow::on_btnTxtRdx_clicked()
 {
-    if(txtHdrFile!="")
-    {
+    if (txtHdrFile != "") {
         loadTxtHdr();
     }
 }
 
-
 void MainWindow::on_btnTxtRst_clicked()
 {
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
     ui->TxtHdrEdit->clear();
     ui->TxtHdrEdit->insertPlainText(sf->TxtHed());
     ui->TxtHdrEdit->document()->clearUndoRedoStacks();
@@ -3062,11 +2755,10 @@ void MainWindow::on_btnTxtRst_clicked()
 
 void MainWindow::on_btnTxtUpd_clicked()
 {
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if(!sf->UpdateTxtHed(ui->TxtHdrEdit->toPlainText()))
-    {
-        QMessageBox::critical(this,"Error","Cannot Update Text Hdr",
+    if (!sf->UpdateTxtHed(ui->TxtHdrEdit->toPlainText())) {
+        QMessageBox::critical(this, "Error", "Cannot Update Text Hdr",
                               QMessageBox::Discard);
     }
     checkTxtHdrChange();
@@ -3080,11 +2772,11 @@ void MainWindow::on_ckTrEd_toggled(bool checked)
 
 void MainWindow::binHdrGridChangedEvent()
 {
-  if(busy) return;
+    if (busy)
+        return;
 
-  checkBinHdrChange();
+    checkBinHdrChange();
 }
-
 
 void MainWindow::on_btnBinRst_clicked()
 {
@@ -3094,14 +2786,14 @@ void MainWindow::on_btnBinRst_clicked()
 
 void MainWindow::on_btnBinUpd_clicked()
 {
-    int              n;
+    int n;
     QVector<QString> vals;
     int nr = binHdrGrid.RowCount();
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    for(n=0;n<nr;n++)
-    {
-        QString s = binHdrGrid.Cell(n,0); vals.append(s);
+    for (n = 0; n < nr; n++) {
+        QString s = binHdrGrid.Cell(n, 0);
+        vals.append(s);
     }
 
     sf->UpdateBinHed(vals);
@@ -3111,69 +2803,65 @@ void MainWindow::on_btnBinUpd_clicked()
 void MainWindow::on_InfoTab_currentChanged(int index)
 {
     Q_UNUSED(index);
-    //ui->InfoTab;
+    // ui->InfoTab;
 }
 
 void MainWindow::on_btnLastTr_clicked()
 {
-    hdrListDtGrid.setCurCell(hdrListDtGrid.rowCount()-1);
+    hdrListDtGrid.setCurCell(hdrListDtGrid.rowCount() - 1);
 }
 
-void MainWindow::on_btnFirstTr_clicked()
-{
-    hdrListDtGrid.setCurCell(0);
-}
+void MainWindow::on_btnFirstTr_clicked() { hdrListDtGrid.setCurCell(0); }
 
 void MainWindow::SaveSval()
 {
     QString sval = ui->cbSval->currentText();
 
-    if(ui->cbSval->findText(sval)<0)
-    {
+    if (ui->cbSval->findText(sval) < 0) {
         ui->cbSval->addItem(sval);
     }
 }
 
-
-
 void MainWindow::FindTrace(QString dir)
 {
-    QString sidx = ui->cbSidx ->currentText();
-    QString sval = ui->cbSval ->currentText();
+    QString sidx = ui->cbSidx->currentText();
+    QString sval = ui->cbSval->currentText();
     QString sign = ui->cbSsign->currentText();
 
-    bool   ok;
-    double val = sval.toDouble(&ok); if(!ok) return;
+    bool ok;
+    double val = sval.toDouble(&ok);
+    if (!ok)
+        return;
 
     SaveSval();
 
-    if(sidx=="Trace#" && val>0)
-    {
-        hdrListDtGrid.setCurCell(val-1);
-    }
-    else
-    {
-        SeisFile* sf = seisSrc.Sfile();
+    if (sidx == "Trace#" && val > 0) {
+        hdrListDtGrid.setCurCell(val - 1);
+    } else {
+        SeisFile *sf = seisSrc.Sfile();
         int cidx = hdrListDtGrid.curRow();
 
         emit stop_find();
 
         SetSearchControls(false);
 
-        QThread* thread = new QThread;
+        QThread *thread = new QThread;
 
-        TraceFindWorker* worker = new TraceFindWorker(sf, cidx, sidx, val, dir, sign);
+        TraceFindWorker *worker =
+            new TraceFindWorker(sf, cidx, sidx, val, dir, sign);
 
         worker->moveToThread(thread);
-        connect(thread, SIGNAL(started()),          worker, SLOT(process()));
-        connect(worker, SIGNAL(finished()),         thread, SLOT(quit()));
-        connect(worker, SIGNAL(finished()),         worker, SLOT(deleteLater()));
-        connect(thread, SIGNAL(finished()),         thread, SLOT(deleteLater()));
-        connect(worker, SIGNAL(efind(int)),         this,   SLOT(x_find(int)));
-        connect(worker, SIGNAL(eprogr(int,QString)),this,   SLOT(x_progr(int,QString)));
-        connect(worker, SIGNAL(efin(QString)),      this,   SLOT(x_find_fin(QString)));
+        connect(thread, SIGNAL(started()), worker, SLOT(process()));
+        connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+        connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+        connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+        connect(worker, SIGNAL(efind(int)), this, SLOT(x_find(int)));
+        connect(worker, SIGNAL(eprogr(int, QString)), this,
+                SLOT(x_progr(int, QString)));
+        connect(worker, SIGNAL(efin(QString)), this, SLOT(x_find_fin(QString)));
 
-        connect(this,   SIGNAL(stop_find()), worker, SLOT(stop()), Qt::DirectConnection);
+        connect(this, SIGNAL(stop_find()), worker, SLOT(stop()),
+                Qt::DirectConnection);
 
         thread->start();
     }
@@ -3188,61 +2876,50 @@ void MainWindow::x_pers (int pers)
 //    m_statMess->setText(QString::number(pers));
 }
 */
-void MainWindow::x_find (int tridx)
+void MainWindow::x_find(int tridx)
 {
     hdrListDtGrid.setCurCell(tridx);
-    ShowProgress("",-1);
+    ShowProgress("", -1);
 }
 
-void MainWindow::x_find_fin (QString mess)
+void MainWindow::x_find_fin(QString mess)
 {
     SetSearchControls(true);
-    ShowProgress(mess,-1);
+    ShowProgress(mess, -1);
 }
-
 
 void MainWindow::SetTrEdCurVal()
 {
-    qint64 n   = hdrListDtGrid.curRow();
-    qint64 c   = hdrListDtGrid.curCol();
-    QString   lab = ui->lbElab->text();
+    qint64 n = hdrListDtGrid.curRow();
+    qint64 c = hdrListDtGrid.curCol();
+    QString lab = ui->lbElab->text();
 
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if(lab=="Trace#")
-    {
-        ui->cbEnval  ->setEnabled(false);
+    if (lab == "Trace#") {
+        ui->cbEnval->setEnabled(false);
         ui->btnUpdTrh->setEnabled(false);
-    }
-    else
-    {
-        ui->cbEnval  ->setEnabled(true);
-  //    ui->btnUpdTrh->setEnabled(true);
+    } else {
+        ui->cbEnval->setEnabled(true);
+        //    ui->btnUpdTrh->setEnabled(true);
     }
 
-    if(n<0 || !sf || !sf->Active() || n>=sf->Nt())
-    {
+    if (n < 0 || !sf || !sf->Active() || n >= sf->Nt()) {
         ui->edEcval->setText("");
-    }
-    else
-    {
-        bool   ok;
+    } else {
+        bool ok;
         double vn = ui->cbEnval->currentText().toDouble(&ok);
 
-        double vc = sf->Rh(n,lab);
+        double vc = sf->Rh(n, lab);
         ui->edEcval->setText(QString::number(vc));
 
-        if(ok && vc!=vn)
-        {
+        if (ok && vc != vn) {
             ui->btnUpdTrh->setEnabled(true);
-        }
-        else
-        {
+        } else {
             ui->btnUpdTrh->setEnabled(false);
         }
     }
 }
-
 
 void MainWindow::SetSearchControls(bool on)
 {
@@ -3251,31 +2928,24 @@ void MainWindow::SetSearchControls(bool on)
     ui->lbElab->setText(lab);
     SetTrEdCurVal();
 
-    if(on)
-    {
-        if(lab=="Trace#")
-        {
-         ui->btnSfwd->setEnabled(false);
-         ui->btnSbkw->setEnabled(false);
-         ui->btnSbin->setEnabled(true);
-        }
-        else
-        {
+    if (on) {
+        if (lab == "Trace#") {
+            ui->btnSfwd->setEnabled(false);
+            ui->btnSbkw->setEnabled(false);
+            ui->btnSbin->setEnabled(true);
+        } else {
             ui->btnSfwd->setEnabled(true);
             ui->btnSbkw->setEnabled(true);
             ui->btnSbin->setEnabled(true);
         }
         ui->btnSstop->setEnabled(false);
-    }
-    else
-    {
+    } else {
         ui->btnSfwd->setEnabled(false);
         ui->btnSbkw->setEnabled(false);
         ui->btnSbin->setEnabled(false);
         ui->btnSstop->setEnabled(true);
     }
 }
-
 
 void MainWindow::on_cbSval_editTextChanged(const QString &arg1)
 {
@@ -3289,42 +2959,30 @@ void MainWindow::on_cbSidx_currentIndexChanged(const QString &arg1)
     SetSearchControls(true);
 }
 
-void MainWindow::on_btnSbin_clicked()
-{
-    FindTrace("=");
-}
+void MainWindow::on_btnSbin_clicked() { FindTrace("="); }
 
-void MainWindow::on_btnSfwd_clicked()
-{
-    FindTrace(">");
-}
+void MainWindow::on_btnSfwd_clicked() { FindTrace(">"); }
 
+void MainWindow::on_btnSbkw_clicked() { FindTrace("<"); }
 
-void MainWindow::on_btnSbkw_clicked()
-{
-    FindTrace("<");
-}
-
-void MainWindow::on_btnSstop_clicked()
-{
-    emit stop_find();
-}
+void MainWindow::on_btnSstop_clicked() { emit stop_find(); }
 
 void MainWindow::on_btnUpdTrh_clicked()
 {
-    bool   ok;
+    bool ok;
     double vn = ui->cbEnval->currentText().toDouble(&ok);
-    if(!ok) return;
+    if (!ok)
+        return;
 
-    long long n   = hdrListDtGrid.curRow();
-    QString   lab = ui->lbElab->text();
+    long long n = hdrListDtGrid.curRow();
+    QString lab = ui->lbElab->text();
 
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if(n<0 || !sf || !sf->Active() || n>=sf->Nt()) return;
+    if (n < 0 || !sf || !sf->Active() || n >= sf->Nt())
+        return;
 
-    if(sf->Wh(n,lab,vn))
-    {
+    if (sf->Wh(n, lab, vn)) {
         SetTrEdCurVal();
         sf->Reset();
         SetHdrDatList();
@@ -3332,8 +2990,7 @@ void MainWindow::on_btnUpdTrh_clicked()
 
         QString enval = ui->cbEnval->currentText();
 
-        if(ui->cbEnval->findText(enval)<0)
-        {
+        if (ui->cbEnval->findText(enval) < 0) {
             ui->cbEnval->addItem(enval);
         }
     }
@@ -3347,141 +3004,138 @@ void MainWindow::on_cbEnval_editTextChanged(const QString &arg1)
 
 void MainWindow::on_btnCkAll_clicked()
 {
-    hdrListCkGrid.setColCheck(0,2);
+    hdrListCkGrid.setColCheck(0, 2);
     SetHdrDatList();
 }
 
 void MainWindow::on_btnCkNon_clicked()
 {
-    hdrListCkGrid.setColCheck(0,0);
+    hdrListCkGrid.setColCheck(0, 0);
     SetHdrDatList();
 }
 
 void MainWindow::on_btnCkNonE_clicked()
 {
-    hdrElstCkGrid.setColCheck(0,0);
+    hdrElstCkGrid.setColCheck(0, 0);
     SetHdrDatElst();
 }
 
 void MainWindow::on_edExpr_textChanged(const QString &arg1)
 {
-    if(busy) return;
+    if (busy)
+        return;
 
-    if(eExpIdx < 2) return;
+    if (eExpIdx < 2)
+        return;
 
-    hdrElstDtGrid.setColLabel(eExpIdx,arg1);
-    QString name = hdrElstDtGrid.colLabel(eExpIdx-1);
+    hdrElstDtGrid.setColLabel(eExpIdx, arg1);
+    QString name = hdrElstDtGrid.colLabel(eExpIdx - 1);
 
     SeisTrExpr expr(arg1);
 
     QPalette *palette = new QPalette();
 
-    if(expr.Error())
-        palette->setColor(QPalette::Text,Qt::red);
+    if (expr.Error())
+        palette->setColor(QPalette::Text, Qt::red);
     else
-        palette->setColor(QPalette::Text,Qt::black);
+        palette->setColor(QPalette::Text, Qt::black);
 
     ui->edExpr->setPalette(*palette);
 
-    exprList[name]=expr;
+    exprList[name] = expr;
 
     hdrElstDtGrid.update();
 }
 
-void  MainWindow::hdrListDtGridHeaderEvent(int col)
+void MainWindow::hdrListDtGridHeaderEvent(int col)
 {
     Q_UNUSED(col);
-/*
-    QString lab = hdrListDtGrid.ColLabel(col);
-    int i = ui->cbSidx->findText(lab);
-    ui->cbSidx->setCurrentIndex(i);
-*/
+    /*
+        QString lab = hdrListDtGrid.ColLabel(col);
+        int i = ui->cbSidx->findText(lab);
+        ui->cbSidx->setCurrentIndex(i);
+    */
 }
 
-
-void  MainWindow::hdrElstDtGridHeaderEvent(int col)
+void MainWindow::hdrElstDtGridHeaderEvent(int col)
 {
-    if(col<1) return;
+    if (col < 1)
+        return;
 
-    busy=true;
+    busy = true;
 
     hdrElstDtGrid.setColHdrBgc(-1); // reset all
 
-    int n = (col-1)/2; n=n*2+1;
+    int n = (col - 1) / 2;
+    n = n * 2 + 1;
 
-//  hdrElstDtGrid.setColLabBg(n,   Qt::cyan);
-//  hdrElstDtGrid.setColLabBg(n+1, Qt::cyan);
+    //  hdrElstDtGrid.setColLabBg(n,   Qt::cyan);
+    //  hdrElstDtGrid.setColLabBg(n+1, Qt::cyan);
 
-    hdrElstDtGrid.setColHdrBgc(n,Qt::cyan);
-    hdrElstDtGrid.setColHdrBgc(n+1,Qt::cyan);
+    hdrElstDtGrid.setColHdrBgc(n, Qt::cyan);
+    hdrElstDtGrid.setColHdrBgc(n + 1, Qt::cyan);
 
     ui->edExpr->setEnabled(true);
-    ui->edExpr->setText(hdrElstDtGrid.colLabel(n+1));
-    eExpIdx=n+1;
+    ui->edExpr->setText(hdrElstDtGrid.colLabel(n + 1));
+    eExpIdx = n + 1;
 
-    busy=false;
-//  qDebug()<< "n=" << n;
+    busy = false;
+    //  qDebug()<< "n=" << n;
 }
-
-
 
 void MainWindow::on_btnNexp_clicked()
 {
-    if(ui->edExpr->isEnabled())
-    {
-       ui->edExpr->setText(ui->edExpr->text()+"N");
+    if (ui->edExpr->isEnabled()) {
+        ui->edExpr->setText(ui->edExpr->text() + "N");
     }
 }
 
 void MainWindow::on_btnLexp_clicked()
 {
-    if(ui->edExpr->isEnabled())
-    {
-       ui->edExpr->setText(ui->edExpr->text()+"L");
+    if (ui->edExpr->isEnabled()) {
+        ui->edExpr->setText(ui->edExpr->text() + "L");
     }
 }
 
-
 void MainWindow::on_btnHexp_clicked()
 {
-   if(!ui->edExpr->isEnabled()) return;
+    if (!ui->edExpr->isEnabled())
+        return;
 
-   SeisFile* sf = seisSrc.Sfile(); if(!sf) return;
+    SeisFile *sf = seisSrc.Sfile();
+    if (!sf)
+        return;
 
-   int r =  hdrElstCkGrid.curRow();
+    int r = hdrElstCkGrid.curRow();
 
-   TrHdrDef* h = sf->THdef(r+1);
+    TrHdrDef *h = sf->THdef(r + 1);
 
-   QString s;
+    QString s;
 
-   s.sprintf("H(%d,%d)", h->pos, h->frmt);
+    s.sprintf("H(%d,%d)", h->pos, h->frmt);
 
-   ui->edExpr->setText(ui->edExpr->text()+s);
+    ui->edExpr->setText(ui->edExpr->text() + s);
 }
 
 void MainWindow::on_btnClrExp_clicked()
 {
-    if(ui->edExpr->isEnabled())
-    {
-       ui->edExpr->setText("");
+    if (ui->edExpr->isEnabled()) {
+        ui->edExpr->setText("");
     }
 }
 
-void MainWindow::setEnabledAllBtns(QWidget* box, bool enabled)
+void MainWindow::setEnabledAllBtns(QWidget *box, bool enabled)
 {
-    QList<QWidget*> widgets = box->findChildren<QWidget*>();
+    QList<QWidget *> widgets = box->findChildren<QWidget *>();
 
-    foreach (QWidget *widget, widgets)
-    {
+    foreach (QWidget *widget, widgets) {
         QString c = widget->metaObject()->className();
 
-        if(c == "QPushButton" || c=="QToolButton")
-        {
+        if (c == "QPushButton" || c == "QToolButton") {
             widget->setEnabled(enabled);
         }
     }
 }
-
 
 void MainWindow::ClrUndoE()
 {
@@ -3489,148 +3143,142 @@ void MainWindow::ClrUndoE()
     ui->btnUndE->setEnabled(false);
 }
 
-
 void MainWindow::on_btnUpdE_clicked()
 {
-    if(expu_running)
-    {
-        emit stop_expu(); return;
+    if (expu_running) {
+        emit stop_expu();
+        return;
     }
 
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if( !sf || !sf->Active() ) return;
+    if (!sf || !sf->Active())
+        return;
 
     ui->btnUpdE->setIcon(QIcon(":/images/stop.png"));
 
-    expu_running=true;
+    expu_running = true;
 
-    QThread* thread = new QThread;
+    QThread *thread = new QThread;
 
-    ChangeThExprWorker* worker = new ChangeThExprWorker(sf,exprList,undofn,0);
+    ChangeThExprWorker *worker =
+        new ChangeThExprWorker(sf, exprList, undofn, 0);
 
     worker->moveToThread(thread);
-    connect(thread, SIGNAL(started()),          worker, SLOT(process()));
-    connect(worker, SIGNAL(finished()),         thread, SLOT(quit()));
-    connect(worker, SIGNAL(finished()),         worker, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()),         thread, SLOT(deleteLater()));
-    connect(worker, SIGNAL(eprogr(int,QString)),this,   SLOT(x_progr(int,QString)));
-    connect(worker, SIGNAL(efin(QString)),      this,   SLOT(x_fin_e(QString)));
+    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(worker, SIGNAL(eprogr(int, QString)), this,
+            SLOT(x_progr(int, QString)));
+    connect(worker, SIGNAL(efin(QString)), this, SLOT(x_fin_e(QString)));
 
-    connect(this,   SIGNAL(stop_expu()), worker, SLOT(stop()), Qt::DirectConnection);
+    connect(this, SIGNAL(stop_expu()), worker, SLOT(stop()),
+            Qt::DirectConnection);
 
     thread->start();
 
     ui->HdrBox->setEnabled(false);
     ui->dirGroup->setEnabled(false);
-    ui->SeisTab->setTabEnabled(0,false);
-    ui->hdrsLstTab->setTabEnabled(0,false);
+    ui->SeisTab->setTabEnabled(0, false);
+    ui->hdrsLstTab->setTabEnabled(0, false);
     ui->HeBox->setEnabled(false);
     ui->edExpr->setEnabled(false);
     hdrElstDtGrid.setEnabled(false);
-    setEnabledAllBtns(ui->EcBox,false);
+    setEnabledAllBtns(ui->EcBox, false);
     ui->btnUpdE->setEnabled(true);
-
 }
 
 void MainWindow::x_fin_e(QString mess)
 {
-    expu_running=false;
+    expu_running = false;
     ui->btnUpdE->setIcon(QIcon(":/images/FileSave.png"));
-    ShowProgress(mess,-1);
+    ShowProgress(mess, -1);
 
     ui->HdrBox->setEnabled(true);
     ui->dirGroup->setEnabled(true);
-    ui->SeisTab->setTabEnabled(0,true);
-    ui->hdrsLstTab->setTabEnabled(0,true);
+    ui->SeisTab->setTabEnabled(0, true);
+    ui->hdrsLstTab->setTabEnabled(0, true);
     ui->HeBox->setEnabled(true);
     ui->edExpr->setEnabled(true);
     hdrElstDtGrid.setEnabled(true);
-    setEnabledAllBtns(ui->EcBox,true);
+    setEnabledAllBtns(ui->EcBox, true);
 
-    if(mess=="Undone" || mess=="Undo error")
-    {
+    if (mess == "Undone" || mess == "Undo error") {
         ClrUndoE();
-    }
-    else
-    {
+    } else {
         ui->btnUndE->setEnabled(true);
         undoList = exprList;
     }
 }
 
-
 void MainWindow::on_btnUndE_clicked()
 {
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if( !sf || !sf->Active() ) return;
+    if (!sf || !sf->Active())
+        return;
 
-    QThread* thread = new QThread;
+    QThread *thread = new QThread;
 
-    ChangeThExprWorker* worker = new ChangeThExprWorker(sf,undoList,undofn,1);
+    ChangeThExprWorker *worker =
+        new ChangeThExprWorker(sf, undoList, undofn, 1);
 
     worker->moveToThread(thread);
-    connect(thread, SIGNAL(started()),          worker, SLOT(process()));
-    connect(worker, SIGNAL(finished()),         thread, SLOT(quit()));
-    connect(worker, SIGNAL(finished()),         worker, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()),         thread, SLOT(deleteLater()));
-    connect(worker, SIGNAL(eprogr(int,QString)),this,   SLOT(x_progr(int,QString)));
-    connect(worker, SIGNAL(efin(QString)),      this,   SLOT(x_fin_e(QString)));
+    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(worker, SIGNAL(eprogr(int, QString)), this,
+            SLOT(x_progr(int, QString)));
+    connect(worker, SIGNAL(efin(QString)), this, SLOT(x_fin_e(QString)));
 
-    connect(this,   SIGNAL(stop_expu()), worker, SLOT(stop()), Qt::DirectConnection);
+    connect(this, SIGNAL(stop_expu()), worker, SLOT(stop()),
+            Qt::DirectConnection);
 
     thread->start();
 
     ui->HdrBox->setEnabled(false);
     ui->dirGroup->setEnabled(false);
-    ui->SeisTab->setTabEnabled(0,false);
-    ui->hdrsLstTab->setTabEnabled(0,false);
+    ui->SeisTab->setTabEnabled(0, false);
+    ui->hdrsLstTab->setTabEnabled(0, false);
     ui->HeBox->setEnabled(false);
     ui->edExpr->setEnabled(false);
     hdrElstDtGrid.setEnabled(false);
-    setEnabledAllBtns(ui->EcBox,false);
+    setEnabledAllBtns(ui->EcBox, false);
 }
 
 void MainWindow::on_actionSave_As_triggered()
 {
-    SeisFile* sf = seisSrc.Sfile();
+    SeisFile *sf = seisSrc.Sfile();
 
-    if( !sf || !sf->Active() ) return;
+    if (!sf || !sf->Active())
+        return;
 
-    SaveAsDlg.sf     = sf;
+    SaveAsDlg.sf = sf;
     SaveAsDlg.savDir = &savDir;
     SaveAsDlg.show();
 }
 
 void MainWindow::on_btnLastTr_2_clicked()
 {
-    hdrElstDtGrid.setCurCell(hdrListDtGrid.rowCount()-1);
+    hdrElstDtGrid.setCurCell(hdrListDtGrid.rowCount() - 1);
 }
 
-void MainWindow::on_btnFirstTr_2_clicked()
-{
-    hdrElstDtGrid.setCurCell(0);
-}
-
+void MainWindow::on_btnFirstTr_2_clicked() { hdrElstDtGrid.setCurCell(0); }
 
 void MainWindow::on_autoGainBtn_clicked()
 {
     seisSct.selTr();
 
-    if(ui->ckNorm->isChecked() || ui->ckAgc->isChecked())
-    {
+    if (ui->ckNorm->isChecked() || ui->ckAgc->isChecked()) {
         seisSct.setGc(2);
         seisSct.setGw(2);
-    }
-    else
-    {
-        if(seisSct.selTr()>=0)
-        {
-            float  a = seisSct.getSelMaxAmp();
-            if(a!=0)
-            {
-                double g = 2/a;
+    } else {
+        if (seisSct.selTr() >= 0) {
+            float a = seisSct.getSelMaxAmp();
+            if (a != 0) {
+                double g = 2 / a;
                 seisSct.setGc(g);
                 seisSct.setGw(g);
             }
@@ -3642,14 +3290,14 @@ void MainWindow::on_autoGainBtn_clicked()
 
 void MainWindow::on_rbDirNorm_toggled(bool checked)
 {
-    if(checked)
-    {
-        SeisFile* sf = seisSrc.Sfile();
+    if (checked) {
+        SeisFile *sf = seisSrc.Sfile();
 
-        if(sf==NULL) return;
+        if (sf == NULL)
+            return;
 
-        seisSct. setX1(-1);
-        seisSct. setX2(sf->Nt());
+        seisSct.setX1(-1);
+        seisSct.setX2(sf->Nt());
         hdrsAxis.setX1(-1);
         hdrsAxis.setX2(sf->Nt());
         hdrsBottomAxis.setX1(-1);
@@ -3659,14 +3307,14 @@ void MainWindow::on_rbDirNorm_toggled(bool checked)
 
 void MainWindow::on_rbDirRev_toggled(bool checked)
 {
-    if(checked)
-    {
-        SeisFile* sf = seisSrc.Sfile();
+    if (checked) {
+        SeisFile *sf = seisSrc.Sfile();
 
-        if(sf==NULL) return;
+        if (sf == NULL)
+            return;
 
-        seisSct. setX1(sf->Nt());
-        seisSct. setX2(-1);
+        seisSct.setX1(sf->Nt());
+        seisSct.setX2(-1);
         hdrsAxis.setX1(sf->Nt());
         hdrsAxis.setX2(-1);
         hdrsBottomAxis.setX1(sf->Nt());
@@ -3674,51 +3322,40 @@ void MainWindow::on_rbDirRev_toggled(bool checked)
     }
 }
 
-
-void MainWindow::on_ckTimLines_toggled(bool checked)
-{
-    seisSct.setTl(checked);
-}
+void MainWindow::on_ckTimLines_toggled(bool checked) { seisSct.setTl(checked); }
 
 void MainWindow::on_actionOpen_File_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Load Text Header from File",
-                                                    curDir,
-                                                    "Any file (*);;"
-                                                    "SEG-Y file (*.sgy);;"
-                                                    "SEG-Y file (*.segy);;"
-                                                    "CST file (*cst)");
-    if(fileName=="")
-    {
+    QString fileName =
+        QFileDialog::getOpenFileName(this, "Load Text Header from File", curDir,
+                                     "Any file (*);;"
+                                     "SEG-Y file (*.sgy);;"
+                                     "SEG-Y file (*.segy);;"
+                                     "CST file (*cst)");
+    if (fileName == "") {
         return;
     }
 
     QFileInfo fi(fileName);
 
     QByteArray qfn = fi.filePath().toLocal8Bit();
-    const char* fname = qfn.data();
+    const char *fname = qfn.data();
 
     setWindowTitle("");
 
-    int frm=2;
+    int frm = 2;
     int cgg, junk, swap;
 
-    if(is_cst_f(fname))
-    {
-        frm  = 3;
-    }
-    else if(is_su_f(fname,swap))
-    {
-        frm  = 2;
-    }
-    else if(is_segy_f(fname,swap,cgg,junk))
-    {
-        frm  = 1;
-    }
-    else
-    {
-        QMessageBox::critical(this,"Error","Unknown format for seismic file: " + QString(fname),
-                              QMessageBox::Discard);
+    if (is_cst_f(fname)) {
+        frm = 3;
+    } else if (is_su_f(fname, swap)) {
+        frm = 2;
+    } else if (is_segy_f(fname, swap, cgg, junk)) {
+        frm = 1;
+    } else {
+        QMessageBox::critical(
+            this, "Error", "Unknown format for seismic file: " + QString(fname),
+            QMessageBox::Discard);
         return;
     }
 
@@ -3726,23 +3363,21 @@ void MainWindow::on_actionOpen_File_triggered()
 
     OpenSeisFile(frm);
 
-    ChangeDataDir(fi.dir().absolutePath(),fi.fileName());
+    ChangeDataDir(fi.dir().absolutePath(), fi.fileName());
 }
-
 
 void MainWindow::on_ckDly_toggled(bool checked)
 {
     Q_UNUSED(checked);
 
-    SeisFile* sf = seisSrc.Sfile();
-    if(!sf) return;
+    SeisFile *sf = seisSrc.Sfile();
+    if (!sf)
+        return;
 
+    _dly_min = 0;
+    _dly_max = 0;
 
-    _dly_min=0;
-    _dly_max=0;
-
-    if(ui->ckDly->isChecked() && sf->ThIdx("DELRECT")>=0)
-    {
+    if (ui->ckDly->isChecked() && sf->ThIdx("DELRECT") >= 0) {
         ScanDelay();
         return;
     }

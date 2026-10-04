@@ -36,9 +36,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_MainWindow
-{
-public:
+class Ui_MainWindow {
+  public:
     QAction *actionOpen_Directory;
     QAction *actionE_xit;
     QAction *actionAbout;
@@ -147,29 +146,35 @@ public:
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(990, 683);
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/images/SegDSee.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/images/SegDSee.png"), QSize(),
+                     QIcon::Normal, QIcon::Off);
         MainWindow->setWindowIcon(icon);
         actionOpen_Directory = new QAction(MainWindow);
-        actionOpen_Directory->setObjectName(QString::fromUtf8("actionOpen_Directory"));
+        actionOpen_Directory->setObjectName(
+            QString::fromUtf8("actionOpen_Directory"));
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/images/OpenDir.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/images/OpenDir.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         actionOpen_Directory->setIcon(icon1);
         actionE_xit = new QAction(MainWindow);
         actionE_xit->setObjectName(QString::fromUtf8("actionE_xit"));
         actionAbout = new QAction(MainWindow);
         actionAbout->setObjectName(QString::fromUtf8("actionAbout"));
         actionUser_Manual = new QAction(MainWindow);
-        actionUser_Manual->setObjectName(QString::fromUtf8("actionUser_Manual"));
+        actionUser_Manual->setObjectName(
+            QString::fromUtf8("actionUser_Manual"));
         actionParameters = new QAction(MainWindow);
         actionParameters->setObjectName(QString::fromUtf8("actionParameters"));
         actionUser_s_Manual_Russian = new QAction(MainWindow);
-        actionUser_s_Manual_Russian->setObjectName(QString::fromUtf8("actionUser_s_Manual_Russian"));
+        actionUser_s_Manual_Russian->setObjectName(
+            QString::fromUtf8("actionUser_s_Manual_Russian"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         verticalLayout_14 = new QVBoxLayout(centralWidget);
         verticalLayout_14->setSpacing(0);
         verticalLayout_14->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_14->setObjectName(QString::fromUtf8("verticalLayout_14"));
+        verticalLayout_14->setObjectName(
+            QString::fromUtf8("verticalLayout_14"));
         verticalLayout_14->setContentsMargins(0, 0, 0, 0);
         splitter = new QSplitter(centralWidget);
         splitter->setObjectName(QString::fromUtf8("splitter"));
@@ -182,7 +187,8 @@ public:
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(dirGroup->sizePolicy().hasHeightForWidth());
+        sizePolicy.setHeightForWidth(
+            dirGroup->sizePolicy().hasHeightForWidth());
         dirGroup->setSizePolicy(sizePolicy);
         dirGroup->setMinimumSize(QSize(250, 0));
         dirGroup->setMaximumSize(QSize(1000, 16777215));
@@ -196,7 +202,8 @@ public:
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(frame_3->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            frame_3->sizePolicy().hasHeightForWidth());
         frame_3->setSizePolicy(sizePolicy1);
         frame_3->setMinimumSize(QSize(0, 30));
         frame_3->setMaximumSize(QSize(16777215, 30));
@@ -208,14 +215,16 @@ public:
         horizontalLayout_3 = new QHBoxLayout(layoutWidget);
         horizontalLayout_3->setSpacing(1);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(
+            QString::fromUtf8("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 2, 0, 0);
         selDirBtn = new QPushButton(layoutWidget);
         selDirBtn->setObjectName(QString::fromUtf8("selDirBtn"));
         QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(selDirBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            selDirBtn->sizePolicy().hasHeightForWidth());
         selDirBtn->setSizePolicy(sizePolicy2);
         selDirBtn->setMinimumSize(QSize(25, 25));
         selDirBtn->setMaximumSize(QSize(25, 25));
@@ -225,28 +234,31 @@ public:
 
         refreshBtn = new QPushButton(layoutWidget);
         refreshBtn->setObjectName(QString::fromUtf8("refreshBtn"));
-        sizePolicy2.setHeightForWidth(refreshBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            refreshBtn->sizePolicy().hasHeightForWidth());
         refreshBtn->setSizePolicy(sizePolicy2);
         refreshBtn->setMinimumSize(QSize(25, 25));
         refreshBtn->setMaximumSize(QSize(25, 25));
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/images/Refresh.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QString::fromUtf8(":/images/Refresh.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         refreshBtn->setIcon(icon2);
 
         horizontalLayout_3->addWidget(refreshBtn);
 
         goBackBtn = new QPushButton(layoutWidget);
         goBackBtn->setObjectName(QString::fromUtf8("goBackBtn"));
-        sizePolicy2.setHeightForWidth(goBackBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            goBackBtn->sizePolicy().hasHeightForWidth());
         goBackBtn->setSizePolicy(sizePolicy2);
         goBackBtn->setMinimumSize(QSize(25, 25));
         goBackBtn->setMaximumSize(QSize(25, 25));
         QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/images/GoBack.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QString::fromUtf8(":/images/GoBack.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         goBackBtn->setIcon(icon3);
 
         horizontalLayout_3->addWidget(goBackBtn);
-
 
         verticalLayout_2->addWidget(frame_3);
 
@@ -263,7 +275,8 @@ public:
         QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(SeisBox->sizePolicy().hasHeightForWidth());
+        sizePolicy3.setHeightForWidth(
+            SeisBox->sizePolicy().hasHeightForWidth());
         SeisBox->setSizePolicy(sizePolicy3);
         horizontalLayout = new QHBoxLayout(SeisBox);
         horizontalLayout->setSpacing(2);
@@ -277,7 +290,8 @@ public:
         horizontalLayout_11 = new QHBoxLayout(HdrsPg);
         horizontalLayout_11->setSpacing(0);
         horizontalLayout_11->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
+        horizontalLayout_11->setObjectName(
+            QString::fromUtf8("horizontalLayout_11"));
         horizontalLayout_11->setContentsMargins(0, 0, 0, 0);
         frame_7 = new QFrame(HdrsPg);
         frame_7->setObjectName(QString::fromUtf8("frame_7"));
@@ -288,11 +302,13 @@ public:
         verticalLayout_13 = new QVBoxLayout(frame_7);
         verticalLayout_13->setSpacing(2);
         verticalLayout_13->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_13->setObjectName(QString::fromUtf8("verticalLayout_13"));
+        verticalLayout_13->setObjectName(
+            QString::fromUtf8("verticalLayout_13"));
         verticalLayout_13->setContentsMargins(2, 2, 2, 2);
         frame_9 = new QFrame(frame_7);
         frame_9->setObjectName(QString::fromUtf8("frame_9"));
-        sizePolicy1.setHeightForWidth(frame_9->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            frame_9->sizePolicy().hasHeightForWidth());
         frame_9->setSizePolicy(sizePolicy1);
         frame_9->setMinimumSize(QSize(100, 24));
         frame_9->setMaximumSize(QSize(16777215, 24));
@@ -305,32 +321,36 @@ public:
         horizontalLayout_10 = new QHBoxLayout(layoutWidget_2);
         horizontalLayout_10->setSpacing(6);
         horizontalLayout_10->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
+        horizontalLayout_10->setObjectName(
+            QString::fromUtf8("horizontalLayout_10"));
         horizontalLayout_10->setContentsMargins(2, 2, 0, 0);
         hdrsBtmBtn = new QPushButton(layoutWidget_2);
         hdrsBtmBtn->setObjectName(QString::fromUtf8("hdrsBtmBtn"));
-        sizePolicy2.setHeightForWidth(hdrsBtmBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            hdrsBtmBtn->sizePolicy().hasHeightForWidth());
         hdrsBtmBtn->setSizePolicy(sizePolicy2);
         hdrsBtmBtn->setMinimumSize(QSize(16, 16));
         hdrsBtmBtn->setMaximumSize(QSize(16, 16));
         QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/images/GoBottom.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon4.addFile(QString::fromUtf8(":/images/GoBottom.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         hdrsBtmBtn->setIcon(icon4);
 
         horizontalLayout_10->addWidget(hdrsBtmBtn);
 
         hdrsTopBtn = new QPushButton(layoutWidget_2);
         hdrsTopBtn->setObjectName(QString::fromUtf8("hdrsTopBtn"));
-        sizePolicy2.setHeightForWidth(hdrsTopBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            hdrsTopBtn->sizePolicy().hasHeightForWidth());
         hdrsTopBtn->setSizePolicy(sizePolicy2);
         hdrsTopBtn->setMinimumSize(QSize(16, 16));
         hdrsTopBtn->setMaximumSize(QSize(16, 16));
         QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/images/GoTop.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon5.addFile(QString::fromUtf8(":/images/GoTop.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         hdrsTopBtn->setIcon(icon5);
 
         horizontalLayout_10->addWidget(hdrsTopBtn);
-
 
         verticalLayout_13->addWidget(frame_9);
 
@@ -341,7 +361,6 @@ public:
         hdrFrame->setFrameShadow(QFrame::Raised);
 
         verticalLayout_13->addWidget(hdrFrame);
-
 
         horizontalLayout_11->addWidget(frame_7);
 
@@ -362,7 +381,8 @@ public:
         horizontalLayout_8 = new QHBoxLayout(ChnPg);
         horizontalLayout_8->setSpacing(0);
         horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
+        horizontalLayout_8->setObjectName(
+            QString::fromUtf8("horizontalLayout_8"));
         horizontalLayout_8->setContentsMargins(0, 0, 0, 0);
         chsFrame = new QFrame(ChnPg);
         chsFrame->setObjectName(QString::fromUtf8("chsFrame"));
@@ -373,11 +393,13 @@ public:
         verticalLayout_12 = new QVBoxLayout(chsFrame);
         verticalLayout_12->setSpacing(0);
         verticalLayout_12->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
+        verticalLayout_12->setObjectName(
+            QString::fromUtf8("verticalLayout_12"));
         verticalLayout_12->setContentsMargins(0, 0, 0, 0);
         frame_6 = new QFrame(chsFrame);
         frame_6->setObjectName(QString::fromUtf8("frame_6"));
-        sizePolicy1.setHeightForWidth(frame_6->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            frame_6->sizePolicy().hasHeightForWidth());
         frame_6->setSizePolicy(sizePolicy1);
         frame_6->setMinimumSize(QSize(100, 40));
         frame_6->setMaximumSize(QSize(16777215, 40));
@@ -391,38 +413,45 @@ public:
         verticalLayout_8->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setSpacing(1);
-        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        horizontalLayout_6->setObjectName(
+            QString::fromUtf8("horizontalLayout_6"));
         btnCkNon = new QPushButton(frame_6);
         btnCkNon->setObjectName(QString::fromUtf8("btnCkNon"));
-        sizePolicy2.setHeightForWidth(btnCkNon->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            btnCkNon->sizePolicy().hasHeightForWidth());
         btnCkNon->setSizePolicy(sizePolicy2);
         btnCkNon->setMinimumSize(QSize(25, 25));
         btnCkNon->setMaximumSize(QSize(25, 25));
         QIcon icon6;
-        icon6.addFile(QString::fromUtf8(":/images/ChkNon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon6.addFile(QString::fromUtf8(":/images/ChkNon.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         btnCkNon->setIcon(icon6);
 
         horizontalLayout_6->addWidget(btnCkNon);
 
         btnCkAll = new QPushButton(frame_6);
         btnCkAll->setObjectName(QString::fromUtf8("btnCkAll"));
-        sizePolicy2.setHeightForWidth(btnCkAll->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            btnCkAll->sizePolicy().hasHeightForWidth());
         btnCkAll->setSizePolicy(sizePolicy2);
         btnCkAll->setMinimumSize(QSize(25, 25));
         btnCkAll->setMaximumSize(QSize(25, 25));
         QIcon icon7;
-        icon7.addFile(QString::fromUtf8(":/images/ChkAll.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon7.addFile(QString::fromUtf8(":/images/ChkAll.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         btnCkAll->setIcon(icon7);
 
         horizontalLayout_6->addWidget(btnCkAll);
 
-        horizontalSpacer = new QSpacerItem(13, 22, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(13, 22, QSizePolicy::Expanding,
+                                           QSizePolicy::Minimum);
 
         horizontalLayout_6->addItem(horizontalSpacer);
 
         verticalLayout_11 = new QVBoxLayout();
         verticalLayout_11->setSpacing(0);
-        verticalLayout_11->setObjectName(QString::fromUtf8("verticalLayout_11"));
+        verticalLayout_11->setObjectName(
+            QString::fromUtf8("verticalLayout_11"));
         ckAll = new QCheckBox(frame_6);
         ckAll->setObjectName(QString::fromUtf8("ckAll"));
         ckAll->setMaximumSize(QSize(40, 16777215));
@@ -435,12 +464,9 @@ public:
 
         verticalLayout_11->addWidget(ckSng);
 
-
         horizontalLayout_6->addLayout(verticalLayout_11);
 
-
         verticalLayout_8->addLayout(horizontalLayout_6);
-
 
         verticalLayout_12->addWidget(frame_6);
 
@@ -452,7 +478,6 @@ public:
 
         verticalLayout_12->addWidget(chsGridFrame);
 
-
         horizontalLayout_8->addWidget(chsFrame);
 
         frame_2 = new QFrame(ChnPg);
@@ -463,7 +488,8 @@ public:
         verticalLayout_10 = new QVBoxLayout(frame_2);
         verticalLayout_10->setSpacing(0);
         verticalLayout_10->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
+        verticalLayout_10->setObjectName(
+            QString::fromUtf8("verticalLayout_10"));
         verticalLayout_10->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(frame_2);
         frame->setObjectName(QString::fromUtf8("frame"));
@@ -476,7 +502,8 @@ public:
         horizontalLayout_5 = new QHBoxLayout(frame);
         horizontalLayout_5->setSpacing(2);
         horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName(
+            QString::fromUtf8("horizontalLayout_5"));
         horizontalLayout_5->setContentsMargins(2, 0, 0, 2);
         groupBox = new QGroupBox(frame);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
@@ -505,9 +532,7 @@ public:
 
         verticalLayout_3->addWidget(ckColor);
 
-
         verticalLayout_6->addLayout(verticalLayout_3);
-
 
         horizontalLayout_5->addWidget(groupBox);
 
@@ -538,9 +563,7 @@ public:
 
         verticalLayout_4->addWidget(rbNeg);
 
-
         verticalLayout_7->addLayout(verticalLayout_4);
-
 
         horizontalLayout_5->addWidget(groupBox_2);
 
@@ -549,7 +572,8 @@ public:
         horizontalLayout_2 = new QHBoxLayout(groupBox_3);
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(
+            QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         gridLayout = new QGridLayout();
         gridLayout->setSpacing(6);
@@ -578,7 +602,8 @@ public:
         zoomVallBtn->setMinimumSize(QSize(18, 18));
         zoomVallBtn->setMaximumSize(QSize(18, 18));
         QIcon icon8;
-        icon8.addFile(QString::fromUtf8(":/images/Zv.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon8.addFile(QString::fromUtf8(":/images/Zv.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         zoomVallBtn->setIcon(icon8);
 
         gridLayout->addWidget(zoomVallBtn, 0, 3, 1, 1);
@@ -604,7 +629,8 @@ public:
         zoomHallBtn->setMinimumSize(QSize(18, 18));
         zoomHallBtn->setMaximumSize(QSize(18, 18));
         QIcon icon9;
-        icon9.addFile(QString::fromUtf8(":/images/Zh.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon9.addFile(QString::fromUtf8(":/images/Zh.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         zoomHallBtn->setIcon(icon9);
 
         gridLayout->addWidget(zoomHallBtn, 1, 3, 1, 1);
@@ -649,9 +675,7 @@ public:
 
         gridLayout->addWidget(TrSlider, 0, 1, 1, 1);
 
-
         horizontalLayout_2->addLayout(gridLayout);
-
 
         horizontalLayout_5->addWidget(groupBox_3);
 
@@ -664,7 +688,8 @@ public:
         verticalLayout_9->setContentsMargins(2, 2, 2, 2);
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(6);
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName(
+            QString::fromUtf8("horizontalLayout_4"));
         horizontalLayout_4->setContentsMargins(2, -1, 2, -1);
         verticalLayout_5 = new QVBoxLayout();
         verticalLayout_5->setSpacing(3);
@@ -685,40 +710,41 @@ public:
 
         verticalLayout_5->addWidget(ckNorm);
 
-
         horizontalLayout_4->addLayout(verticalLayout_5);
 
         procParmBtn = new QPushButton(groupBox_4);
         procParmBtn->setObjectName(QString::fromUtf8("procParmBtn"));
         procParmBtn->setMaximumSize(QSize(23, 23));
         QIcon icon10;
-        icon10.addFile(QString::fromUtf8(":/images/Procp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon10.addFile(QString::fromUtf8(":/images/Procp.png"), QSize(),
+                       QIcon::Normal, QIcon::Off);
         procParmBtn->setIcon(icon10);
 
         horizontalLayout_4->addWidget(procParmBtn);
 
-
         verticalLayout_9->addLayout(horizontalLayout_4);
-
 
         horizontalLayout_5->addWidget(groupBox_4);
 
-        horizontalSpacer_2 = new QSpacerItem(0, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(0, 20, QSizePolicy::Expanding,
+                                             QSizePolicy::Minimum);
 
         horizontalLayout_5->addItem(horizontalSpacer_2);
-
 
         verticalLayout_10->addWidget(frame);
 
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setSpacing(2);
-        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+        horizontalLayout_9->setObjectName(
+            QString::fromUtf8("horizontalLayout_9"));
         frame_8 = new QFrame(frame_2);
         frame_8->setObjectName(QString::fromUtf8("frame_8"));
-        QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+        QSizePolicy sizePolicy4(QSizePolicy::Preferred,
+                                QSizePolicy::MinimumExpanding);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(frame_8->sizePolicy().hasHeightForWidth());
+        sizePolicy4.setHeightForWidth(
+            frame_8->sizePolicy().hasHeightForWidth());
         frame_8->setSizePolicy(sizePolicy4);
         frame_8->setMinimumSize(QSize(32, 150));
         frame_8->setMaximumSize(QSize(32, 16777215));
@@ -728,52 +754,62 @@ public:
         zoomAllBtn = new QPushButton(frame_8);
         zoomAllBtn->setObjectName(QString::fromUtf8("zoomAllBtn"));
         zoomAllBtn->setGeometry(QRect(4, 4, 25, 25));
-        sizePolicy2.setHeightForWidth(zoomAllBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            zoomAllBtn->sizePolicy().hasHeightForWidth());
         zoomAllBtn->setSizePolicy(sizePolicy2);
         zoomAllBtn->setMinimumSize(QSize(25, 25));
         zoomAllBtn->setMaximumSize(QSize(25, 25));
         QIcon icon11;
-        icon11.addFile(QString::fromUtf8(":/images/ZoomA.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon11.addFile(QString::fromUtf8(":/images/ZoomA.png"), QSize(),
+                       QIcon::Normal, QIcon::Off);
         zoomAllBtn->setIcon(icon11);
         zoomWinBtn = new QPushButton(frame_8);
         zoomWinBtn->setObjectName(QString::fromUtf8("zoomWinBtn"));
         zoomWinBtn->setGeometry(QRect(4, 35, 25, 25));
-        sizePolicy2.setHeightForWidth(zoomWinBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            zoomWinBtn->sizePolicy().hasHeightForWidth());
         zoomWinBtn->setSizePolicy(sizePolicy2);
         zoomWinBtn->setMinimumSize(QSize(25, 25));
         zoomWinBtn->setMaximumSize(QSize(25, 25));
         QIcon icon12;
-        icon12.addFile(QString::fromUtf8(":/images/ZoomW.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon12.addFile(QString::fromUtf8(":/images/ZoomW.png"), QSize(),
+                       QIcon::Normal, QIcon::Off);
         zoomWinBtn->setIcon(icon12);
         zoomOutBtn = new QPushButton(frame_8);
         zoomOutBtn->setObjectName(QString::fromUtf8("zoomOutBtn"));
         zoomOutBtn->setGeometry(QRect(4, 66, 25, 25));
-        sizePolicy2.setHeightForWidth(zoomOutBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            zoomOutBtn->sizePolicy().hasHeightForWidth());
         zoomOutBtn->setSizePolicy(sizePolicy2);
         zoomOutBtn->setMinimumSize(QSize(25, 25));
         zoomOutBtn->setMaximumSize(QSize(25, 25));
         QIcon icon13;
-        icon13.addFile(QString::fromUtf8(":/images/ZoomO.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon13.addFile(QString::fromUtf8(":/images/ZoomO.png"), QSize(),
+                       QIcon::Normal, QIcon::Off);
         zoomOutBtn->setIcon(icon13);
         zoomInBtn = new QPushButton(frame_8);
         zoomInBtn->setObjectName(QString::fromUtf8("zoomInBtn"));
         zoomInBtn->setGeometry(QRect(4, 97, 25, 25));
-        sizePolicy2.setHeightForWidth(zoomInBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            zoomInBtn->sizePolicy().hasHeightForWidth());
         zoomInBtn->setSizePolicy(sizePolicy2);
         zoomInBtn->setMinimumSize(QSize(25, 25));
         zoomInBtn->setMaximumSize(QSize(25, 25));
         QIcon icon14;
-        icon14.addFile(QString::fromUtf8(":/images/ZoomI.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon14.addFile(QString::fromUtf8(":/images/ZoomI.png"), QSize(),
+                       QIcon::Normal, QIcon::Off);
         zoomInBtn->setIcon(icon14);
         zoomPreBtn = new QPushButton(frame_8);
         zoomPreBtn->setObjectName(QString::fromUtf8("zoomPreBtn"));
         zoomPreBtn->setGeometry(QRect(4, 128, 25, 25));
-        sizePolicy2.setHeightForWidth(zoomPreBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            zoomPreBtn->sizePolicy().hasHeightForWidth());
         zoomPreBtn->setSizePolicy(sizePolicy2);
         zoomPreBtn->setMinimumSize(QSize(25, 25));
         zoomPreBtn->setMaximumSize(QSize(25, 25));
         QIcon icon15;
-        icon15.addFile(QString::fromUtf8(":/images/ZoomP.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon15.addFile(QString::fromUtf8(":/images/ZoomP.png"), QSize(),
+                       QIcon::Normal, QIcon::Off);
         zoomPreBtn->setIcon(icon15);
 
         horizontalLayout_9->addWidget(frame_8);
@@ -783,7 +819,8 @@ public:
         QSizePolicy sizePolicy5(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(seisFrame1->sizePolicy().hasHeightForWidth());
+        sizePolicy5.setHeightForWidth(
+            seisFrame1->sizePolicy().hasHeightForWidth());
         seisFrame1->setSizePolicy(sizePolicy5);
         seisFrame1->setMinimumSize(QSize(100, 160));
         seisFrame1->setFrameShape(QFrame::StyledPanel);
@@ -811,12 +848,9 @@ public:
 
         verticalLayout->addWidget(seisFrame);
 
-
         horizontalLayout_9->addWidget(seisFrame1);
 
-
         verticalLayout_10->addLayout(horizontalLayout_9);
-
 
         horizontalLayout_8->addWidget(frame_2);
 
@@ -856,70 +890,108 @@ public:
         menuProcessing->addAction(actionParameters);
 
         retranslateUi(MainWindow);
-        QObject::connect(actionE_xit, SIGNAL(triggered()), MainWindow, SLOT(close()));
+        QObject::connect(actionE_xit, SIGNAL(triggered()), MainWindow,
+                         SLOT(close()));
 
         SeisTab->setCurrentIndex(1);
-
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "SegDSee", nullptr));
-        actionOpen_Directory->setText(QCoreApplication::translate("MainWindow", "Open &Directory", nullptr));
-        actionE_xit->setText(QCoreApplication::translate("MainWindow", "E&xit", nullptr));
-        actionAbout->setText(QCoreApplication::translate("MainWindow", "About", nullptr));
-        actionUser_Manual->setText(QCoreApplication::translate("MainWindow", "User's Manual (English)", nullptr));
-        actionParameters->setText(QCoreApplication::translate("MainWindow", "Parameters", nullptr));
-        actionUser_s_Manual_Russian->setText(QCoreApplication::translate("MainWindow", "\320\230\320\275\321\201\321\202\321\200\321\203\320\272\321\206\320\270\321\217 (\320\240\321\203\321\201\321\201\320\272\320\270\320\271)", nullptr));
-        dirGroup->setTitle(QCoreApplication::translate("MainWindow", "Directory List", nullptr));
+        MainWindow->setWindowTitle(
+            QCoreApplication::translate("MainWindow", "SegDSee", nullptr));
+        actionOpen_Directory->setText(QCoreApplication::translate(
+            "MainWindow", "Open &Directory", nullptr));
+        actionE_xit->setText(
+            QCoreApplication::translate("MainWindow", "E&xit", nullptr));
+        actionAbout->setText(
+            QCoreApplication::translate("MainWindow", "About", nullptr));
+        actionUser_Manual->setText(QCoreApplication::translate(
+            "MainWindow", "User's Manual (English)", nullptr));
+        actionParameters->setText(
+            QCoreApplication::translate("MainWindow", "Parameters", nullptr));
+        actionUser_s_Manual_Russian->setText(QCoreApplication::translate(
+            "MainWindow",
+            "\320\230\320\275\321\201\321\202\321\200\321\203\320\272\321\206"
+            "\320"
+            "\270\321\217 "
+            "(\320\240\321\203\321\201\321\201\320\272\320\270\320\271)",
+            nullptr));
+        dirGroup->setTitle(QCoreApplication::translate(
+            "MainWindow", "Directory List", nullptr));
         selDirBtn->setText(QString());
         refreshBtn->setText(QString());
         goBackBtn->setText(QString());
         SeisBox->setTitle(QString());
         hdrsBtmBtn->setText(QString());
         hdrsTopBtn->setText(QString());
-        SeisTab->setTabText(SeisTab->indexOf(HdrsPg), QCoreApplication::translate("MainWindow", "Headers", nullptr));
+        SeisTab->setTabText(
+            SeisTab->indexOf(HdrsPg),
+            QCoreApplication::translate("MainWindow", "Headers", nullptr));
         btnCkNon->setText(QString());
         btnCkAll->setText(QString());
-        ckAll->setText(QCoreApplication::translate("MainWindow", "All", nullptr));
-        ckSng->setText(QCoreApplication::translate("MainWindow", "Single", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("MainWindow", "Display Mode", nullptr));
-        ckWiggle->setText(QCoreApplication::translate("MainWindow", "Wiggle", nullptr));
-        ckGray->setText(QCoreApplication::translate("MainWindow", "Gray", nullptr));
-        ckColor->setText(QCoreApplication::translate("MainWindow", "Color", nullptr));
-        groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "Wggle Fill", nullptr));
-        rbNon->setText(QCoreApplication::translate("MainWindow", "None", nullptr));
-        rbPos->setText(QCoreApplication::translate("MainWindow", "Positive", nullptr));
-        rbNeg->setText(QCoreApplication::translate("MainWindow", "Negative", nullptr));
-        groupBox_3->setTitle(QCoreApplication::translate("MainWindow", "Scale", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "Traces", nullptr));
+        ckAll->setText(
+            QCoreApplication::translate("MainWindow", "All", nullptr));
+        ckSng->setText(
+            QCoreApplication::translate("MainWindow", "Single", nullptr));
+        groupBox->setTitle(
+            QCoreApplication::translate("MainWindow", "Display Mode", nullptr));
+        ckWiggle->setText(
+            QCoreApplication::translate("MainWindow", "Wiggle", nullptr));
+        ckGray->setText(
+            QCoreApplication::translate("MainWindow", "Gray", nullptr));
+        ckColor->setText(
+            QCoreApplication::translate("MainWindow", "Color", nullptr));
+        groupBox_2->setTitle(
+            QCoreApplication::translate("MainWindow", "Wggle Fill", nullptr));
+        rbNon->setText(
+            QCoreApplication::translate("MainWindow", "None", nullptr));
+        rbPos->setText(
+            QCoreApplication::translate("MainWindow", "Positive", nullptr));
+        rbNeg->setText(
+            QCoreApplication::translate("MainWindow", "Negative", nullptr));
+        groupBox_3->setTitle(
+            QCoreApplication::translate("MainWindow", "Scale", nullptr));
+        label->setText(
+            QCoreApplication::translate("MainWindow", "Traces", nullptr));
         zoomVallBtn->setText(QString());
-        label_2->setText(QCoreApplication::translate("MainWindow", "Time", nullptr));
+        label_2->setText(
+            QCoreApplication::translate("MainWindow", "Time", nullptr));
         zoomHallBtn->setText(QString());
-        label_3->setText(QCoreApplication::translate("MainWindow", "Gain", nullptr));
-        aGainBtn->setText(QCoreApplication::translate("MainWindow", "A", nullptr));
-        groupBox_4->setTitle(QCoreApplication::translate("MainWindow", "Display Mode", nullptr));
-        ckFilt->setText(QCoreApplication::translate("MainWindow", "Filter", nullptr));
-        ckAgc->setText(QCoreApplication::translate("MainWindow", "Agc", nullptr));
-        ckNorm->setText(QCoreApplication::translate("MainWindow", "Norm", nullptr));
+        label_3->setText(
+            QCoreApplication::translate("MainWindow", "Gain", nullptr));
+        aGainBtn->setText(
+            QCoreApplication::translate("MainWindow", "A", nullptr));
+        groupBox_4->setTitle(
+            QCoreApplication::translate("MainWindow", "Display Mode", nullptr));
+        ckFilt->setText(
+            QCoreApplication::translate("MainWindow", "Filter", nullptr));
+        ckAgc->setText(
+            QCoreApplication::translate("MainWindow", "Agc", nullptr));
+        ckNorm->setText(
+            QCoreApplication::translate("MainWindow", "Norm", nullptr));
         procParmBtn->setText(QString());
         zoomAllBtn->setText(QString());
         zoomWinBtn->setText(QString());
         zoomOutBtn->setText(QString());
         zoomInBtn->setText(QString());
         zoomPreBtn->setText(QString());
-        SeisTab->setTabText(SeisTab->indexOf(ChnPg), QCoreApplication::translate("MainWindow", "Channel Sets", nullptr));
-        menu_File->setTitle(QCoreApplication::translate("MainWindow", "&File", nullptr));
-        menu_Help->setTitle(QCoreApplication::translate("MainWindow", "&Help", nullptr));
-        menuProcessing->setTitle(QCoreApplication::translate("MainWindow", "Processing", nullptr));
+        SeisTab->setTabText(
+            SeisTab->indexOf(ChnPg),
+            QCoreApplication::translate("MainWindow", "Channel Sets", nullptr));
+        menu_File->setTitle(
+            QCoreApplication::translate("MainWindow", "&File", nullptr));
+        menu_Help->setTitle(
+            QCoreApplication::translate("MainWindow", "&Help", nullptr));
+        menuProcessing->setTitle(
+            QCoreApplication::translate("MainWindow", "Processing", nullptr));
     } // retranslateUi
-
 };
 
 namespace Ui {
-    class MainWindow: public Ui_MainWindow {};
+class MainWindow : public Ui_MainWindow {};
 } // namespace Ui
 
 QT_END_NAMESPACE

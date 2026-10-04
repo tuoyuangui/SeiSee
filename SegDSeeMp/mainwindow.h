@@ -1,35 +1,34 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
-#include <QWidget>
-#include <QMainWindow>
 #include <QApplication>
-#include <QStack>
-#include <QProgressBar>
-#include <QLabel>
 #include <QDebug>
+#include <QLabel>
+#include <QMainWindow>
+#include <QProgressBar>
+#include <QStack>
 #include <QThread>
+#include <QWidget>
 
-#include "gfxview.h"
-#include "myscrollarea.h"
-#include "gfxsrcseistest.h"
+#include "gfxobjhsrslab.h"
+#include "gfxobjseishdrs.h"
 #include "gfxobjseissect.h"
 #include "gfxobjtaxis.h"
-#include "gfxobjseishdrs.h"
-#include "gfxobjhsrslab.h"
-#include "gfxsrcseismemsegd.h"
-#include "mystringtable.h"
 #include "gfxsctlist.h"
+#include "gfxsrcseismemsegd.h"
+#include "gfxsrcseistest.h"
+#include "gfxview.h"
 #include "myobjptrlist.h"
+#include "myscrollarea.h"
+#include "mystringtable.h"
 
-#include "procparmdialog.h"
 #include "aboutdialog.h"
+#include "procparmdialog.h"
 
 #include "readerthread.h"
 
-#include "libSegD.h"
 #include "cwp.h"
+#include "libSegD.h"
 
 #define VERSION "4.0.2"
 
@@ -37,73 +36,69 @@ namespace Ui {
 class MainWindow;
 }
 
-class myEventCatcher:public QObject
-{
+class myEventCatcher : public QObject {
     Q_OBJECT
-protected:
-
+  protected:
     int _tag;
 
-public:
-
-     myEventCatcher(int tag, QObject * parent):QObject(parent) { _tag = tag; }
+  public:
+    myEventCatcher(int tag, QObject *parent)
+        : QObject(parent)
+    {
+        _tag = tag;
+    }
     ~myEventCatcher() {}
 
-    bool eventFilter(QObject* object,QEvent* event)
+    bool eventFilter(QObject *object, QEvent *event)
     {
-       if(event->type() == QEvent::Wheel)
-        {
-           QWheelEvent* e = dynamic_cast<QWheelEvent *>(event);
-           emit whellEvent(_tag,e);
-           return true;
+        if (event->type() == QEvent::Wheel) {
+            QWheelEvent *e = dynamic_cast<QWheelEvent *>(event);
+            emit whellEvent(_tag, e);
+            return true;
         }
 
         // standard event processing
         return QObject::eventFilter(object, event);
     }
 
-signals:
-    void whellEvent(int tag, QWheelEvent* event);
+  signals:
+    void whellEvent(int tag, QWheelEvent *event);
 
-public slots:
-
+  public slots:
 };
 
-
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
-    
-public:
+
+  public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-public slots:
+  public slots:
 
-    void sendSmp(int ncs, int nch, float* smp, char &rc);
+    void sendSmp(int ncs, int nch, float *smp, char &rc);
 
-    void sclZoom (double zx, double zy, int xc, int yc);
+    void sclZoom(double zx, double zy, int xc, int yc);
     void sclZoomV(double zx, double zy, int xc, int yc);
     void sclZoomH(double zx, double zy, int xc, int yc);
 
     void winZoom(QRect r);
 
-
     void FillChsGrid();
 
-    virtual void closeEvent(QCloseEvent * event);
-    
-private slots:
+    virtual void closeEvent(QCloseEvent *event);
+
+  private slots:
 
     void dirGridEvent(int row, int mode);
     void hdrGridEvent(int row, int mode);
     void chsGridEvent(int row, int mode);
 
-    void viewMouseEvent(QMouseEvent* event);
+    void viewMouseEvent(QMouseEvent *event);
 
     void procParmEvent();
 
-    void edWhellEvent(int tag, QWheelEvent* event);
+    void edWhellEvent(int tag, QWheelEvent *event);
 
     void ResetSrc();
 
@@ -195,104 +190,103 @@ private slots:
 
     void on_actionUser_s_Manual_Russian_triggered();
 
-private:
+  private:
     Ui::MainWindow *ui;
 
-    ReadThread*    WorkThread;
-    ReadThread*    ChkfThread;
+    ReadThread *WorkThread;
+    ReadThread *ChkfThread;
 
     QProgressBar *progressBar;
 
-    QLabel * m_statMess;
-    QLabel * m_statTime;
-    QLabel * m_statChSet;
-    QLabel * m_statChan;
-    QLabel * m_statFfid;
-    QLabel * m_statSp;
-    QLabel * m_statusRight;
+    QLabel *m_statMess;
+    QLabel *m_statTime;
+    QLabel *m_statChSet;
+    QLabel *m_statChan;
+    QLabel *m_statFfid;
+    QLabel *m_statSp;
+    QLabel *m_statusRight;
 
     ProcParmDialog ProcParmDlg;
-    AboutDialog    AboutDlg;
+    AboutDialog AboutDlg;
 
     QList<DirItem> dlist;
     QList<QString> hlist;
-    QStack<zdata>  zstack;
+    QStack<zdata> zstack;
 
-    QList<QRgb>    pal;
+    QList<QRgb> pal;
 
-    QString    find;
+    QString find;
 
-    int        dirw;
+    int dirw;
 
-    double     _f1, _f2, _f3, _f4;
-    double     _agcw;
+    double _f1, _f2, _f3, _f4;
+    double _agcw;
 
-    float             _smax;
-    bool              cs_changed;
+    float _smax;
+    bool cs_changed;
 
-    bool              busy;
+    bool busy;
 
-    double            xss, yss, gss; // sliders' values
+    double xss, yss, gss; // sliders' values
 
-    QVector<bool>     chsSel;
+    QVector<bool> chsSel;
 
-    GfxView           timeView;
-    GfxView           hdrsView;
-    GfxView           hlabView;
-    GfxView           seisView;
+    GfxView timeView;
+    GfxView hdrsView;
+    GfxView hlabView;
+    GfxView seisView;
 
-    MyScrollArea*     hdrsScrl;
-    MyScrollArea*     timeScrl;
-    MyScrollArea*     seisScrl;
+    MyScrollArea *hdrsScrl;
+    MyScrollArea *timeScrl;
+    MyScrollArea *seisScrl;
 
-    GfxObjTAxis       timeAxis;
-    GfxObjHsrsLab     hdrsLab;
+    GfxObjTAxis timeAxis;
+    GfxObjHsrsLab hdrsLab;
 
-    MyStringTable     dirGrid;
-    MyStringTable     chsGrid;
-    MyStringTable     hdrGrid;
+    MyStringTable dirGrid;
+    MyStringTable chsGrid;
+    MyStringTable hdrGrid;
 
-    GfxSctList        sctList;
-    MyObjPtrList      srcList;
-    MyObjPtrList      haxList;
+    GfxSctList sctList;
+    MyObjPtrList srcList;
+    MyObjPtrList haxList;
 
-    TSegD*            segd;
+    TSegD *segd;
 
-    QString           curDir;
-    QString           curFile;
-    QString           curHdr;
-    QString           curFn;  // file number in ltod
+    QString curDir;
+    QString curFile;
+    QString curHdr;
+    QString curFn; // file number in ltod
 
-    int  tabcsi(int nr);
+    int tabcsi(int nr);
 
     double allSectWidth();
 
-    void FillDirRow  (int nr, DirItem di);
+    void FillDirRow(int nr, DirItem di);
     void FillDirGrid(QList<DirItem> list, int mode);
 
     void StopThreads();
 
-    void ChangeDataDir(QString Dname, QString Find="");
-    void ScanLtod     ();
-    void CheckFiles   (QString Dname, QList<DirItem> Dlist);
+    void ChangeDataDir(QString Dname, QString Find = "");
+    void ScanLtod();
+    void CheckFiles(QString Dname, QList<DirItem> Dlist);
 
-    void SetZoomC (double  xs,  double  ys, int  xc, int  yc);
-    void SetZoom  (double  xs,  double  ys, int  xo, int  yo, bool push=true);
-    void GetZoom  (double& xs,  double& ys, int& xo, int& yo);
+    void SetZoomC(double xs, double ys, int xc, int yc);
+    void SetZoom(double xs, double ys, int xo, int yo, bool push = true);
+    void GetZoom(double &xs, double &ys, int &xo, int &yo);
 
-    int  Parse(byte *buf, int len);
+    int Parse(byte *buf, int len);
     void Clear();
 
     CwpFilter Fi;
 
-    int Filter(float* inps,
-               float f1, float f2, float f3, float f4,
-               double si, int ns);
+    int Filter(float *inps, float f1, float f2, float f3, float f4, double si,
+               int ns);
 
     void ShowProgress(QString mes, int pers);
 
-    int  ReadSegdFile  ();
-    int  ReadSegdInLtod(int row);
+    int ReadSegdFile();
+    int ReadSegdInLtod(int row);
 
     void SelCsets();
 
@@ -301,12 +295,12 @@ private:
     void FillEdits();
     void FillControls();
 
-    void GetRegInfo ();
+    void GetRegInfo();
     void SaveRegInfo();
 
-    void SaveCsSel(bool clear=false);
+    void SaveCsSel(bool clear = false);
 
-    void NewFileReady(TSegD* newsegd);
+    void NewFileReady(TSegD *newsegd);
 
     bool event(QEvent *evt);
 };

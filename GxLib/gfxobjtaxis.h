@@ -3,37 +3,32 @@
 
 #include "gfxobj.h"
 
-class GfxObjTAxis : public GfxObj
-{
-protected:
+class GfxObjTAxis : public GfxObj {
+  protected:
     double m_Ti;
     bool m_rightSide;
 
     virtual void DoDraw();
 
-
-public:
+  public:
     GfxObjTAxis(QObject *parent = 0);
 
     void setRightSide(bool v)
     {
-        m_rightSide = v; Update();
+        m_rightSide = v;
+        Update();
     }
 
-    void  setTi(double v)
+    void setTi(double v)
     {
-        m_Ti=v; Update();
+        m_Ti = v;
+        Update();
     }
 
-    double Ti()
-    {
-        return m_Ti;
-    }
+    double Ti() { return m_Ti; }
 
-    virtual double X1() {return 0; }
-    virtual double X2() {return pix2x(gfx->W()); }
-
-
+    virtual double X1() { return 0; }
+    virtual double X2() { return pix2x(gfx->W()); }
 };
 
 #endif // GFXOBJTAXIS_H

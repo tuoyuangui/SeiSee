@@ -32,9 +32,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_SaveAsDialog
-{
-public:
+class Ui_SaveAsDialog {
+  public:
     QVBoxLayout *verticalLayout_7;
     QSplitter *splitter;
     QGroupBox *groupBox;
@@ -110,7 +109,8 @@ public:
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
+        sizePolicy.setHeightForWidth(
+            groupBox->sizePolicy().hasHeightForWidth());
         groupBox->setSizePolicy(sizePolicy);
         groupBox->setMaximumSize(QSize(350, 16777215));
         verticalLayout = new QVBoxLayout(groupBox);
@@ -202,10 +202,10 @@ public:
 
         gridLayout->addWidget(btnTrStp, 3, 2, 1, 1);
 
-
         verticalLayout_6->addLayout(gridLayout);
 
-        verticalSpacer = new QSpacerItem(20, 43, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer = new QSpacerItem(20, 43, QSizePolicy::Minimum,
+                                         QSizePolicy::Expanding);
 
         verticalLayout_6->addItem(verticalSpacer);
 
@@ -218,66 +218,76 @@ public:
         EcBox = new QGroupBox(tab_2);
         EcBox->setObjectName(QString::fromUtf8("EcBox"));
         horizontalLayout_15 = new QHBoxLayout(EcBox);
-        horizontalLayout_15->setObjectName(QString::fromUtf8("horizontalLayout_15"));
+        horizontalLayout_15->setObjectName(
+            QString::fromUtf8("horizontalLayout_15"));
         btnHexp = new QPushButton(EcBox);
         btnHexp->setObjectName(QString::fromUtf8("btnHexp"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(btnHexp->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            btnHexp->sizePolicy().hasHeightForWidth());
         btnHexp->setSizePolicy(sizePolicy1);
         btnHexp->setMinimumSize(QSize(25, 25));
         btnHexp->setMaximumSize(QSize(25, 25));
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/images/Hexp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/images/Hexp.png"), QSize(),
+                     QIcon::Normal, QIcon::Off);
         btnHexp->setIcon(icon);
 
         horizontalLayout_15->addWidget(btnHexp);
 
         btnNexp = new QPushButton(EcBox);
         btnNexp->setObjectName(QString::fromUtf8("btnNexp"));
-        sizePolicy1.setHeightForWidth(btnNexp->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            btnNexp->sizePolicy().hasHeightForWidth());
         btnNexp->setSizePolicy(sizePolicy1);
         btnNexp->setMinimumSize(QSize(25, 25));
         btnNexp->setMaximumSize(QSize(25, 25));
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/images/Nexp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/images/Nexp.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         btnNexp->setIcon(icon1);
 
         horizontalLayout_15->addWidget(btnNexp);
 
         btnLexp = new QPushButton(EcBox);
         btnLexp->setObjectName(QString::fromUtf8("btnLexp"));
-        sizePolicy1.setHeightForWidth(btnLexp->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            btnLexp->sizePolicy().hasHeightForWidth());
         btnLexp->setSizePolicy(sizePolicy1);
         btnLexp->setMinimumSize(QSize(25, 25));
         btnLexp->setMaximumSize(QSize(25, 25));
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/images/Lexp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QString::fromUtf8(":/images/Lexp.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         btnLexp->setIcon(icon2);
 
         horizontalLayout_15->addWidget(btnLexp);
 
-        horizontalSpacer_12 = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_12 =
+            new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         horizontalLayout_15->addItem(horizontalSpacer_12);
 
         btnClrExp = new QPushButton(EcBox);
         btnClrExp->setObjectName(QString::fromUtf8("btnClrExp"));
-        sizePolicy1.setHeightForWidth(btnClrExp->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            btnClrExp->sizePolicy().hasHeightForWidth());
         btnClrExp->setSizePolicy(sizePolicy1);
         btnClrExp->setMinimumSize(QSize(25, 25));
         btnClrExp->setMaximumSize(QSize(25, 25));
         QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/images/delete_item.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QString::fromUtf8(":/images/delete_item.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         btnClrExp->setIcon(icon3);
 
         horizontalLayout_15->addWidget(btnClrExp);
 
-        horizontalSpacer_13 = new QSpacerItem(115, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_13 = new QSpacerItem(115, 20, QSizePolicy::Expanding,
+                                              QSizePolicy::Minimum);
 
         horizontalLayout_15->addItem(horizontalSpacer_13);
-
 
         verticalLayout_5->addWidget(EcBox);
 
@@ -289,7 +299,6 @@ public:
         tabNumExp->addTab(tab_2, QString());
 
         verticalLayout_3->addWidget(tabNumExp);
-
 
         verticalLayout->addWidget(groupBox_3);
 
@@ -341,9 +350,7 @@ public:
 
         gridLayout_2->addWidget(btnTmMax, 1, 2, 1, 1);
 
-
         verticalLayout_2->addLayout(gridLayout_2);
-
 
         verticalLayout->addWidget(groupBox_4);
 
@@ -366,7 +373,6 @@ public:
 
         horizontalLayout->addWidget(cbFormat);
 
-
         verticalLayout_4->addLayout(horizontalLayout);
 
         ckRev = new QCheckBox(groupBox_5);
@@ -381,17 +387,18 @@ public:
 
         verticalLayout_4->addWidget(ckProc);
 
-
         verticalLayout->addWidget(groupBox_5);
 
         groupBox_6 = new QGroupBox(groupBox);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
         horizontalLayout_2 = new QHBoxLayout(groupBox_6);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(
+            QString::fromUtf8("horizontalLayout_2"));
         btnSave = new QToolButton(groupBox_6);
         btnSave->setObjectName(QString::fromUtf8("btnSave"));
         QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/images/FileSave.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon4.addFile(QString::fromUtf8(":/images/FileSave.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         btnSave->setIcon(icon4);
         btnSave->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
@@ -403,7 +410,6 @@ public:
         btnClose->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
         horizontalLayout_2->addWidget(btnClose);
-
 
         verticalLayout->addWidget(groupBox_6);
 
@@ -432,58 +438,83 @@ public:
 
         verticalLayout_7->addWidget(edMess);
 
-
         retranslateUi(SaveAsDialog);
 
         tabNumExp->setCurrentIndex(0);
-
 
         QMetaObject::connectSlotsByName(SaveAsDialog);
     } // setupUi
 
     void retranslateUi(QDialog *SaveAsDialog)
     {
-        SaveAsDialog->setWindowTitle(QCoreApplication::translate("SaveAsDialog", "Save File As", nullptr));
+        SaveAsDialog->setWindowTitle(QCoreApplication::translate(
+            "SaveAsDialog", "Save File As", nullptr));
         groupBox->setTitle(QString());
-        groupBox_3->setTitle(QCoreApplication::translate("SaveAsDialog", "Trace", nullptr));
-        ckTrAll->setText(QCoreApplication::translate("SaveAsDialog", "All Traces", nullptr));
-        label_2->setText(QCoreApplication::translate("SaveAsDialog", "By:", nullptr));
-        label_3->setText(QCoreApplication::translate("SaveAsDialog", "Min:", nullptr));
-        btnTrMin->setText(QCoreApplication::translate("SaveAsDialog", "Min", nullptr));
-        label_4->setText(QCoreApplication::translate("SaveAsDialog", "Max:", nullptr));
-        btnTrMax->setText(QCoreApplication::translate("SaveAsDialog", "Max", nullptr));
-        label_5->setText(QCoreApplication::translate("SaveAsDialog", "Step:", nullptr));
-        btnTrStp->setText(QCoreApplication::translate("SaveAsDialog", "Every Trace", nullptr));
-        tabNumExp->setTabText(tabNumExp->indexOf(tab), QCoreApplication::translate("SaveAsDialog", "By Number", nullptr));
+        groupBox_3->setTitle(
+            QCoreApplication::translate("SaveAsDialog", "Trace", nullptr));
+        ckTrAll->setText(
+            QCoreApplication::translate("SaveAsDialog", "All Traces", nullptr));
+        label_2->setText(
+            QCoreApplication::translate("SaveAsDialog", "By:", nullptr));
+        label_3->setText(
+            QCoreApplication::translate("SaveAsDialog", "Min:", nullptr));
+        btnTrMin->setText(
+            QCoreApplication::translate("SaveAsDialog", "Min", nullptr));
+        label_4->setText(
+            QCoreApplication::translate("SaveAsDialog", "Max:", nullptr));
+        btnTrMax->setText(
+            QCoreApplication::translate("SaveAsDialog", "Max", nullptr));
+        label_5->setText(
+            QCoreApplication::translate("SaveAsDialog", "Step:", nullptr));
+        btnTrStp->setText(QCoreApplication::translate("SaveAsDialog",
+                                                      "Every Trace", nullptr));
+        tabNumExp->setTabText(
+            tabNumExp->indexOf(tab),
+            QCoreApplication::translate("SaveAsDialog", "By Number", nullptr));
         EcBox->setTitle(QString());
         btnHexp->setText(QString());
         btnNexp->setText(QString());
         btnLexp->setText(QString());
         btnClrExp->setText(QString());
-        tabNumExp->setTabText(tabNumExp->indexOf(tab_2), QCoreApplication::translate("SaveAsDialog", "By Expression", nullptr));
-        groupBox_4->setTitle(QCoreApplication::translate("SaveAsDialog", "Time", nullptr));
-        ckTmAll->setText(QCoreApplication::translate("SaveAsDialog", "Whole trace", nullptr));
-        label_6->setText(QCoreApplication::translate("SaveAsDialog", "Min:", nullptr));
-        btnTmMin->setText(QCoreApplication::translate("SaveAsDialog", "Min", nullptr));
-        label_7->setText(QCoreApplication::translate("SaveAsDialog", "Max:", nullptr));
-        btnTmMax->setText(QCoreApplication::translate("SaveAsDialog", "Max", nullptr));
+        tabNumExp->setTabText(tabNumExp->indexOf(tab_2),
+                              QCoreApplication::translate(
+                                  "SaveAsDialog", "By Expression", nullptr));
+        groupBox_4->setTitle(
+            QCoreApplication::translate("SaveAsDialog", "Time", nullptr));
+        ckTmAll->setText(QCoreApplication::translate("SaveAsDialog",
+                                                     "Whole trace", nullptr));
+        label_6->setText(
+            QCoreApplication::translate("SaveAsDialog", "Min:", nullptr));
+        btnTmMin->setText(
+            QCoreApplication::translate("SaveAsDialog", "Min", nullptr));
+        label_7->setText(
+            QCoreApplication::translate("SaveAsDialog", "Max:", nullptr));
+        btnTmMax->setText(
+            QCoreApplication::translate("SaveAsDialog", "Max", nullptr));
         groupBox_5->setTitle(QString());
-        label_8->setText(QCoreApplication::translate("SaveAsDialog", "Format:", nullptr));
-        cbFormat->setItemText(0, QCoreApplication::translate("SaveAsDialog", "IEEE 32 Float", nullptr));
-        cbFormat->setItemText(1, QCoreApplication::translate("SaveAsDialog", "IBM 32 Float", nullptr));
+        label_8->setText(
+            QCoreApplication::translate("SaveAsDialog", "Format:", nullptr));
+        cbFormat->setItemText(0, QCoreApplication::translate(
+                                     "SaveAsDialog", "IEEE 32 Float", nullptr));
+        cbFormat->setItemText(1, QCoreApplication::translate(
+                                     "SaveAsDialog", "IBM 32 Float", nullptr));
 
-        ckRev->setText(QCoreApplication::translate("SaveAsDialog", "Reversal order", nullptr));
-        ckProc->setText(QCoreApplication::translate("SaveAsDialog", "Apply Processing", nullptr));
+        ckRev->setText(QCoreApplication::translate("SaveAsDialog",
+                                                   "Reversal order", nullptr));
+        ckProc->setText(QCoreApplication::translate(
+            "SaveAsDialog", "Apply Processing", nullptr));
         groupBox_6->setTitle(QString());
-        btnSave->setText(QCoreApplication::translate("SaveAsDialog", "Save", nullptr));
-        btnClose->setText(QCoreApplication::translate("SaveAsDialog", "Close", nullptr));
-        hdrBox->setTitle(QCoreApplication::translate("SaveAsDialog", "Trace Headers", nullptr));
+        btnSave->setText(
+            QCoreApplication::translate("SaveAsDialog", "Save", nullptr));
+        btnClose->setText(
+            QCoreApplication::translate("SaveAsDialog", "Close", nullptr));
+        hdrBox->setTitle(QCoreApplication::translate("SaveAsDialog",
+                                                     "Trace Headers", nullptr));
     } // retranslateUi
-
 };
 
 namespace Ui {
-    class SaveAsDialog: public Ui_SaveAsDialog {};
+class SaveAsDialog : public Ui_SaveAsDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE

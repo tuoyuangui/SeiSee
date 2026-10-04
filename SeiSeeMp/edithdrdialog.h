@@ -3,31 +3,30 @@
 
 #include <QDialog>
 
-#include "sgyfile.h"
 #include "hdrdef.h"
 #include "mystringtable.h"
+#include "sgyfile.h"
 
 namespace Ui {
 class EditHdrDialog;
 }
 
-class EditHdrDialog : public QDialog
-{
+class EditHdrDialog : public QDialog {
     Q_OBJECT
 
-public:
+  public:
     explicit EditHdrDialog(QWidget *parent = 0);
     ~EditHdrDialog();
 
-    MyStringTable     hdrGrid;
-    MyStringTable     insGrid;
-    bool              changed;
-    bool              busy;
-    int               curtype;
+    MyStringTable hdrGrid;
+    MyStringTable insGrid;
+    bool changed;
+    bool busy;
+    int curtype;
 
     void show();
 
-private:
+  private:
     Ui::EditHdrDialog *ui;
 
     void setChanged(bool v);
@@ -40,7 +39,7 @@ private:
 
     void onUserInput();
 
-private slots:
+  private slots:
 
     void hdrTabEvent(int row, int mode);
 
@@ -63,7 +62,7 @@ private slots:
 
     void on_insBtn_clicked();
 
-signals:
+  signals:
     void changedEvent();
 };
 

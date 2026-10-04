@@ -3,120 +3,108 @@
 
 #include "seisfile.h"
 
-class SgyFile : public SeisFile
-{
+class SgyFile : public SeisFile {
     Q_OBJECT
 
-protected:
+  protected:
+    virtual void Open(string fn);
+    virtual void Close();
 
-    virtual void  Open (string fn);
-    virtual void  Close();
+    virtual bool ReadTxtHed();
 
-    virtual bool   ReadTxtHed();
+    virtual bool ReadBinHed();
 
-    virtual bool   ReadBinHed();
+    virtual void ReadTrace(long long ntr);
 
-    virtual void   ReadTrace(long long ntr);
+    virtual float GetSample(int idx, byte *inptrc);
 
-    virtual float  GetSample(int idx, byte *inptrc);
-public:
+  public:
     explicit SgyFile(QObject *parent = 0);
     virtual ~SgyFile();
 
-    virtual float*  Ts (long long ntr);
-    virtual float*  Rs(long long ntr);
+    virtual float *Ts(long long ntr);
+    virtual float *Rs(long long ntr);
 
-    float*          Rs(long long ntr, byte* hed);
+    float *Rs(long long ntr, byte *hed);
 
     virtual QString typeName() { return "SEG-Y"; }
-    virtual int     typIdx()   { return 1;       }
+    virtual int typIdx() { return 1; }
 
-    int ReadRawTrace(byte* &buf, long long ntr, bool header_only=false);
-    int WriteRawTrace(byte* buf, long long ntr, bool header_only=false);
+    int ReadRawTrace(byte *&buf, long long ntr, bool header_only = false);
+    int WriteRawTrace(byte *buf, long long ntr, bool header_only = false);
 
-    virtual bool UpdateTxtHed   (QString txt);
-    virtual bool UpdateBinHed   (QVector<QString> vals);
+    virtual bool UpdateTxtHed(QString txt);
+    virtual bool UpdateBinHed(QVector<QString> vals);
 
     virtual bool Active()
     {
-        if(_f<0) return false;
-        else     return true;
+        if (_f < 0)
+            return false;
+        else
+            return true;
     }
 
-signals:
+  signals:
 
-public slots:
-
+  public slots:
 };
 
-class SuFile : public SgyFile
-{
+class SuFile : public SgyFile {
     Q_OBJECT
 
-protected:
+  protected:
+    virtual void Open(string fn);
+    virtual void Close();
 
-    virtual void  Open (string fn);
-    virtual void  Close();
+    virtual float *Rs(long long ntr);
 
-    virtual float*  Rs(long long ntr);
+    virtual bool ReadBinHed();
 
-    virtual bool   ReadBinHed();
+    virtual void ReadTrace(long long ntr);
 
-    virtual void   ReadTrace(long long ntr);
-
-public:
+  public:
     explicit SuFile(QObject *parent = 0);
     virtual ~SuFile();
 
-    int ReadRawTrace(byte* &buf, long long ntr, bool header_only=false);
-    int WriteRawTrace(byte* buf, long long ntr, bool header_only=false);
+    int ReadRawTrace(byte *&buf, long long ntr, bool header_only = false);
+    int WriteRawTrace(byte *buf, long long ntr, bool header_only = false);
 
-    virtual QString typeName() { return "SU";}
-    virtual int     typeIdx()  { return    2;}
+    virtual QString typeName() { return "SU"; }
+    virtual int typeIdx() { return 2; }
 
-signals:
+  signals:
 
-public slots:
-
+  public slots:
 };
 
-
-class CstFile : public SgyFile
-{
+class CstFile : public SgyFile {
     Q_OBJECT
 
-protected:
+  protected:
+    virtual void Open(string fn);
+    virtual void Close();
 
-    virtual void  Open (string fn);
-    virtual void  Close();
+    virtual float *Rs(long long ntr);
 
-    virtual float*  Rs(long long ntr);
+    virtual bool ReadBinHed();
 
-    virtual bool   ReadBinHed();
+    virtual void ReadTrace(long long ntr);
 
-    virtual void   ReadTrace(long long ntr);
-
-public:
-
+  public:
     explicit CstFile(QObject *parent = 0);
     virtual ~CstFile();
 
-    virtual QString typeName() { return "CST";}
-    virtual int     typeIdx()  { return 3;    }
+    virtual QString typeName() { return "CST"; }
+    virtual int typeIdx() { return 3; }
 
-    int ReadRawTrace(byte* &buf, long long ntr, bool header_only=false);
-    int WriteRawTrace(byte* buf, long long ntr, bool header_only=false);
+    int ReadRawTrace(byte *&buf, long long ntr, bool header_only = false);
+    int WriteRawTrace(byte *buf, long long ntr, bool header_only = false);
 
-    virtual float   GetSample(int idx, byte* inptrc);
+    virtual float GetSample(int idx, byte *inptrc);
 
+  signals:
 
-signals:
-
-public slots:
-
+  public slots:
 };
-
-
-
 
 #endif // SGYFILE_H

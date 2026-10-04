@@ -1,13 +1,13 @@
-#include <math.h>
 #include <limits.h>
+#include <math.h>
 
 #include "gfx.h"
 
-#include <QFont>
-#include <QFontMetrics>
-#include <QFontDatabase>
-#include <QStringList> 
 #include <QDebug>
+#include <QFont>
+#include <QFontDatabase>
+#include <QFontMetrics>
+#include <QStringList>
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -53,22 +53,16 @@ int Bresenham(int x0, int y0, int x1, int y1, int *x, int *y)
     int dx = x1 - x0;
     int stepx, stepy;
 
-    if (dy < 0)
-    {
+    if (dy < 0) {
         dy = -dy;
         stepy = -1;
-    }
-    else
-    {
+    } else {
         stepy = 1;
     }
-    if (dx < 0)
-    {
+    if (dx < 0) {
         dx = -dx;
         stepx = -1;
-    }
-    else
-    {
+    } else {
         stepx = 1;
     }
     dy <<= 1; // dy is now 2*dy
@@ -80,13 +74,10 @@ int Bresenham(int x0, int y0, int x1, int y1, int *x, int *y)
 
     xo = x0;
 
-    if (dx > dy)
-    {
+    if (dx > dy) {
         int fraction = dy - (dx >> 1); // same as 2*dy - dx
-        while (x0 != x1)
-        {
-            if (fraction >= 0)
-            {
+        while (x0 != x1) {
+            if (fraction >= 0) {
                 y0 += stepy;
                 fraction -= dx; // same as fraction -= 2*dx
             }
@@ -97,22 +88,17 @@ int Bresenham(int x0, int y0, int x1, int y1, int *x, int *y)
             y[n++] = y0;
         }
         return n;
-    }
-    else
-    {
+    } else {
         int fraction = dx - (dy >> 1);
-        while (y0 != y1)
-        {
-            if (fraction >= 0)
-            {
+        while (y0 != y1) {
+            if (fraction >= 0) {
                 x0 += stepx;
                 fraction -= dy;
             }
             y0 += stepy;
             fraction += dx;
             //  SetPixel(1,x0,y0);
-            if (xo != x0)
-            {
+            if (xo != x0) {
                 x[n] = x0;
                 y[n++] = y0;
                 xo = x0;
@@ -147,8 +133,7 @@ void iRamp(int X0, int X1, int V0, int V1, int *X, int *V, int &NX)
     int x1 = (X1);
     int v0 = (V0);
     int v1 = (V1);
-    if (x0 > x1)
-    {
+    if (x0 > x1) {
         Swapi(x0, x1);
         Swapi(v0, v1);
     }
@@ -163,8 +148,7 @@ void iRamp(int X0, int X1, int V0, int V1, int *X, int *V, int &NX)
 
     stepv = dv / dx;
 
-    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv)
-    {
+    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv) {
         if (X)
             X[nx] = xo;
         if (V)
@@ -182,22 +166,19 @@ inline void Ramp(int X0, int X1, int V0, int V1, int *X, int *V, int &NX)
     int v0 = (V0);
     int v1 = (V1);
 
-    if (x0 == x1)
-    {
+    if (x0 == x1) {
         NX = 1;
         X[0] = x0;
         V[0] = v0;
         return;
     }
 
-    if (x0 > x1)
-    {
+    if (x0 > x1) {
         Swapi(x0, x1);
         Swapi(v0, v1);
     }
 
-    if ((x1 - x0) == 1)
-    {
+    if ((x1 - x0) == 1) {
         NX = 2;
         X[0] = x0;
         V[0] = v0;
@@ -206,12 +187,10 @@ inline void Ramp(int X0, int X1, int V0, int V1, int *X, int *V, int &NX)
         return;
     }
 
-    if (v1 == v0)
-    {
+    if (v1 == v0) {
         /*int dx = x1 - x0; */
         int nx = 0;
-        for (xo = x0; xo <= x1; xo++)
-        {
+        for (xo = x0; xo <= x1; xo++) {
             {
                 X[nx] = xo;
                 V[nx] = v1;
@@ -231,8 +210,7 @@ inline void Ramp(int X0, int X1, int V0, int V1, int *X, int *V, int &NX)
         int dv = v1 - v0;
         int stepv = dv / dx;
 
-        for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv)
-        {
+        for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv) {
             X[nx] = xo;
             V[nx] = vo >> 16;
             nx++;
@@ -278,10 +256,9 @@ Gfx::Gfx()
     _font = font;
     int font_Id = QFontDatabase::addApplicationFont(":/fonts/TIMES.TTF");
     QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
-//    qDebug()<<font_Id;
-//    qDebug()<<font_list;
-    if(!font_list.isEmpty())
-    {
+    //    qDebug()<<font_Id;
+    //    qDebug()<<font_list;
+    if (!font_list.isEmpty()) {
         QFont f;
         f.setFamily(font_list[0]);
         _font = f;
@@ -295,8 +272,7 @@ Gfx::Gfx()
 
     int n;
 
-    for (n = 0; n < 256; n++)
-    {
+    for (n = 0; n < 256; n++) {
         _pal[n] = QColor(n, n, n).rgb();
     }
 }
@@ -316,8 +292,7 @@ void Gfx::SetViewPort(QPainter *p, QRect *r)
     m_x = x;
     m_y = y;
 
-    if ((m_w != w) || (m_h != h))
-    {
+    if ((m_w != w) || (m_h != h)) {
         m_w = w;
         m_h = h;
         _img = QImage(m_w, m_h, QImage::Format_RGB32);
@@ -331,24 +306,20 @@ void Gfx::SetViewPort(QPainter *p, QRect *r)
 
 void Gfx::mSetPixel(int c, int x, int y)
 {
-    if (_trim)
-    {
-        if (m_h > 0 &&
-            (x) >= 0 && (x) < m_w &&
-            (y) >= 0 && (y) < m_h &&
-            (x) >= m_tx1 && (x) <= m_tx2 &&
-            (y) >= m_ty1 && (y) <= m_ty2)
-        {
+    if (_trim) {
+        if (m_h > 0 && (x) >= 0 && (x) < m_w && (y) >= 0 && (y) < m_h &&
+            (x) >= m_tx1 && (x) <= m_tx2 && (y) >= m_ty1 && (y) <= m_ty2) {
             _img.setPixel(x, y, c);
-            //{ int cc = (c); char* a = (m_Scn[(y)]+(((x)<<1)+(x))); memcpy(a,&cc,3); }
+            //{ int cc = (c); char* a = (m_Scn[(y)]+(((x)<<1)+(x)));
+            // memcpy(a,&cc,3);
+            //}
         }
-    }
-    else
-    {
-        if (m_h > 0 && (x) >= 0 && (x) < m_w && (y) >= 0 && (y) < m_h)
-        {
+    } else {
+        if (m_h > 0 && (x) >= 0 && (x) < m_w && (y) >= 0 && (y) < m_h) {
             _img.setPixel(x, y, c);
-            //{ int cc = (c); char* a = (m_Scn[(y)]+(((x)<<1)+(x))); memcpy(a,&cc,3); }
+            //{ int cc = (c); char* a = (m_Scn[(y)]+(((x)<<1)+(x)));
+            // memcpy(a,&cc,3);
+            //}
         }
     }
 
@@ -385,22 +356,16 @@ void Gfx::DrawLine(int x0, int y0, int x1, int y1, int cidx)
     if (y0 > m_h && y1 > m_h)
         return;
 
-    if (dy < 0)
-    {
+    if (dy < 0) {
         dy = -dy;
         stepy = -1;
-    }
-    else
-    {
+    } else {
         stepy = 1;
     }
-    if (dx < 0)
-    {
+    if (dx < 0) {
         dx = -dx;
         stepx = -1;
-    }
-    else
-    {
+    } else {
         stepx = 1;
     }
     dy <<= 1; // dy is now 2*dy
@@ -411,13 +376,10 @@ void Gfx::DrawLine(int x0, int y0, int x1, int y1, int cidx)
     if (dx == 0 && dy == 0)
         return;
 
-    if (dx > dy)
-    {
+    if (dx > dy) {
         int fraction = dy - (dx >> 1); // same as 2*dy - dx
-        while (x0 != x1)
-        {
-            if (fraction >= 0)
-            {
+        while (x0 != x1) {
+            if (fraction >= 0) {
                 y0 += stepy;
                 fraction -= dx; // same as fraction -= 2*dx
             }
@@ -425,14 +387,10 @@ void Gfx::DrawLine(int x0, int y0, int x1, int y1, int cidx)
             fraction += dy; // same as fraction -= 2*dy
             mSetPixel(cidx, x0, y0);
         }
-    }
-    else
-    {
+    } else {
         int fraction = dx - (dy >> 1);
-        while (y0 != y1)
-        {
-            if (fraction >= 0)
-            {
+        while (y0 != y1) {
+            if (fraction >= 0) {
                 x0 += stepx;
                 fraction -= dy;
             }
@@ -453,29 +411,24 @@ void Gfx::DrawLine(int x0, int y0, int x1, int y1, int cidx, int w, int wc)
 
     int w2 = w >> 1;
 
-    if (dx < dy)
-    {
+    if (dx < dy) {
         int xa = -w2;
         int xb = w2;
         int x;
 
-        if (wc != -1)
-        {
+        if (wc != -1) {
             DrawLine(x0 + xa - 1, y0, x1 + xa - 1, y1, wc);
             DrawLine(x0 + xb + 1, y0, x1 + xb + 1, y1, wc);
         }
 
         for (x = xa; x <= xb; x++)
             DrawLine(x0 + x, y0, x1 + x, y1, cidx);
-    }
-    else
-    {
+    } else {
         int ya = -w2;
         int yb = w2;
         int y;
 
-        if (wc != -1)
-        {
+        if (wc != -1) {
             DrawLine(x0, y0 + ya - 1, x1, y1 + ya - 1, wc);
             DrawLine(x0, y0 + yb + 1, x1, y1 + yb + 1, wc);
         }
@@ -517,22 +470,16 @@ void Gfx::DrawRampLine(int xa, int ya, int xb, int yb, int ca, int cb)
     if (y0 > m_h && y1 > m_h)
         return;
 
-    if (dy < 0)
-    {
+    if (dy < 0) {
         dy = -dy;
         stepy = -1;
-    }
-    else
-    {
+    } else {
         stepy = 1;
     }
-    if (dx < 0)
-    {
+    if (dx < 0) {
         dx = -dx;
         stepx = -1;
-    }
-    else
-    {
+    } else {
         stepx = 1;
     }
     dy <<= 1; // dy is now 2*dy
@@ -543,18 +490,15 @@ void Gfx::DrawRampLine(int xa, int ya, int xb, int yb, int ca, int cb)
     if (dx == 0 && dy == 0)
         return;
 
-    if (dx > dy)
-    {
+    if (dx > dy) {
         int *c = new int[dx + 1];
         int nc;
 
         iRamp(xa, xb, ca, cb, NULL, c, nc);
 
         int fraction = dy - (dx >> 1); // same as 2*dy - dx
-        while (x0 != x1)
-        {
-            if (fraction >= 0)
-            {
+        while (x0 != x1) {
+            if (fraction >= 0) {
                 y0 += stepy;
                 fraction -= dx; // same as fraction -= 2*dx
             }
@@ -564,19 +508,15 @@ void Gfx::DrawRampLine(int xa, int ya, int xb, int yb, int ca, int cb)
             SetPixel(cidx, x0, y0);
         }
         delete[] c;
-    }
-    else
-    {
+    } else {
         int *c = new int[dy + 1];
         int nc;
 
         iRamp(ya, yb, ca, cb, NULL, c, nc);
 
         int fraction = dx - (dy >> 1);
-        while (y0 != y1)
-        {
-            if (fraction >= 0)
-            {
+        while (y0 != y1) {
+            if (fraction >= 0) {
                 x0 += stepx;
                 fraction -= dy;
             }
@@ -599,17 +539,14 @@ void Gfx::DrawRampLine(int x0, int y0, int x1, int y1, int c0, int c1, int w)
 
     int w2 = w >> 1;
 
-    if (dx < dy)
-    {
+    if (dx < dy) {
         int xa = -w2;
         int xb = w2;
         int x;
 
         for (x = xa; x <= xb; x++)
             DrawRampLine(x0 + x, y0, x1 + x, y1, c0, c1);
-    }
-    else
-    {
+    } else {
         int ya = -w2;
         int yb = w2;
         int y;
@@ -631,15 +568,13 @@ void Gfx::FillRect(int x1, int y1, int x2, int y2, int cidx)
 {
     int y;
 
-    if (y1 > y2)
-    {
+    if (y1 > y2) {
         int t = y2;
         y2 = y1;
         y1 = t;
     }
 
-    for (y = y1; y <= y2; y++)
-    {
+    for (y = y1; y <= y2; y++) {
         DrawHLine(y, x1, x2, 1, cidx);
     }
 }
@@ -649,8 +584,7 @@ void Gfx::DrawHLine(int y, int x0, int x1, int w, int cidx)
     int x, y1, y2;
     int w2 = w >> 1;
 
-    if (x1 < x0)
-    {
+    if (x1 < x0) {
         x = x0;
         x0 = x1;
         x1 = x;
@@ -680,8 +614,7 @@ void Gfx::DrawVLine(int x, int y0, int y1, int w, int cidx)
     int y, x1, x2;
     int w2 = w >> 1;
 
-    if (y1 < y0)
-    {
+    if (y1 < y0) {
         y = y0;
         y0 = y1;
         y1 = y;
@@ -706,8 +639,8 @@ void Gfx::DrawVLine(int x, int y0, int y1, int w, int cidx)
             mSetPixel(cidx, x, y);
 }
 
-void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil, double g, int clp,
-                            int fc, int wc)
+void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil,
+                            double g, int clp, int fc, int wc)
 {
     int v1, v2, cy;
     int y1, y2;
@@ -726,8 +659,7 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil, d
 
     s1 = yi[nny - 3];
 
-    for (cy = 0; cy < nny - 2; cy++)
-    {
+    for (cy = 0; cy < nny - 2; cy++) {
         s1 = yi[cy];
         s2 = yi[cy + 1];
 
@@ -736,8 +668,7 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil, d
 
         int l = tr._nsmp;
 
-        if (s1 > l)
-        {
+        if (s1 > l) {
             int v = v1;
         }
 
@@ -760,14 +691,10 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil, d
         if (ny1 < 2)
             DrawHLine(y1, x + v1, x + v2, 1, wc);
 
-        for (n = 0; n < ny1 - 1; n++)
-        {
-            if (fil < 0 && v[n] < 0)
-            {
+        for (n = 0; n < ny1 - 1; n++) {
+            if (fil < 0 && v[n] < 0) {
                 DrawHLine(y[n], x, x + v[n], 1, fc);
-            }
-            else if (fil > 0 && v[n] > 0)
-            {
+            } else if (fil > 0 && v[n] > 0) {
                 DrawHLine(y[n], x, x + v[n], 1, fc);
             }
 
@@ -781,8 +708,8 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil, d
     delete[] y;
 }
 
-void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, float *s, int fil, double g, int clp,
-                            int fc, int wc)
+void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, float *s, int fil,
+                            double g, int clp, int fc, int wc)
 {
     int v1, v2, cy;
     int y1, y2;
@@ -799,8 +726,7 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, float *s, int fil,
     int *y = new int[SZ];
     int *v = new int[SZ];
 
-    for (cy = 0; cy < nny - 2; cy++)
-    {
+    for (cy = 0; cy < nny - 2; cy++) {
         s1 = yi[cy];
         s2 = yi[cy + 1];
 
@@ -826,14 +752,10 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, float *s, int fil,
         if (ny1 < 2)
             DrawHLine(y1, x + v1, x + v2, 1, wc);
 
-        for (n = 0; n < ny1 - 1; n++)
-        {
-            if (fil < 0 && v[n] < 0)
-            {
+        for (n = 0; n < ny1 - 1; n++) {
+            if (fil < 0 && v[n] < 0) {
                 DrawHLine(y[n], x, x + v[n], 1, fc);
-            }
-            else if (fil > 0 && v[n] > 0)
-            {
+            } else if (fil > 0 && v[n] > 0) {
                 DrawHLine(y[n], x, x + v[n], 1, fc);
             }
 
@@ -846,8 +768,7 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, float *s, int fil,
 
 void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, float *s1,
                             int x2, int *yi2, int *yj2, int nny2, float *s2,
-                            int lx, int rx,
-                            double g, int)
+                            int lx, int rx, double g, int)
 {
     x1 -= m_x;
     x2 -= m_x;
@@ -857,8 +778,7 @@ void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, float *s1,
     if (nny2 < 1)
         return;
 
-    if (x1 > x2)
-    {
+    if (x1 > x2) {
         int tmpx = x1;
         x1 = x2;
         x2 = tmpx;
@@ -906,8 +826,7 @@ void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, float *s1,
 
     int ny;
 
-    for (ny = 0; ny < nab; ny++)
-    {
+    for (ny = 0; ny < nab; ny++) {
         DrawHRamp2(y1[ny] - m_y, x1, x2 - 1, v1[ny], v2[ny], lx, rx, 0);
     }
 
@@ -919,8 +838,7 @@ void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, float *s1,
 
 void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, Ttr tr1,
                             int x2, int *yi2, int *yj2, int nny2, Ttr tr2,
-                            int lx, int rx,
-                            double g, int mode)
+                            int lx, int rx, double g, int mode)
 {
     x1 -= m_x;
     x2 -= m_x;
@@ -930,8 +848,7 @@ void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, Ttr tr1,
     if (nny2 < 1)
         return;
 
-    if (x1 > x2)
-    {
+    if (x1 > x2) {
         int tmpx = x1;
         x1 = x2;
         x2 = tmpx;
@@ -980,8 +897,7 @@ void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, Ttr tr1,
 
     int ny;
 
-    for (ny = 0; ny < nab; ny++)
-    {
+    for (ny = 0; ny < nab; ny++) {
         DrawHRamp2(y1[ny] - m_y, x1, x2 - 1, v1[ny], v2[ny], lx, rx, 0);
     }
 
@@ -991,8 +907,8 @@ void Gfx::Draw2ColorTraceTB(int x1, int *yi1, int *yj1, int nny1, Ttr tr1,
     delete[] v2;
 }
 
-inline void Gfx::PrepareColorTrace(int *yi, int *yj, int nny, float *s, double g,
-                                   int ya, int yb, int *yp, int *vp)
+inline void Gfx::PrepareColorTrace(int *yi, int *yj, int nny, float *s,
+                                   double g, int ya, int yb, int *yp, int *vp)
 {
     int v1, v2, cy;
     int y1, y2;
@@ -1000,8 +916,7 @@ inline void Gfx::PrepareColorTrace(int *yi, int *yj, int nny, float *s, double g
 
     int n, k = 0;
 
-    for (cy = 0; cy < nny - 1; cy++)
-    {
+    for (cy = 0; cy < nny - 1; cy++) {
         y1 = yj[cy];
         y2 = yj[cy + 1];
 
@@ -1030,17 +945,14 @@ inline void Gfx::PrepareColorTrace(int *yi, int *yj, int nny, float *s, double g
         Ramp(y1, y2, v1, v2, _cy, _cv, ny1);
         //      Ramp1(s1,s2,v1,v2,_h+1, vv+ny,so,nr);
 
-        if (ny1 < 2)
-        {
+        if (ny1 < 2) {
             vp[0] = v1;
             yp[0] = y1;
             k++;
         }
 
-        for (n = 0; n < ny1; n++)
-        {
-            if (_cy[n] >= ya && _cy[n] <= yb)
-            {
+        for (n = 0; n < ny1; n++) {
+            if (_cy[n] >= ya && _cy[n] <= yb) {
                 int yy = _cy[n] - ya;
                 vp[yy] = _cv[n];
                 yp[yy] = _cy[n];
@@ -1062,8 +974,7 @@ inline void Gfx::PrepareColorTrace(int *yi, int *yj, int nny, Ttr tr, double g,
 
     int n, k = 0;
 
-    for (cy = 0; cy < nny - 1; cy++)
-    {
+    for (cy = 0; cy < nny - 1; cy++) {
         y1 = yj[cy];
         y2 = yj[cy + 1];
 
@@ -1092,17 +1003,14 @@ inline void Gfx::PrepareColorTrace(int *yi, int *yj, int nny, Ttr tr, double g,
         Ramp(y1, y2, v1, v2, _cy, _cv, ny1);
         //      Ramp1(s1,s2,v1,v2,_h+1, vv+ny,so,nr);
 
-        if (ny1 < 2)
-        {
+        if (ny1 < 2) {
             vp[0] = v1;
             yp[0] = y1;
             k++;
         }
 
-        for (n = 0; n < ny1; n++)
-        {
-            if (_cy[n] >= ya && _cy[n] <= yb)
-            {
+        for (n = 0; n < ny1; n++) {
+            if (_cy[n] >= ya && _cy[n] <= yb) {
                 int yy = _cy[n] - ya;
                 vp[yy] = _cv[n];
                 yp[yy] = _cy[n];
@@ -1122,8 +1030,7 @@ void Ramp1A(int XA, int XB, int X0, int X1, int V0, int V1, int *V, int &NX)
     int x1 = (X1);
     int v0 = (V0);
     int v1 = (V1);
-    if (x0 > x1)
-    {
+    if (x0 > x1) {
         Swapi(x0, x1);
         Swapi(v0, v1);
     }
@@ -1141,10 +1048,8 @@ void Ramp1A(int XA, int XB, int X0, int X1, int V0, int V1, int *V, int &NX)
     else
         stepv = dv / dx;
 
-    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv)
-    {
-        if (xo >= XA && xo <= XB)
-        {
+    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv) {
+        if (xo >= XA && xo <= XB) {
             V[xo - XA] = vo >> 16;
             nx++;
         }
@@ -1152,7 +1057,8 @@ void Ramp1A(int XA, int XB, int X0, int X1, int V0, int V1, int *V, int &NX)
     NX = nx;
 }
 
-void Ramp1F(int XA, int XB, int X0, int X1, float V0, float V1, float *V, int &NX)
+void Ramp1F(int XA, int XB, int X0, int X1, float V0, float V1, float *V,
+            int &NX)
 {
     int xo;
     float vo;
@@ -1160,8 +1066,7 @@ void Ramp1F(int XA, int XB, int X0, int X1, float V0, float V1, float *V, int &N
     int x1 = (X1);
     float v0 = (V0);
     float v1 = (V1);
-    if (x0 > x1)
-    {
+    if (x0 > x1) {
         Swapi(x0, x1);
         Swapf(v0, v1);
     }
@@ -1176,10 +1081,8 @@ void Ramp1F(int XA, int XB, int X0, int X1, float V0, float V1, float *V, int &N
     else
         stepv = dv / dx;
 
-    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv)
-    {
-        if (xo >= XA && xo <= XB)
-        {
+    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv) {
+        if (xo >= XA && xo <= XB) {
             V[xo - XA] = vo;
             nx++;
         }
@@ -1199,13 +1102,11 @@ void Gfx::PrepareVelTrace(int ya, int yb, int ll, int *yy, float *vv, float *v)
     float vp, vc;
     int nx;
 
-    for (n = 0; n < ll; n++)
-    {
+    for (n = 0; n < ll; n++) {
         yc = yy[n];
         vc = vv[n];
 
-        if (n > 0)
-        {
+        if (n > 0) {
             Ramp1F(ya, yb, yp, yc, vp, vc, v, nx);
         }
         yp = yc;
@@ -1213,10 +1114,9 @@ void Gfx::PrepareVelTrace(int ya, int yb, int ll, int *yy, float *vv, float *v)
     }
 }
 
-void Gfx::Draw2VelTraceTB(
-    int xa, int ll1, int *yy1, float *vv1,
-    int xb, int ll2, int *yy2, float *vv2,
-    int xl, int xr, int ya, int yb)
+void Gfx::Draw2VelTraceTB(int xa, int ll1, int *yy1, float *vv1, int xb,
+                          int ll2, int *yy2, float *vv2, int xl, int xr, int ya,
+                          int yb)
 {
 
     //    DrawVLine(xa, ya, yb, 1,1);
@@ -1233,12 +1133,11 @@ void Gfx::Draw2VelTraceTB(
     PrepareVelTrace(ya, yb, ll1, yy1, vv1, v1);
     PrepareVelTrace(ya, yb, ll2, yy2, vv2, v2);
 
-    for (n = 0, y = ya; n < l; n++, y++)
-    {
+    for (n = 0, y = ya; n < l; n++, y++) {
         int yn = y - ya;
-        if (v1[yn] >= 0 && v2[yn] >= 0)
-        {
-            DrawHRamp2F(y - m_y, xa - m_x, xb - m_x, v1[yn], v2[yn], xl - m_x, xr - m_x, 0);
+        if (v1[yn] >= 0 && v2[yn] >= 0) {
+            DrawHRamp2F(y - m_y, xa - m_x, xb - m_x, v1[yn], v2[yn], xl - m_x,
+                        xr - m_x, 0);
         }
     }
 
@@ -1257,14 +1156,12 @@ void Gfx::DrawHRamp1(int y, int x0, int x1, int v0, int v1, int)
     if (y < 0 || y > m_h)
         return;
 
-    if (x0 > x1)
-    {
+    if (x0 > x1) {
         Swapi(x0, x1);
         Swapi(v0, v1);
     }
 
-    if (x0 == x1)
-    {
+    if (x0 == x1) {
         SetPixel(vo, xo, y);
         return;
     }
@@ -1295,14 +1192,12 @@ void Gfx::DrawHRamp2(int y, int x0, int x1, int v0, int v1, int lx, int rx, int)
     if (y < 0 || y > m_h)
         return;
 
-    if (x0 == x1)
-    {
+    if (x0 == x1) {
         SetPixel(v0, x0, y);
         return;
     }
 
-    if (x0 > x1)
-    {
+    if (x0 > x1) {
         Swapi(x0, x1);
         Swapi(v0, v1);
     }
@@ -1323,7 +1218,8 @@ void Gfx::DrawHRamp2(int y, int x0, int x1, int v0, int v1, int lx, int rx, int)
     return;
 }
 
-void Gfx::DrawHRamp2F(int y, int x0, int x1, float v0, float v1, int lx, int rx, int)
+void Gfx::DrawHRamp2F(int y, int x0, int x1, float v0, float v1, int lx, int rx,
+                      int)
 {
     int xo;
     float vo;
@@ -1338,14 +1234,12 @@ void Gfx::DrawHRamp2F(int y, int x0, int x1, float v0, float v1, int lx, int rx,
     //    vo=2;
     //    v1=6;
 
-    if (x0 == x1)
-    {
+    if (x0 == x1) {
         SetPixel(v0, x0, y);
         return;
     }
 
-    if (x0 > x1)
-    {
+    if (x0 > x1) {
         Swapi(x0, x1);
         Swapf(v0, v1);
     }
@@ -1358,10 +1252,8 @@ void Gfx::DrawHRamp2F(int y, int x0, int x1, float v0, float v1, int lx, int rx,
 
     stepv = dv / dx;
 
-    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv)
-    {
-        if (xo >= lx && xo <= rx)
-        {
+    for (vo = v0, xo = x0; xo <= x1; xo++, vo += stepv) {
+        if (xo >= lx && xo <= rx) {
             //            qDebug() << xo << vo;
             SetPixel(vo, xo, y);
         }
@@ -1384,7 +1276,8 @@ void Gfx::SetPixel(int v, int x, int y)
     mSetPixel(c, x, y);
 }
 
-void Gfx::DrawText(int x, int y, QString str, int color, double rotate, int size, bool fill_bg)
+void Gfx::DrawText(int x, int y, QString str, int color, double rotate,
+                   int size, bool fill_bg)
 {
     // QFont font;
     if (size < 0)
@@ -1443,10 +1336,7 @@ int Gfx::GetTextHeight(int size)
     return fm.height();
 }
 
-QFontMetrics Gfx::GetFontMetrics()
-{
-    return _ipainter.fontMetrics();
-}
+QFontMetrics Gfx::GetFontMetrics() { return _ipainter.fontMetrics(); }
 
 void Gfx::SetTrim(int x1, int x2, int y1, int y2)
 {
@@ -1470,22 +1360,17 @@ void Gfx::SetTrim(int x1, int x2, int y1, int y2)
     _ipainter.setClipping(_trim);
 }
 
-void Gfx::ClrTrim()
-{
-    _trim = false;
-}
+void Gfx::ClrTrim() { _trim = false; }
 
 void Gfx::SetPalette(QList<QRgb> pal)
 {
     int n;
 
-    for (n = 0; n < pal.count() && n < 256; n++)
-    {
+    for (n = 0; n < pal.count() && n < 256; n++) {
         _pal[n] = pal[n];
     }
 
-    for (; n < 256; n++)
-    {
+    for (; n < 256; n++) {
         _pal[n] = QColor(n, n, n).rgb();
     }
 }
@@ -1496,10 +1381,7 @@ void Gfx::SetFontSize(int size)
     _font.setPointSize(size);
 }
 
-void Gfx::setFont(const QFont & font)
-{
-    _font = font;
-}
+void Gfx::setFont(const QFont &font) { _font = font; }
 
 int Gfx::GetPalColor(int cidx)
 {
@@ -1513,8 +1395,7 @@ void Gfx::DrawPLine(int *x, int *y, int n, int cidx, int w)
 {
     int i;
 
-    for (i = 0; i < n - 1; i++)
-    {
+    for (i = 0; i < n - 1; i++) {
         DrawLine(x[i], y[i], x[i + 1], y[i + 1], cidx, w);
     }
 }
@@ -1523,8 +1404,7 @@ void Gfx::DrawPLine(int *x, int *y, int *cidx, int n, int w)
 {
     int i;
 
-    for (i = 0; i < n - 1; i++)
-    {
+    for (i = 0; i < n - 1; i++) {
         DrawLine(x[i], y[i], x[i + 1], y[i + 1], cidx[i], w);
     }
 }
@@ -1533,8 +1413,7 @@ void Gfx::DrawPLine(int *x, int *y, int *cidx, int *w, int n, int wc)
 {
     int i;
 
-    for (i = 0; i < n - 1; i++)
-    {
+    for (i = 0; i < n - 1; i++) {
         DrawLine(x[i], y[i], x[i + 1], y[i + 1], cidx[i], w[i], wc);
     }
 }
@@ -1544,8 +1423,7 @@ void Gfx::DrawCircle(int xCenter, int yCenter, int r, int cidx, int w, int wc)
     int rr;
     int ww = w > 1;
 
-    if (wc != -1)
-    {
+    if (wc != -1) {
         DrawCircle(xCenter, yCenter, r - ww - 1, wc);
         DrawCircle(xCenter, yCenter, r + ww + 1, wc);
     }
@@ -1571,8 +1449,7 @@ void Gfx::DrawCircle(int xCenter, int yCenter, int r, int cidx)
     if (yCenter - r > m_h)
         return;
 
-    if (r == 1)
-    {
+    if (r == 1) {
         mSetPixel(cidx, xCenter, yCenter);
         return;
     }
@@ -1580,8 +1457,7 @@ void Gfx::DrawCircle(int xCenter, int yCenter, int r, int cidx)
     int x = 0, y = r;
     int d = 3 - (2 * r);
 
-    while (x <= y)
-    {
+    while (x <= y) {
 
         mSetPixel(cidx, xCenter + x, yCenter + y);
         mSetPixel(cidx, xCenter + y, yCenter + x);
@@ -1594,8 +1470,7 @@ void Gfx::DrawCircle(int xCenter, int yCenter, int r, int cidx)
 
         if (d < 0)
             d += (4 * x) + 6;
-        else
-        {
+        else {
             d += (4 * (x - y)) + 10;
             y -= 1;
         }
@@ -1620,8 +1495,7 @@ void Gfx::FillCircle(int xCenter, int yCenter, int r, int cidx)
     int x = 0, y = r;
     int d = 3 - (2 * r);
 
-    while (x <= y)
-    {
+    while (x <= y) {
         DrawHLine(yCenter + y, xCenter + x, xCenter - x, 1, cidx);
 
         DrawHLine(yCenter + x, xCenter + y, xCenter - y, 1, cidx);
@@ -1632,8 +1506,7 @@ void Gfx::FillCircle(int xCenter, int yCenter, int r, int cidx)
 
         if (d < 0)
             d += (4 * x) + 6;
-        else
-        {
+        else {
             d += (4 * (x - y)) + 10;
             y -= 1;
         }

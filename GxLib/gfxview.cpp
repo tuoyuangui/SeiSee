@@ -1,12 +1,12 @@
+#include <QApplication>
 #include <QDebug>
 #include <QDesktopWidget>
-#include <QApplication>
 
-#include "gfxview.h"
 #include "gfx.h"
+#include "gfxview.h"
 
-GfxView::GfxView(QWidget *parent) :
-    QWidget(parent)
+GfxView::GfxView(QWidget *parent)
+    : QWidget(parent)
 {
     setFixedSize(5000, 5000);
 
@@ -14,11 +14,11 @@ GfxView::GfxView(QWidget *parent) :
 
     int dpix = desk.logicalDpiX();
     int dpiy = desk.logicalDpiY();
-    m_Xpmm=dpix/25.5;
-    m_Ypmm=dpiy/25.5;
+    m_Xpmm = dpix / 25.5;
+    m_Ypmm = dpiy / 25.5;
 
-    m_Xs=1;
-    m_Ys=1;
+    m_Xs = 1;
+    m_Ys = 1;
     setMouseTracking(true);
 }
 
@@ -26,18 +26,19 @@ GfxView::~GfxView()
 {
     int n;
 
-    for(n=0; n<m_links.count();n++) m_links[n]->setView(NULL);
+    for (n = 0; n < m_links.count(); n++)
+        m_links[n]->setView(NULL);
 }
 // ----------------------------------------------------------------------
 
-void GfxView::RegisterLink(GfxObj* v)
+void GfxView::RegisterLink(GfxObj *v)
 {
     m_links.append(v);
     _nlinks = m_links.count();
     update();
 }
 
-void  GfxView::UnRegisterLink(GfxObj* v)
+void GfxView::UnRegisterLink(GfxObj *v)
 {
     _nlinks = m_links.count();
     m_links.removeAll(v);
@@ -46,28 +47,21 @@ void  GfxView::UnRegisterLink(GfxObj* v)
 }
 // ----------------------------------------------------------------------
 
-void  GfxView::Preset()
+void GfxView::Preset()
 {
     int n;
     int nobj = m_links.count();
 
-    for(n=0; n<nobj;n++)
-    {
+    for (n = 0; n < nobj; n++) {
         m_links[n]->Preset();
     }
 }
 
-
 // ----------------------------------------------------------------------
 
+static bool myLessThan(GfxObj *a, GfxObj *b) { return a->Layer() < b->Layer(); }
 
-static bool myLessThan( GfxObj *a, GfxObj *b )
-{
-    return a->Layer() < b->Layer();
-}
-
-
-void GfxView::paintEvent(QPaintEvent* pe)
+void GfxView::paintEvent(QPaintEvent *pe)
 {
     int n, nobj;
 
@@ -75,7 +69,7 @@ void GfxView::paintEvent(QPaintEvent* pe)
 
     QRect r = pe->rect();
 
-    QPaintEngine* engine;
+    QPaintEngine *engine;
 
     engine = painter.paintEngine();
 
@@ -83,51 +77,45 @@ void GfxView::paintEvent(QPaintEvent* pe)
 
     painter.setFont(font());
     painter.setBackgroundMode(Qt::TransparentMode);
-    painter.setRenderHint(QPainter::Antialiasing,false);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform,false);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
 
     engine = painter.paintEngine();
 
     int dpix = engine->paintDevice()->logicalDpiX();
     int dpiy = engine->paintDevice()->logicalDpiY();
 
-     m_Xpmm = dpix/25.5;
-     m_Ypmm = dpiy/25.5;
+    m_Xpmm = dpix / 25.5;
+    m_Ypmm = dpiy / 25.5;
 
-//   qDebug() << "m_Ypmm:" << m_Ypmm;
+    //   qDebug() << "m_Ypmm:" << m_Ypmm;
 
-     m_gfx.SetViewPort(&painter,&r);
+    m_gfx.SetViewPort(&painter, &r);
 
-    int rc = receivers(SIGNAL(OnPrevDraw(GfxView*)));
-    if(rc>0)
-     {
+    int rc = receivers(SIGNAL(OnPrevDraw(GfxView *)));
+    if (rc > 0) {
         emit OnPrevDraw(this);
-     }
+    }
 
-     nobj = m_links.count();
+    nobj = m_links.count();
 
-     if(m_links.count()>0)
-     {
-         qSort( m_links.begin(), m_links.end(), myLessThan );
-     }
+    if (m_links.count() > 0) {
+        qSort(m_links.begin(), m_links.end(), myLessThan);
+    }
 
+    for (n = 0; n < nobj; n++) {
+        m_links[n]->Draw();
+    }
 
-     for(n=0; n<nobj;n++)
-     {
-         m_links[n]->Draw();
-     }
+    rc = receivers(SIGNAL(OnPostDraw(GfxView *)));
+    if (rc > 0) {
+        emit OnPostDraw(this);
+    }
 
-     rc = receivers(SIGNAL(OnPostDraw(GfxView*)));
-     if(rc>0)
-      {
-         emit OnPostDraw(this);
-      }
+    m_gfx.Paint();
 
-     m_gfx.Paint();
-
-//   painter.drawRect(r);
-//   painter.drawLine(r.left(),r.top(),r.right(),r.bottom());
-
+    //   painter.drawRect(r);
+    //   painter.drawLine(r.left(),r.top(),r.right(),r.bottom());
 }
 
 /*
@@ -156,22 +144,21 @@ GfxObj* GfxView::ObjHit(int x, int y)
     return obj_hit;
 }
 */
-void GfxView::mousePressEvent(QMouseEvent * event)
+void GfxView::mousePressEvent(QMouseEvent *event)
 {
     emit mouseEvent(event);
     QWidget::mousePressEvent(event);
 }
 
-
-void GfxView::wheelEvent(QWheelEvent* event)
+void GfxView::wheelEvent(QWheelEvent *event)
 {
-/*
-    double d = event->delta();
-    double z = 1+0.002*abs(d); if(d<0) z = 1/z;
+    /*
+        double d = event->delta();
+        double z = 1+0.002*abs(d); if(d<0) z = 1/z;
 
-    int xm = event->pos().x();
-    int ym = event->pos().y();
-*/
+        int xm = event->pos().x();
+        int ym = event->pos().y();
+    */
     emit wheel_Event(event);
 
     QWidget::wheelEvent(event);

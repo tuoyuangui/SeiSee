@@ -4,48 +4,37 @@
 #include <QObject>
 #include <QVector>
 
-class MyObjPtrList : public QObject
-{
+class MyObjPtrList : public QObject {
     Q_OBJECT
-protected:
+  protected:
+    QVector<QObject *> items;
 
-    QVector<QObject*>items;
-
-public:
+  public:
     explicit MyObjPtrList(QObject *parent = 0);
 
     ~MyObjPtrList();
 
-
     int count() { return items.count(); }
 
-    QObject* operator[](int i)
-    {
-        return items.value(i,NULL);
-    }
+    QObject *operator[](int i) { return items.value(i, NULL); }
 
-    void append(QObject* v)
-    {
-        items.append(v);
-    }
+    void append(QObject *v) { items.append(v); }
 
     void clear()
     {
         int n;
 
-        for(n=0;n<items.count();n++)
-        {
-            if(items[n]) delete items[n];
+        for (n = 0; n < items.count(); n++) {
+            if (items[n])
+                delete items[n];
         }
 
         items.clear();
     }
 
-    
-signals:
-    
-public slots:
-    
+  signals:
+
+  public slots:
 };
 
 #endif // MYPTRLIST_H

@@ -1,24 +1,21 @@
 #ifndef GFXOBJSEISHDRS_H
 #define GFXOBJSEISHDRS_H
 
-#include <QString>
 #include <QList>
+#include <QString>
 
 #include "gfxobjseis.h"
 
-class GfxObjSeisHdrs : public GfxObjSeis
-{
-protected:
-
+class GfxObjSeisHdrs : public GfxObjSeis {
+  protected:
     QList<QString> m_hdrs;
     bool m_bottomSide;
 
     virtual void DoDraw();
 
-public:
-
-    virtual double Y1() {return 0; }
-    virtual double Y2() {return pix2y(gfx->H()); }
+  public:
+    virtual double Y1() { return 0; }
+    virtual double Y2() { return pix2y(gfx->H()); }
 
     GfxObjSeisHdrs(QObject *parent = 0);
 

@@ -19,9 +19,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_AboutDialog
-{
-public:
+class Ui_AboutDialog {
+  public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QLabel *label_2;
@@ -55,7 +54,6 @@ public:
 
         horizontalLayout->addWidget(label_3);
 
-
         verticalLayout->addLayout(horizontalLayout);
 
         label_rev = new QLabel(AboutDialog);
@@ -86,28 +84,52 @@ public:
 
         verticalLayout->addWidget(buttonBox);
 
-
         retranslateUi(AboutDialog);
-        QObject::connect(buttonBox, SIGNAL(accepted()), AboutDialog, SLOT(accept()));
-        QObject::connect(buttonBox, SIGNAL(rejected()), AboutDialog, SLOT(reject()));
+        QObject::connect(buttonBox, SIGNAL(accepted()), AboutDialog,
+                         SLOT(accept()));
+        QObject::connect(buttonBox, SIGNAL(rejected()), AboutDialog,
+                         SLOT(reject()));
 
         QMetaObject::connectSlotsByName(AboutDialog);
     } // setupUi
 
     void retranslateUi(QDialog *AboutDialog)
     {
-        AboutDialog->setWindowTitle(QCoreApplication::translate("AboutDialog", "About", nullptr));
+        AboutDialog->setWindowTitle(
+            QCoreApplication::translate("AboutDialog", "About", nullptr));
         label_2->setText(QString());
-        label_3->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600; color:#00007f;\">SeiSee</span></p><p align=\"center\"><span style=\" font-size:10pt; font-weight:600; color:#00007f;\">MultiPlatform</span></p><p align=\"center\"><span style=\" font-size:12pt; font-weight:600; color:#00007f;\">SEG-Y Viewer</span></p></body></html>", nullptr));
-        label_rev->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\">Rev: </p></body></html>", nullptr));
-        label->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\">Auther: Segrey Pavlukhin <span style=\" color:#0000ff;\">(psi@dmng.ru)</span></p></body></html>", nullptr));
-        label_ww->setText(QCoreApplication::translate("AboutDialog", "<html><head/><body><p align=\"center\">Modify: Wang Wei <span style=\" color:#0000ff;\">(ww_geophy@126.com)</span></p></body></html>", nullptr));
+        label_3->setText(QCoreApplication::translate(
+            "AboutDialog",
+            "<html><head/><body><p align=\"center\"><span style=\" "
+            "font-size:22pt; "
+            "font-weight:600; color:#00007f;\">SeiSee</span></p><p "
+            "align=\"center\"><span style=\" font-size:10pt; font-weight:600; "
+            "color:#00007f;\">MultiPlatform</span></p><p "
+            "align=\"center\"><span "
+            "style=\" font-size:12pt; font-weight:600; color:#00007f;\">SEG-Y "
+            "Viewer</span></p></body></html>",
+            nullptr));
+        label_rev->setText(QCoreApplication::translate(
+            "AboutDialog",
+            "<html><head/><body><p align=\"center\">Rev: </p></body></html>",
+            nullptr));
+        label->setText(QCoreApplication::translate(
+            "AboutDialog",
+            "<html><head/><body><p align=\"center\">Auther: Segrey Pavlukhin "
+            "<span "
+            "style=\" color:#0000ff;\">(psi@dmng.ru)</span></p></body></html>",
+            nullptr));
+        label_ww->setText(QCoreApplication::translate(
+            "AboutDialog",
+            "<html><head/><body><p align=\"center\">Modify: Wang Wei <span "
+            "style=\" "
+            "color:#0000ff;\">(ww_geophy@126.com)</span></p></body></html>",
+            nullptr));
     } // retranslateUi
-
 };
 
 namespace Ui {
-    class AboutDialog: public Ui_AboutDialog {};
+class AboutDialog : public Ui_AboutDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE

@@ -3,33 +3,30 @@
 
 #include <QDialog>
 
-class ProcParm
-{
-public:
-
+class ProcParm {
+  public:
 };
 
 namespace Ui {
 class ProcParmDialog;
 }
 
-class ProcParmDialog : public QDialog
-{
+class ProcParmDialog : public QDialog {
     Q_OBJECT
-    
-public:
+
+  public:
     explicit ProcParmDialog(QWidget *parent = 0);
     ~ProcParmDialog();
 
-    double f1,f2,f3,f4;
+    double f1, f2, f3, f4;
     double agcw;
-    bool   filt;
-    bool   agc;
-    bool   norm;
+    bool filt;
+    bool agc;
+    bool norm;
 
     void show();
-    
-private slots:
+
+  private slots:
     void on_closeButton_pressed();
 
     void on_okButton_pressed();
@@ -40,16 +37,14 @@ private slots:
 
     void on_ckNorm_toggled(bool checked);
 
-private:
+  private:
     Ui::ProcParmDialog *ui;
 
     void FillForm();
     bool ReadForm();
 
-
-signals:
+  signals:
     void changedEvent();
-
 };
 
 #endif // PROCPARMDIALOG_H

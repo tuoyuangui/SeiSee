@@ -1,39 +1,37 @@
 #ifndef AXISDIALOG_H
 #define AXISDIALOG_H
 
-#include <QDialog>
-#include "mystringtable.h"
 #include "hdrdef.h"
+#include "mystringtable.h"
+#include <QDialog>
 
 namespace Ui {
 class AxisDialog;
 }
 
-class AxisDialog : public QDialog
-{
+class AxisDialog : public QDialog {
     Q_OBJECT
 
-private:
-
-    MyStringTable     selHdrGrid;
-    MyStringTable     aviHdrGrid;
+  private:
+    MyStringTable selHdrGrid;
+    MyStringTable aviHdrGrid;
 
     QStringList hdrList;
 
-    bool              changed;
+    bool changed;
 
-public:
+  public:
     explicit AxisDialog(QWidget *parent = 0);
     ~AxisDialog();
 
-   TrHdrDefList*  hdrDefList;
-   CkListSet*  ckList;
-   int         dT;
-   bool        tL;
+    TrHdrDefList *hdrDefList;
+    CkListSet *ckList;
+    int dT;
+    bool tL;
 
     void show();
 
-private slots:
+  private slots:
     void on_closeButton_pressed();
 
     void on_addBtn_pressed();
@@ -54,13 +52,13 @@ private slots:
 
     void on_ckTimLines_toggled(bool checked);
 
-private:
+  private:
     Ui::AxisDialog *ui;
 
     void FillAviGrid();
     void FillForm();
 
-signals:
+  signals:
     void changedEvent();
 };
 

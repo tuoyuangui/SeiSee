@@ -23,9 +23,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_ProcParmDialog
-{
-public:
+class Ui_ProcParmDialog {
+  public:
     QVBoxLayout *verticalLayout_4;
     QGroupBox *groupBox;
     QHBoxLayout *horizontalLayout_14;
@@ -76,7 +75,8 @@ public:
         groupBox = new QGroupBox(ProcParmDialog);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         horizontalLayout_14 = new QHBoxLayout(groupBox);
-        horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
+        horizontalLayout_14->setObjectName(
+            QString::fromUtf8("horizontalLayout_14"));
         label = new QLabel(groupBox);
         label->setObjectName(QString::fromUtf8("label"));
         label->setPixmap(QPixmap(QString::fromUtf8(":/images/Filt.png")));
@@ -108,11 +108,11 @@ public:
 
         horizontalLayout->addWidget(label_3);
 
-
         verticalLayout_2->addLayout(horizontalLayout);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(
+            QString::fromUtf8("horizontalLayout_2"));
         label_4 = new QLabel(groupBox);
         label_4->setObjectName(QString::fromUtf8("label_4"));
         label_4->setFont(font);
@@ -130,11 +130,11 @@ public:
 
         horizontalLayout_2->addWidget(label_5);
 
-
         verticalLayout_2->addLayout(horizontalLayout_2);
 
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(
+            QString::fromUtf8("horizontalLayout_3"));
         label_6 = new QLabel(groupBox);
         label_6->setObjectName(QString::fromUtf8("label_6"));
         label_6->setFont(font);
@@ -152,11 +152,11 @@ public:
 
         horizontalLayout_3->addWidget(label_7);
 
-
         verticalLayout_2->addLayout(horizontalLayout_3);
 
         horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName(
+            QString::fromUtf8("horizontalLayout_4"));
         label_8 = new QLabel(groupBox);
         label_8->setObjectName(QString::fromUtf8("label_8"));
         label_8->setFont(font);
@@ -174,7 +174,6 @@ public:
 
         horizontalLayout_4->addWidget(label_9);
 
-
         verticalLayout_2->addLayout(horizontalLayout_4);
 
         ckFilt = new QCheckBox(groupBox);
@@ -182,16 +181,15 @@ public:
 
         verticalLayout_2->addWidget(ckFilt);
 
-
         horizontalLayout_14->addLayout(verticalLayout_2);
-
 
         verticalLayout_4->addWidget(groupBox);
 
         groupBox_2 = new QGroupBox(ProcParmDialog);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         horizontalLayout_15 = new QHBoxLayout(groupBox_2);
-        horizontalLayout_15->setObjectName(QString::fromUtf8("horizontalLayout_15"));
+        horizontalLayout_15->setObjectName(
+            QString::fromUtf8("horizontalLayout_15"));
         label_10 = new QLabel(groupBox_2);
         label_10->setObjectName(QString::fromUtf8("label_10"));
         label_10->setFont(font1);
@@ -223,13 +221,12 @@ public:
 
         verticalLayout->addWidget(ckNorm);
 
-
         horizontalLayout_15->addLayout(verticalLayout);
 
-        horizontalSpacer = new QSpacerItem(0, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(0, 20, QSizePolicy::Expanding,
+                                           QSizePolicy::Minimum);
 
         horizontalLayout_15->addItem(horizontalSpacer);
-
 
         verticalLayout_4->addWidget(groupBox_2);
 
@@ -238,7 +235,8 @@ public:
         verticalLayout_3 = new QVBoxLayout(groupBox_3);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         horizontalLayout_7 = new QHBoxLayout();
-        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        horizontalLayout_7->setObjectName(
+            QString::fromUtf8("horizontalLayout_7"));
         okButton = new QPushButton(groupBox_3);
         okButton->setObjectName(QString::fromUtf8("okButton"));
 
@@ -254,12 +252,9 @@ public:
 
         horizontalLayout_7->addWidget(closeButton);
 
-
         verticalLayout_3->addLayout(horizontalLayout_7);
 
-
         verticalLayout_4->addWidget(groupBox_3);
-
 
         retranslateUi(ProcParmDialog);
 
@@ -268,33 +263,51 @@ public:
 
     void retranslateUi(QDialog *ProcParmDialog)
     {
-        ProcParmDialog->setWindowTitle(QCoreApplication::translate("ProcParmDialog", "Dialog", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("ProcParmDialog", "Band Pass Filter", nullptr));
+        ProcParmDialog->setWindowTitle(
+            QCoreApplication::translate("ProcParmDialog", "Dialog", nullptr));
+        groupBox->setTitle(QCoreApplication::translate(
+            "ProcParmDialog", "Band Pass Filter", nullptr));
         label->setText(QString());
-        label_2->setText(QCoreApplication::translate("ProcParmDialog", "F1", nullptr));
-        label_3->setText(QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
-        label_4->setText(QCoreApplication::translate("ProcParmDialog", "F2", nullptr));
-        label_5->setText(QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
-        label_6->setText(QCoreApplication::translate("ProcParmDialog", "F3", nullptr));
-        label_7->setText(QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
-        label_8->setText(QCoreApplication::translate("ProcParmDialog", "F4", nullptr));
-        label_9->setText(QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
-        ckFilt->setText(QCoreApplication::translate("ProcParmDialog", "Use Filter", nullptr));
-        groupBox_2->setTitle(QCoreApplication::translate("ProcParmDialog", "Automatic Gain Control", nullptr));
-        label_10->setText(QCoreApplication::translate("ProcParmDialog", "Window Length", nullptr));
-        label_11->setText(QCoreApplication::translate("ProcParmDialog", "ms", nullptr));
-        ckAgc->setText(QCoreApplication::translate("ProcParmDialog", "Use AGC", nullptr));
-        ckNorm->setText(QCoreApplication::translate("ProcParmDialog", "Use Normalization", nullptr));
+        label_2->setText(
+            QCoreApplication::translate("ProcParmDialog", "F1", nullptr));
+        label_3->setText(
+            QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
+        label_4->setText(
+            QCoreApplication::translate("ProcParmDialog", "F2", nullptr));
+        label_5->setText(
+            QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
+        label_6->setText(
+            QCoreApplication::translate("ProcParmDialog", "F3", nullptr));
+        label_7->setText(
+            QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
+        label_8->setText(
+            QCoreApplication::translate("ProcParmDialog", "F4", nullptr));
+        label_9->setText(
+            QCoreApplication::translate("ProcParmDialog", "Hz", nullptr));
+        ckFilt->setText(QCoreApplication::translate("ProcParmDialog",
+                                                    "Use Filter", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate(
+            "ProcParmDialog", "Automatic Gain Control", nullptr));
+        label_10->setText(QCoreApplication::translate(
+            "ProcParmDialog", "Window Length", nullptr));
+        label_11->setText(
+            QCoreApplication::translate("ProcParmDialog", "ms", nullptr));
+        ckAgc->setText(
+            QCoreApplication::translate("ProcParmDialog", "Use AGC", nullptr));
+        ckNorm->setText(QCoreApplication::translate(
+            "ProcParmDialog", "Use Normalization", nullptr));
         groupBox_3->setTitle(QString());
-        okButton->setText(QCoreApplication::translate("ProcParmDialog", "OK", nullptr));
-        applyButton->setText(QCoreApplication::translate("ProcParmDialog", "Apply", nullptr));
-        closeButton->setText(QCoreApplication::translate("ProcParmDialog", "Close", nullptr));
+        okButton->setText(
+            QCoreApplication::translate("ProcParmDialog", "OK", nullptr));
+        applyButton->setText(
+            QCoreApplication::translate("ProcParmDialog", "Apply", nullptr));
+        closeButton->setText(
+            QCoreApplication::translate("ProcParmDialog", "Close", nullptr));
     } // retranslateUi
-
 };
 
 namespace Ui {
-    class ProcParmDialog: public Ui_ProcParmDialog {};
+class ProcParmDialog : public Ui_ProcParmDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE

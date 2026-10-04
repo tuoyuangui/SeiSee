@@ -3,57 +3,58 @@
 
 SeisTrExpr::SeisTrExpr(QString e)
 {
-    Hdr=NULL;
+    Hdr = NULL;
     Len = 240;
-    L    = 0;
-    N    = 0;
+    L = 0;
+    N = 0;
 
-    error=true;
+    error = true;
 
     val_list.AddDefaultValues();
-    val_list.AddAddress("_Hdr_", (double*)&Hdr);
-    val_list.AddAddress("_Len_", (double*)&Len);
-    val_list.AddAddress("_Swp_", (double*)&Swp);
-    val_list.AddAddress("L",     (double*)&L);
-    val_list.AddAddress("N",     (double*)&N);
+    val_list.AddAddress("_Hdr_", (double *)&Hdr);
+    val_list.AddAddress("_Len_", (double *)&Len);
+    val_list.AddAddress("_Swp_", (double *)&Swp);
+    val_list.AddAddress("L", (double *)&L);
+    val_list.AddAddress("N", (double *)&N);
 
     fun_list.AddDefaultFunctions();
     fun_list.Add(new TrcHdrFactory());
 
-    SetValueList   (&val_list);
+    SetValueList(&val_list);
     SetFunctionList(&fun_list);
 
     ExprStr = e;
     Parse();
 }
 
-SeisTrExpr::SeisTrExpr(const SeisTrExpr& src)
+SeisTrExpr::SeisTrExpr(const SeisTrExpr &src)
 {
-    Hdr =  src.Hdr;
-    Len  = src.Len;
-    L    = src.L;
-    N    = src.N;
+    Hdr = src.Hdr;
+    Len = src.Len;
+    L = src.L;
+    N = src.N;
 
     val_list.AddDefaultValues();
-    val_list.AddAddress("_Hdr_", (double*)&Hdr);
-    val_list.AddAddress("_Len_", (double*)&Len);
-    val_list.AddAddress("_Swp_", (double*)&Swp);
-    val_list.AddAddress("L",     (double*)&L);
-    val_list.AddAddress("N",     (double*)&N);
+    val_list.AddAddress("_Hdr_", (double *)&Hdr);
+    val_list.AddAddress("_Len_", (double *)&Len);
+    val_list.AddAddress("_Swp_", (double *)&Swp);
+    val_list.AddAddress("L", (double *)&L);
+    val_list.AddAddress("N", (double *)&N);
 
     fun_list.AddDefaultFunctions();
     fun_list.Add(new TrcHdrFactory());
 
-    SetValueList   (&val_list);
+    SetValueList(&val_list);
     SetFunctionList(&fun_list);
 
     ExprStr = src.ExprStr;
     Parse();
 }
 
-SeisTrExpr& SeisTrExpr::operator= (const SeisTrExpr &src)
+SeisTrExpr &SeisTrExpr::operator=(const SeisTrExpr &src)
 {
-    if (this == &src)return *this;
+    if (this == &src)
+        return *this;
 
     ExprStr = src.ExprStr;
     Parse();
@@ -61,30 +62,28 @@ SeisTrExpr& SeisTrExpr::operator= (const SeisTrExpr &src)
     return *this;
 }
 
-
 bool SeisTrExpr::Error()
 {
-    if(ExprStr=="") return true;
-    else            return error;
+    if (ExprStr == "")
+        return true;
+    else
+        return error;
 }
 
 void SeisTrExpr::Parse()
 {
-    if(ExprStr=="")
-    {
-        error=true; return;
+    if (ExprStr == "") {
+        error = true;
+        return;
     }
 
     QByteArray es = ExprStr.toLocal8Bit();
 
-    try
-    {
+    try {
         Expression::Parse(es.data());
-        error=false;
-    }
-    catch(Exception &e)
-    {
-        error=true;
+        error = false;
+    } catch (Exception &e) {
+        error = true;
     }
 }
 
@@ -94,77 +93,70 @@ void SeisTrExpr::setExprString(QString str)
     Parse();
 }
 
-QString SeisTrExpr::ExprString()
-{
-    return ExprStr;
-}
-
-
+QString SeisTrExpr::ExprString() { return ExprStr; }
 
 double SeisTrExpr::Evaluate()
 {
-    if(error) return 0;
+    if (error)
+        return 0;
 
     double v = 0;
 
-    try
-    {
-        v=Expression::Evaluate();
-        //error=false;
-    }
-    catch(Exception &e)
-    {
-        error=true;
+    try {
+        v = Expression::Evaluate();
+        // error=false;
+    } catch (Exception &e) {
+        error = true;
         v = 0;
     }
 
     return v;
 }
 
-void SeisTrExpr::setHdr(byte* buf, int len, int swp, long long n, long long l)
+void SeisTrExpr::setHdr(byte *buf, int len, int swp, long long n, long long l)
 {
-    Hdr  = buf;
-    Len  = len;
-    Swp  = swp;
-    L    = l;
-    N    = n;
+    Hdr = buf;
+    Len = len;
+    Swp = swp;
+    L = l;
+    N = n;
 }
 
 double TrcHdrNode::DoEvaluate()
 {
-    byte** a = (byte**)(m_expr->GetValueList()->GetAddress("_Hdr_"));
+    byte **a = (byte **)(m_expr->GetValueList()->GetAddress("_Hdr_"));
 
-    byte* b = *a;
-    int*  i = *((int**)a);
+    byte *b = *a;
+    int *i = *((int **)a);
 
-//    qDebug() << "i[0]="  << i[0];
+    //    qDebug() << "i[0]="  << i[0];
 
-    if(b==NULL) throw(NullPointerException(GetName()));
+    if (b == NULL)
+        throw(NullPointerException(GetName()));
 
-    int len  = *((int*)(m_expr->GetValueList()->GetAddress("_Len_")));
-    int swp  = *((int*)(m_expr->GetValueList()->GetAddress("_Swp_")));
+    int len = *((int *)(m_expr->GetValueList()->GetAddress("_Len_")));
+    int swp = *((int *)(m_expr->GetValueList()->GetAddress("_Swp_")));
 
-//    qDebug() << "len=" << len;
-//    qDebug() << "swp=" << swp;
+    //    qDebug() << "len=" << len;
+    //    qDebug() << "swp=" << swp;
 
     int pos = m_nodes[0]->Evaluate();
     int frm = m_nodes[1]->Evaluate();
 
-//    qDebug() << "frm="   << frm;
+    //    qDebug() << "frm="   << frm;
 
-    int l  = frm%10;
+    int l = frm % 10;
 
-//    qDebug() << "l="   << l;
-//    qDebug() << "pos=" << pos;
-//    qDebug() << "len=" << len;
+    //    qDebug() << "l="   << l;
+    //    qDebug() << "pos=" << pos;
+    //    qDebug() << "len=" << len;
 
-    if(pos<0 || pos+l>len) throw(MathException(GetName()));
+    if (pos < 0 || pos + l > len)
+        throw(MathException(GetName()));
 
-    double v = iFmt(frm,b,pos,swp);
+    double v = iFmt(frm, b, pos, swp);
 
-//    qDebug() << "v=" << v;
+    //    qDebug() << "v=" << v;
 
     return v;
 }
-
-

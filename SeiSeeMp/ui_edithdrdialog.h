@@ -28,9 +28,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_EditHdrDialog
-{
-public:
+class Ui_EditHdrDialog {
+  public:
     QVBoxLayout *verticalLayout_4;
     QGroupBox *groupBox_5;
     QHBoxLayout *horizontalLayout;
@@ -93,7 +92,8 @@ public:
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(groupBox_5->sizePolicy().hasHeightForWidth());
+        sizePolicy.setHeightForWidth(
+            groupBox_5->sizePolicy().hasHeightForWidth());
         groupBox_5->setSizePolicy(sizePolicy);
         horizontalLayout = new QHBoxLayout(groupBox_5);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -116,13 +116,15 @@ public:
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(btnAddItem->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            btnAddItem->sizePolicy().hasHeightForWidth());
         btnAddItem->setSizePolicy(sizePolicy1);
         btnAddItem->setMinimumSize(QSize(25, 25));
         btnAddItem->setMaximumSize(QSize(25, 25));
         btnAddItem->setFocusPolicy(Qt::StrongFocus);
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/images/add_item.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/images/add_item.png"), QSize(),
+                     QIcon::Normal, QIcon::Off);
         btnAddItem->setIcon(icon);
         btnAddItem->setAutoDefault(false);
 
@@ -131,34 +133,38 @@ public:
         btnDelItem = new QPushButton(groupBox_5);
         btnDelItem->setObjectName(QString::fromUtf8("btnDelItem"));
         btnDelItem->setEnabled(true);
-        sizePolicy1.setHeightForWidth(btnDelItem->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            btnDelItem->sizePolicy().hasHeightForWidth());
         btnDelItem->setSizePolicy(sizePolicy1);
         btnDelItem->setMinimumSize(QSize(25, 25));
         btnDelItem->setMaximumSize(QSize(25, 25));
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/images/delete_item.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/images/delete_item.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         btnDelItem->setIcon(icon1);
         btnDelItem->setAutoDefault(false);
 
         horizontalLayout->addWidget(btnDelItem);
 
-        horizontalSpacer_6 = new QSpacerItem(394, 17, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_6 = new QSpacerItem(394, 17, QSizePolicy::Expanding,
+                                             QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer_6);
-
 
         verticalLayout_4->addWidget(groupBox_5);
 
         groupBox_2 = new QGroupBox(EditHdrDialog);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         horizontalLayout_3 = new QHBoxLayout(groupBox_2);
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(
+            QString::fromUtf8("horizontalLayout_3"));
         hdrsBox = new QGroupBox(groupBox_2);
         hdrsBox->setObjectName(QString::fromUtf8("hdrsBox"));
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(hdrsBox->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            hdrsBox->sizePolicy().hasHeightForWidth());
         hdrsBox->setSizePolicy(sizePolicy2);
         hdrsBox->setMinimumSize(QSize(200, 0));
         hdrsBox->setMaximumSize(QSize(280, 16777215));
@@ -167,7 +173,8 @@ public:
 
         selHdrsBox = new QGroupBox(groupBox_2);
         selHdrsBox->setObjectName(QString::fromUtf8("selHdrsBox"));
-        sizePolicy2.setHeightForWidth(selHdrsBox->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            selHdrsBox->sizePolicy().hasHeightForWidth());
         selHdrsBox->setSizePolicy(sizePolicy2);
         selHdrsBox->setMinimumSize(QSize(400, 0));
         verticalLayout_3 = new QVBoxLayout(selHdrsBox);
@@ -185,7 +192,6 @@ public:
 
         verticalLayout_2->addWidget(edName);
 
-
         verticalLayout_3->addLayout(verticalLayout_2);
 
         verticalLayout = new QVBoxLayout();
@@ -200,7 +206,6 @@ public:
         edDesc->setObjectName(QString::fromUtf8("edDesc"));
 
         verticalLayout->addWidget(edDesc);
-
 
         verticalLayout_3->addLayout(verticalLayout);
 
@@ -225,7 +230,6 @@ public:
 
         verticalLayout_5->addWidget(edPos);
 
-
         verticalLayout_7->addLayout(verticalLayout_5);
 
         verticalLayout_6 = new QVBoxLayout();
@@ -249,10 +253,10 @@ public:
 
         verticalLayout_6->addWidget(cbForm);
 
-
         verticalLayout_7->addLayout(verticalLayout_6);
 
-        verticalSpacer = new QSpacerItem(20, 124, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer = new QSpacerItem(20, 124, QSizePolicy::Minimum,
+                                         QSizePolicy::Expanding);
 
         verticalLayout_7->addItem(verticalSpacer);
 
@@ -261,7 +265,8 @@ public:
         tab_2->setObjectName(QString::fromUtf8("tab_2"));
         tab_2->setAutoFillBackground(true);
         horizontalLayout_5 = new QHBoxLayout(tab_2);
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName(
+            QString::fromUtf8("horizontalLayout_5"));
         txtExpr = new QPlainTextEdit(tab_2);
         txtExpr->setObjectName(QString::fromUtf8("txtExpr"));
 
@@ -280,7 +285,8 @@ public:
         insBtn->setSizePolicy(sizePolicy1);
         insBtn->setMaximumSize(QSize(16777215, 16));
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/images/ToLeft.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QString::fromUtf8(":/images/ToLeft.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         insBtn->setIcon(icon2);
         insBtn->setAutoDefault(false);
 
@@ -292,7 +298,6 @@ public:
         frmHdrs->setFrameShadow(QFrame::Raised);
 
         verticalLayout_8->addWidget(frmHdrs);
-
 
         horizontalLayout_5->addWidget(groupBox);
 
@@ -315,8 +320,10 @@ public:
         verticalLayout_3->addWidget(lbErr);
 
         horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalLayout_4->setObjectName(
+            QString::fromUtf8("horizontalLayout_4"));
+        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding,
+                                             QSizePolicy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer_4);
 
@@ -330,26 +337,27 @@ public:
 
         horizontalLayout_4->addWidget(btnReset);
 
-        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding,
+                                             QSizePolicy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer_5);
 
-
         verticalLayout_3->addLayout(horizontalLayout_4);
 
-
         horizontalLayout_3->addWidget(selHdrsBox);
-
 
         verticalLayout_4->addWidget(groupBox_2);
 
         groupBox_3 = new QGroupBox(EditHdrDialog);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-        sizePolicy.setHeightForWidth(groupBox_3->sizePolicy().hasHeightForWidth());
+        sizePolicy.setHeightForWidth(
+            groupBox_3->sizePolicy().hasHeightForWidth());
         groupBox_3->setSizePolicy(sizePolicy);
         horizontalLayout_2 = new QHBoxLayout(groupBox_3);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        horizontalSpacer = new QSpacerItem(203, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalLayout_2->setObjectName(
+            QString::fromUtf8("horizontalLayout_2"));
+        horizontalSpacer = new QSpacerItem(203, 20, QSizePolicy::Expanding,
+                                           QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer);
 
@@ -368,13 +376,12 @@ public:
 
         horizontalLayout_2->addWidget(btnClose);
 
-        horizontalSpacer_2 = new QSpacerItem(202, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(202, 20, QSizePolicy::Expanding,
+                                             QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
-
         verticalLayout_4->addWidget(groupBox_3);
-
 
         retranslateUi(EditHdrDialog);
 
@@ -382,53 +389,84 @@ public:
         tabMode->setCurrentIndex(0);
         cbForm->setCurrentIndex(0);
 
-
         QMetaObject::connectSlotsByName(EditHdrDialog);
     } // setupUi
 
     void retranslateUi(QDialog *EditHdrDialog)
     {
-        EditHdrDialog->setWindowTitle(QCoreApplication::translate("EditHdrDialog", "Header Editor", nullptr));
+        EditHdrDialog->setWindowTitle(QCoreApplication::translate(
+            "EditHdrDialog", "Header Editor", nullptr));
         groupBox_5->setTitle(QString());
-        label_6->setText(QCoreApplication::translate("EditHdrDialog", "Table:", nullptr));
-        cbSet->setItemText(0, QCoreApplication::translate("EditHdrDialog", "SEG-Y / SU", nullptr));
-        cbSet->setItemText(1, QCoreApplication::translate("EditHdrDialog", "CST", nullptr));
+        label_6->setText(
+            QCoreApplication::translate("EditHdrDialog", "Table:", nullptr));
+        cbSet->setItemText(0, QCoreApplication::translate(
+                                  "EditHdrDialog", "SEG-Y / SU", nullptr));
+        cbSet->setItemText(
+            1, QCoreApplication::translate("EditHdrDialog", "CST", nullptr));
 
         btnAddItem->setText(QString());
         btnDelItem->setText(QString());
         groupBox_2->setTitle(QString());
-        hdrsBox->setTitle(QCoreApplication::translate("EditHdrDialog", "Select Header", nullptr));
-        selHdrsBox->setTitle(QCoreApplication::translate("EditHdrDialog", "Header Description", nullptr));
-        label_2->setText(QCoreApplication::translate("EditHdrDialog", "Name", nullptr));
-        label_3->setText(QCoreApplication::translate("EditHdrDialog", "Description", nullptr));
-        label_4->setText(QCoreApplication::translate("EditHdrDialog", "Position", nullptr));
-        label_5->setText(QCoreApplication::translate("EditHdrDialog", "Format", nullptr));
-        cbForm->setItemText(0, QCoreApplication::translate("EditHdrDialog", "Integer 8 bit", nullptr));
-        cbForm->setItemText(1, QCoreApplication::translate("EditHdrDialog", "Integer 16 bit", nullptr));
-        cbForm->setItemText(2, QCoreApplication::translate("EditHdrDialog", "Unsigned integer 16 bit", nullptr));
-        cbForm->setItemText(3, QCoreApplication::translate("EditHdrDialog", "Ineger 32 bit", nullptr));
-        cbForm->setItemText(4, QCoreApplication::translate("EditHdrDialog", "IEEE float 32 bit", nullptr));
-        cbForm->setItemText(5, QCoreApplication::translate("EditHdrDialog", "IEEE float 64 bit", nullptr));
-        cbForm->setItemText(6, QCoreApplication::translate("EditHdrDialog", "IBM float 32 bit", nullptr));
-        cbForm->setItemText(7, QCoreApplication::translate("EditHdrDialog", "Expression", nullptr));
+        hdrsBox->setTitle(QCoreApplication::translate(
+            "EditHdrDialog", "Select Header", nullptr));
+        selHdrsBox->setTitle(QCoreApplication::translate(
+            "EditHdrDialog", "Header Description", nullptr));
+        label_2->setText(
+            QCoreApplication::translate("EditHdrDialog", "Name", nullptr));
+        label_3->setText(QCoreApplication::translate("EditHdrDialog",
+                                                     "Description", nullptr));
+        label_4->setText(
+            QCoreApplication::translate("EditHdrDialog", "Position", nullptr));
+        label_5->setText(
+            QCoreApplication::translate("EditHdrDialog", "Format", nullptr));
+        cbForm->setItemText(0, QCoreApplication::translate(
+                                   "EditHdrDialog", "Integer 8 bit", nullptr));
+        cbForm->setItemText(1, QCoreApplication::translate(
+                                   "EditHdrDialog", "Integer 16 bit", nullptr));
+        cbForm->setItemText(
+            2, QCoreApplication::translate("EditHdrDialog",
+                                           "Unsigned integer 16 bit", nullptr));
+        cbForm->setItemText(3, QCoreApplication::translate(
+                                   "EditHdrDialog", "Ineger 32 bit", nullptr));
+        cbForm->setItemText(4, QCoreApplication::translate("EditHdrDialog",
+                                                           "IEEE float 32 bit",
+                                                           nullptr));
+        cbForm->setItemText(5, QCoreApplication::translate("EditHdrDialog",
+                                                           "IEEE float 64 bit",
+                                                           nullptr));
+        cbForm->setItemText(6, QCoreApplication::translate("EditHdrDialog",
+                                                           "IBM float 32 bit",
+                                                           nullptr));
+        cbForm->setItemText(7, QCoreApplication::translate(
+                                   "EditHdrDialog", "Expression", nullptr));
 
-        tabMode->setTabText(tabMode->indexOf(tab), QCoreApplication::translate("EditHdrDialog", "Position / Format", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("EditHdrDialog", "Header List", nullptr));
+        tabMode->setTabText(tabMode->indexOf(tab),
+                            QCoreApplication::translate(
+                                "EditHdrDialog", "Position / Format", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("EditHdrDialog",
+                                                       "Header List", nullptr));
         insBtn->setText(QString());
-        tabMode->setTabText(tabMode->indexOf(tab_2), QCoreApplication::translate("EditHdrDialog", "Expressioin", nullptr));
-        lbErr->setText(QCoreApplication::translate("EditHdrDialog", "Error", nullptr));
-        btnUpdate->setText(QCoreApplication::translate("EditHdrDialog", "Update", nullptr));
-        btnReset->setText(QCoreApplication::translate("EditHdrDialog", "Reset", nullptr));
+        tabMode->setTabText(tabMode->indexOf(tab_2),
+                            QCoreApplication::translate(
+                                "EditHdrDialog", "Expressioin", nullptr));
+        lbErr->setText(
+            QCoreApplication::translate("EditHdrDialog", "Error", nullptr));
+        btnUpdate->setText(
+            QCoreApplication::translate("EditHdrDialog", "Update", nullptr));
+        btnReset->setText(
+            QCoreApplication::translate("EditHdrDialog", "Reset", nullptr));
         groupBox_3->setTitle(QString());
-        btnApply->setText(QCoreApplication::translate("EditHdrDialog", "Apply Changes", nullptr));
-        btnDiscard->setText(QCoreApplication::translate("EditHdrDialog", "Cancel Changes", nullptr));
-        btnClose->setText(QCoreApplication::translate("EditHdrDialog", "Close", nullptr));
+        btnApply->setText(QCoreApplication::translate(
+            "EditHdrDialog", "Apply Changes", nullptr));
+        btnDiscard->setText(QCoreApplication::translate(
+            "EditHdrDialog", "Cancel Changes", nullptr));
+        btnClose->setText(
+            QCoreApplication::translate("EditHdrDialog", "Close", nullptr));
     } // retranslateUi
-
 };
 
 namespace Ui {
-    class EditHdrDialog: public Ui_EditHdrDialog {};
+class EditHdrDialog : public Ui_EditHdrDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE

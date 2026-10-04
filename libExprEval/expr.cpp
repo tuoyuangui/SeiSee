@@ -4,23 +4,25 @@
 //------------------------------------------------------------------------------
 
 // Includes
-#include <new>
 #include <memory>
+#include <new>
 
-#include "expr.h"
-#include "parser.h"
-#include "node.h"
 #include "except.h"
+#include "expr.h"
+#include "node.h"
+#include "parser.h"
 
 using namespace std;
 using namespace ExprEval;
-
 
 // Expression object
 //------------------------------------------------------------------------------
 
 // Constructor
-Expression::Expression() : m_vlist(0), m_flist(0), m_expr(0)
+Expression::Expression()
+    : m_vlist(0)
+    , m_flist(0)
+    , m_expr(0)
 {
     m_abortcount = 200000;
     m_abortreset = 200000;
@@ -34,28 +36,16 @@ Expression::~Expression()
 }
 
 // Set value list
-void Expression::SetValueList(ValueList *vlist)
-{
-    m_vlist = vlist;
-}
+void Expression::SetValueList(ValueList *vlist) { m_vlist = vlist; }
 
 // Get value list
-ValueList *Expression::GetValueList() const
-{
-    return m_vlist;
-}
+ValueList *Expression::GetValueList() const { return m_vlist; }
 
 // Set function list
-void Expression::SetFunctionList(FunctionList *flist)
-{
-    m_flist = flist;
-}
+void Expression::SetFunctionList(FunctionList *flist) { m_flist = flist; }
 
 // Get function list
-FunctionList *Expression::GetFunctionList() const
-{
-    return m_flist;
-}
+FunctionList *Expression::GetFunctionList() const { return m_flist; }
 
 // Test for an abort
 bool Expression::DoTestAbort()
@@ -67,30 +57,22 @@ bool Expression::DoTestAbort()
 // Test for an abort
 void Expression::TestAbort(bool force)
 {
-    if(force)
-    {
+    if (force) {
         // Test for an abort now
-        if(DoTestAbort())
-        {
+        if (DoTestAbort()) {
             throw(AbortException());
         }
-    }
-    else
-    {
+    } else {
         // Test only if abort count is 0
-        if(m_abortcount == 0)
-        {
+        if (m_abortcount == 0) {
             // Reset count
             m_abortcount = m_abortreset;
 
             // Test abort
-            if(DoTestAbort())
-            {
+            if (DoTestAbort()) {
                 throw(AbortException());
             }
-        }
-        else
-        {
+        } else {
             // Decrease abort count
             m_abortcount--;
         }
@@ -101,7 +83,7 @@ void Expression::TestAbort(bool force)
 void Expression::SetTestAbortCount(unsigned long count)
 {
     m_abortreset = count;
-    if(m_abortcount > count)
+    if (m_abortcount > count)
         m_abortcount = count;
 }
 
@@ -109,7 +91,7 @@ void Expression::SetTestAbortCount(unsigned long count)
 void Expression::Parse(const string &exstr)
 {
     // Clear the expression if needed
-    if(m_expr)
+    if (m_expr)
         Clear();
 
     // Create parser
@@ -129,12 +111,9 @@ void Expression::Clear()
 // Evaluate an expression
 double Expression::Evaluate()
 {
-    if(m_expr)
-    {
+    if (m_expr) {
         return m_expr->Evaluate();
-    }
-    else
-    {
+    } else {
         throw(EmptyExpressionException());
     }
 }

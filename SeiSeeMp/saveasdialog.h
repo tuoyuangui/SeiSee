@@ -14,21 +14,19 @@ namespace Ui {
 class SaveAsDialog;
 }
 
-class SaveAsDialog : public QDialog
-{
+class SaveAsDialog : public QDialog {
     Q_OBJECT
 
-public:
-
-    SeisFile*  sf;
-    QString*   savDir;
+  public:
+    SeisFile *sf;
+    QString *savDir;
 
     explicit SaveAsDialog(QWidget *parent = 0);
     ~SaveAsDialog();
 
     void show();
 
-private slots:
+  private slots:
 
     void hdrListEvent(int row, int mode);
 
@@ -51,25 +49,23 @@ private slots:
     void on_btnTmMax_clicked();
 
     void x_progr(int pers, QString mess);
-    void x_fin  (QString mess);
+    void x_fin(QString mess);
 
-private:
-
+  private:
     bool running;
 
-    MyStringTable     hdrListGrid;
+    MyStringTable hdrListGrid;
 
     Ui::SaveAsDialog *ui;
-
 
     void ShowProgress(QString mes, int pers);
 
     void FillHdrListGrid();
     void FillLimits();
 
-    int  ReadTxt(QLineEdit* edt, bool& ok);
+    int ReadTxt(QLineEdit *edt, bool &ok);
 
-signals:
+  signals:
     void stop();
 };
 

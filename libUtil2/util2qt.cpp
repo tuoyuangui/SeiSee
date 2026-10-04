@@ -1,68 +1,66 @@
 //---------------------------------------------------------------------------
 
+#include <fcntl.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <stdint.h>
 
 #include "util2.h"
 
-#include <QFile>
-#include <QDir>
-#include <QDebug>
-#include <QRgb>
 #include <QColor>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QRgb>
 
 #ifdef _MSC_VER
-    #pragma warning( push )
-    #pragma warning( disable : 4244 4267 4305) // implicit conversion, possible loss of data
+#pragma warning(push)
+#pragma warning(                                                               \
+    disable : 4244 4267 4305) // implicit conversion, possible loss of data
 #else
-    #pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 
 //---------------------------------------------------------------------------
 
-
-int is_segd_f(QString fname, int& FFID, long long pos)
+int is_segd_f(QString fname, int &FFID, long long pos)
 {
-    QByteArray qfn   = fname.toLocal8Bit();
+    QByteArray qfn = fname.toLocal8Bit();
     return is_segd_f(qfn.data(), FFID, pos);
 }
 
 off64_t getfilesize64(QString inpfn)
 {
-    QByteArray qfn   = inpfn.toLocal8Bit();
+    QByteArray qfn = inpfn.toLocal8Bit();
 
     return getfilesize64(qfn.data());
 }
 
-
 int is_segy_f(QString fn)
 {
     QByteArray qfn = fn.toLocal8Bit();
-    char* fname = qfn.data();
+    char *fname = qfn.data();
 
     return is_segy_f(fname);
 }
 
 //---------------------------------------------------------------------------
 
-int is_segy_f(QString fn, int& s, int& cgg, int& junk)
+int is_segy_f(QString fn, int &s, int &cgg, int &junk)
 {
     QByteArray qfn = fn.toLocal8Bit();
-    char* fname = qfn.data();
+    char *fname = qfn.data();
 
     return is_segy_f(fname, s, cgg, junk);
 }
 
 int is_cst_f(QString fname)
 {
-    QByteArray qfn   = fname.toLocal8Bit();
+    QByteArray qfn = fname.toLocal8Bit();
 
     return is_cst_f(qfn.data());
 }
@@ -83,27 +81,24 @@ bool DirExists(QString Name)
     return d.exists();
 }
 
-
 bool RemoveDir(const QString &dirName)
 {
     bool result = true;
     QDir dir(dirName);
 
-    if (dir.exists(dirName))
-    {
-        Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
-        {
-            if (info.isDir())
-            {
+    if (dir.exists(dirName)) {
+        Q_FOREACH (QFileInfo info,
+                   dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System |
+                                         QDir::Hidden | QDir::AllDirs |
+                                         QDir::Files,
+                                     QDir::DirsFirst)) {
+            if (info.isDir()) {
                 result = RemoveDir(info.absoluteFilePath());
-            }
-            else
-            {
+            } else {
                 result = QFile::remove(info.absoluteFilePath());
             }
 
-            if (!result)
-            {
+            if (!result) {
                 return result;
             }
         }
@@ -117,9 +112,10 @@ bool IsDirEmpty(QString path)
 {
     QDir dir(path);
 
-    int count = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count();
+    int count =
+        dir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count();
 
-    return ( count == 0);
+    return (count == 0);
 }
 
 //---------------------------------------------------------------------------
@@ -127,12 +123,12 @@ bool IsDirEmpty(QString path)
 int open_q(QString fn, int flags, int perm)
 {
     QByteArray qfn = fn.toLocal8Bit();
-    const char* fname = qfn.data();
+    const char *fname = qfn.data();
 
-    return open((const char*)fname, flags, perm);
+    return open((const char *)fname, flags, perm);
 }
 
-FILE* fopen_q(QString fn, QString ff)
+FILE *fopen_q(QString fn, QString ff)
 {
     QByteArray qfn = fn.toLocal8Bit();
     QByteArray qff = ff.toLocal8Bit();
@@ -143,70 +139,76 @@ FILE* fopen_q(QString fn, QString ff)
 int unlink_q(QString fn)
 {
     QByteArray qfn = fn.toLocal8Bit();
-    char* fname = qfn.data();
+    char *fname = qfn.data();
 
     return unlink(fname);
 }
 
 //---------------------------------------------------------------------------
-QList<QRgb> MkVPalette(QRgb* colors, int ncolors, double vmin, double vmax, double vinc)
+QList<QRgb> MkVPalette(QRgb *colors, int ncolors, double vmin, double vmax,
+                       double vinc)
 {
     QList<QRgb> pal;
-    int         i, j;
+    int i, j;
 
-    int nvels = (vmax-vmin)/vinc;
+    int nvels = (vmax - vmin) / vinc;
 
-    if(nvels<1)
-    {
+    if (nvels < 1) {
         return pal;
-    }
-    else if(nvels==1)
-    {
+    } else if (nvels == 1) {
         pal.append(colors[0]);
         return pal;
     }
 
-    double* vels = new double [nvels];
-    QRgb*   pals = new QRgb   [nvels];
+    double *vels = new double[nvels];
+    QRgb *pals = new QRgb[nvels];
 
     double jj;
 
+    for (i = 0; i < nvels; i++) {
+        double rc, gc, bc;
 
-    for(i=0;i<nvels;i++)
-    {
-        double rc,gc,bc;
+        jj = double(i) * (ncolors - 1) / (nvels - 1.);
+        j = int(jj);
 
-        jj = double(i)*(ncolors-1)/(nvels-1.);
-        j  = int(jj);
+        double r1 = qRed(colors[j]);
+        double r2 = qRed(colors[j + 1]);
 
-        double r1 = qRed  (colors[j  ]);
-        double r2 = qRed  (colors[j+1]);
+        double g1 = qGreen(colors[j]);
+        double g2 = qGreen(colors[j + 1]);
 
-        double g1 = qGreen(colors[j  ]);
-        double g2 = qGreen(colors[j+1]);
+        double b1 = qBlue(colors[j]);
+        double b2 = qBlue(colors[j + 1]);
 
-        double b1 = qBlue (colors[j  ]);
-        double b2 = qBlue (colors[j+1]);
+        double n1 = j;
+        if (n1 > ncolors - 1)
+            n1 = ncolors - 1;
+        double n2 = n1 + 1;
+        if (n2 > ncolors - 1)
+            n2 = n1;
+        double n = jj;
 
-        double n1 = j;    if(n1>ncolors-1) n1=ncolors-1;
-        double n2 = n1+1; if(n2>ncolors-1) n2=n1;
-        double n  = jj;
+        if (n2 == n1)
+            rc = r1;
+        else
+            rc = r1 + (r2 - r1) / (n2 - n1) * (n - n1);
 
-        if(n2==n1) rc = r1;
-        else       rc = r1 + (r2-r1) / (n2-n1) * (n-n1);
+        if (n2 == n1)
+            gc = g1;
+        else
+            gc = g1 + (g2 - g1) / (n2 - n1) * (n - n1);
 
-        if(n2==n1) gc = g1;
-        else       gc = g1 + (g2-g1) / (n2-n1) * (n-n1);
+        if (n2 == n1)
+            bc = b1;
+        else
+            bc = b1 + (b2 - b1) / (n2 - n1) * (n - n1);
 
-        if(n2==n1) bc = b1;
-        else       bc = b1 + (b2-b1) / (n2-n1) * (n-n1);
-
-        pals[i]=QColor(rc,gc,bc).rgb();
+        pals[i] = QColor(rc, gc, bc).rgb();
         pal.append(pals[i]);
     }
 
-    delete [] vels;
-    delete [] pals;
+    delete[] vels;
+    delete[] pals;
 
     return pal;
 }

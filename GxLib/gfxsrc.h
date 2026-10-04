@@ -1,34 +1,31 @@
 #ifndef GFXSRC_H
 #define GFXSRC_H
 
-#include <QObject>
 #include <QList>
+#include <QObject>
 
 #include "gfxobj.h"
 
-class GfxSrc : public QObject
-{
+class GfxSrc : public QObject {
     Q_OBJECT
 
-protected:
-    QList<GfxObj*> m_links;
+  protected:
+    QList<GfxObj *> m_links;
 
-public:
+  public:
     explicit GfxSrc(QObject *parent = 0);
 
     virtual ~GfxSrc();
 
-    void RegisterLink(GfxObj* v);
+    void RegisterLink(GfxObj *v);
 
-    void  UnRegisterLink(GfxObj* v);
+    void UnRegisterLink(GfxObj *v);
 
-    virtual void Clear ();
+    virtual void Clear();
 
-    
-signals:
-    
-public slots:
-    
+  signals:
+
+  public slots:
 };
 
 #endif // GFXSRC_H

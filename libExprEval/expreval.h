@@ -7,12 +7,11 @@
 #define __EXPREVAL_EXPREVAL_H
 
 // Include items
-#include "vallist.h"
-#include "funclist.h"
+#include "except.h"
 #include "expr.h"
+#include "funclist.h"
 #include "node.h"
 #include "parser.h"
-#include "except.h"
+#include "vallist.h"
 
 #endif // __EXPREVAL_EXPREVAL_H
-

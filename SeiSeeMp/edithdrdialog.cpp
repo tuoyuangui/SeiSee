@@ -1,9 +1,9 @@
 #include "edithdrdialog.h"
 #include "ui_edithdrdialog.h"
 
-EditHdrDialog::EditHdrDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::EditHdrDialog)
+EditHdrDialog::EditHdrDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::EditHdrDialog)
 {
     ui->setupUi(this);
 
@@ -13,116 +13,97 @@ EditHdrDialog::EditHdrDialog(QWidget *parent) :
 
     ui->lbErr->setText("");
 
-    busy=true;
+    busy = true;
 
     ui->cbForm->clear();
 
-
-    for(n=0;n<FormatList::count();n++)
-    {
+    for (n = 0; n < FormatList::count(); n++) {
         ui->cbForm->addItem(FormatList::namei(n));
     }
 
     ui->cbForm->addItem("Expression");
 
-    busy=false;
-
-    hdrGrid.setRowCount(0);
-    hdrGrid.setColCount(2);
-    hdrGrid.verticalHeader()  ->setVisible(false);
+    busy = false;
 
     hdrGrid.setRowCount(0);
     hdrGrid.setColCount(2);
     hdrGrid.verticalHeader()->setVisible(false);
-    hdrGrid.setColLabel   (0,"Name");
-    hdrGrid.setColLabel   (1,"Description");
-    hdrGrid.setColWidth(0,65);
-    hdrGrid.setColWidth(1,0);
 
-    QVBoxLayout* hdrGridLayout = new QVBoxLayout;
-    hdrGridLayout->setMargin (1);
+    hdrGrid.setRowCount(0);
+    hdrGrid.setColCount(2);
+    hdrGrid.verticalHeader()->setVisible(false);
+    hdrGrid.setColLabel(0, "Name");
+    hdrGrid.setColLabel(1, "Description");
+    hdrGrid.setColWidth(0, 65);
+    hdrGrid.setColWidth(1, 0);
+
+    QVBoxLayout *hdrGridLayout = new QVBoxLayout;
+    hdrGridLayout->setMargin(1);
     hdrGridLayout->setSpacing(1);
     hdrGridLayout->addWidget(&hdrGrid);
     ui->hdrsBox->setLayout(hdrGridLayout);
 
     insGrid.setRowCount(0);
     insGrid.setColCount(2);
-    insGrid.verticalHeader()  ->setVisible(false);
+    insGrid.verticalHeader()->setVisible(false);
 
     insGrid.setRowCount(0);
     insGrid.setColCount(2);
     insGrid.verticalHeader()->setVisible(false);
-    insGrid.setColLabel   (0,"Name");
-    insGrid.setColLabel   (1,"Description");
-    insGrid.setColWidth(0,65);
-    insGrid.setColWidth(1,0);
+    insGrid.setColLabel(0, "Name");
+    insGrid.setColLabel(1, "Description");
+    insGrid.setColWidth(0, 65);
+    insGrid.setColWidth(1, 0);
 
-    QVBoxLayout* insGridLayout = new QVBoxLayout;
-    insGridLayout->setMargin (1);
+    QVBoxLayout *insGridLayout = new QVBoxLayout;
+    insGridLayout->setMargin(1);
     insGridLayout->setSpacing(1);
     insGridLayout->addWidget(&insGrid);
     ui->frmHdrs->setLayout(insGridLayout);
 
-
     setChanged(false);
 
     ui->btnUpdate->hide();
-    ui->btnReset ->hide();
+    ui->btnReset->hide();
 
-
-    connect
-            (
-                &hdrGrid,
-                SIGNAL(rowEvent(int, int)),
-                this,
-                SLOT(hdrTabEvent(int,int))
-                );
+    connect(&hdrGrid, SIGNAL(rowEvent(int, int)), this,
+            SLOT(hdrTabEvent(int, int)));
 
     enableEdit(true);
-
 }
 
-EditHdrDialog::~EditHdrDialog()
-{
-    delete ui;
-}
+EditHdrDialog::~EditHdrDialog() { delete ui; }
 
 void EditHdrDialog::setChanged(bool v)
 {
-    changed=v;
+    changed = v;
 
-    if(v)
-    {
+    if (v) {
         ui->cbSet->setEnabled(false);
-        ui->btnApply   ->show();
-        ui->btnDiscard ->show();
-        ui->btnClose   ->hide();
-    }
-    else
-    {
+        ui->btnApply->show();
+        ui->btnDiscard->show();
+        ui->btnClose->hide();
+    } else {
         ui->cbSet->setEnabled(true);
-        ui->btnApply   ->hide();
-        ui->btnDiscard ->hide();
-        ui->btnClose   ->show();
+        ui->btnApply->hide();
+        ui->btnDiscard->hide();
+        ui->btnClose->show();
     }
 }
 
 void EditHdrDialog::enableEdit(bool enable)
 {
-    if(enable)
-    {
-        ui->edName ->setEnabled(enable);
-        ui->edDesc ->setEnabled(enable);
-        ui->edPos  ->setEnabled(enable);
-        ui->cbForm ->setEnabled(enable);
+    if (enable) {
+        ui->edName->setEnabled(enable);
+        ui->edDesc->setEnabled(enable);
+        ui->edPos->setEnabled(enable);
+        ui->cbForm->setEnabled(enable);
         ui->txtExpr->setEnabled(enable);
-    }
-    else
-    {
-        ui->edName ->setEnabled(enable);
-        ui->edDesc ->setEnabled(enable);
-        ui->edPos  ->setEnabled(enable);
-        ui->cbForm ->setEnabled(enable);
+    } else {
+        ui->edName->setEnabled(enable);
+        ui->edDesc->setEnabled(enable);
+        ui->edPos->setEnabled(enable);
+        ui->cbForm->setEnabled(enable);
         ui->txtExpr->setEnabled(enable);
     }
 }
@@ -132,23 +113,24 @@ void EditHdrDialog::hdrTabEvent(int row, int mode)
     QString name;
     QString desc;
     QString estr;
-    int     fidx;
-    int     frmt;
-    int     edit = true;
-    int     pos;
+    int fidx;
+    int frmt;
+    int edit = true;
+    int pos;
 
-    if(mode==1) // && ui->tabMode->currentIndex()==0)
+    if (mode == 1) // && ui->tabMode->currentIndex()==0)
     {
-        busy=true;
+        busy = true;
 
-        name = hdrGrid.Cell(row,0);
-        desc = hdrGrid.Cell(row,1);
-        pos  = hdrGrid.Tag (row,0);
-        frmt = hdrGrid.Tag (row,1);
-        estr = hdrGrid.Data(row,1);
+        name = hdrGrid.Cell(row, 0);
+        desc = hdrGrid.Cell(row, 1);
+        pos = hdrGrid.Tag(row, 0);
+        frmt = hdrGrid.Tag(row, 1);
+        estr = hdrGrid.Data(row, 1);
 
         fidx = FormatList::index(frmt);
-        if(estr!=0) fidx=7;
+        if (estr != 0)
+            fidx = 7;
 
         ui->edName->setText(name);
         ui->edDesc->setText(desc);
@@ -158,21 +140,22 @@ void EditHdrDialog::hdrTabEvent(int row, int mode)
 
         ui->btnDelItem->setEnabled(edit);
 
-        busy=false;
+        busy = false;
     }
 }
 
 void EditHdrDialog::show()
 {
     curtype = TraceHdrsSet.listIdx();
-    ui->cbSet->setCurrentIndex(curtype-1);
+    ui->cbSet->setCurrentIndex(curtype - 1);
 
     int r = hdrGrid.curRow();
 
     FillHdrGrid();
     FillInsGrid();
 
-    if(r>0) hdrGrid.setCurCell(r);
+    if (r > 0)
+        hdrGrid.setCurCell(r);
 
     QDialog::show();
 }
@@ -181,39 +164,37 @@ void EditHdrDialog::FillHdrGrid()
 {
     int n;
 
-    TrHdrDefList* hdrDefList = TraceHdrsSet.List(curtype);
+    TrHdrDefList *hdrDefList = TraceHdrsSet.List(curtype);
 
     int la = hdrDefList->count();
     int l;
 
-    for(n=l=0;n<la;n++)
-    {
+    for (n = l = 0; n < la; n++) {
         int edit = hdrDefList->item(n)->edit;
-        if(edit) l++;
+        if (edit)
+            l++;
     }
 
     hdrGrid.setRowCount(l);
 
-    for(n=l=0;n<la;n++)
-    {
-       int     edit = hdrDefList->item(n)->edit;
-       if(edit)
-       {
-           QString desc = hdrDefList->item(n)->desc;
-           QString name = hdrDefList->item(n)->name;
-           QString estr = hdrDefList->item(n)->expr.ExprString();
-           int     frmt = hdrDefList->item(n)->frmt;
-           int     pos  = hdrDefList->item(n)->pos;
+    for (n = l = 0; n < la; n++) {
+        int edit = hdrDefList->item(n)->edit;
+        if (edit) {
+            QString desc = hdrDefList->item(n)->desc;
+            QString name = hdrDefList->item(n)->name;
+            QString estr = hdrDefList->item(n)->expr.ExprString();
+            int frmt = hdrDefList->item(n)->frmt;
+            int pos = hdrDefList->item(n)->pos;
 
-           //if(estr!="") bstr="EXPR";
+            // if(estr!="") bstr="EXPR";
 
-           hdrGrid.setCell(l,0,name);
-           hdrGrid.setCell(l,1,desc);
-           hdrGrid.setTag (l,0,pos);
-           hdrGrid.setTag (l,1,frmt);
-           hdrGrid.setData(l,1,estr);
-           l++;
-       }
+            hdrGrid.setCell(l, 0, name);
+            hdrGrid.setCell(l, 1, desc);
+            hdrGrid.setTag(l, 0, pos);
+            hdrGrid.setTag(l, 1, frmt);
+            hdrGrid.setData(l, 1, estr);
+            l++;
+        }
     }
 }
 
@@ -221,37 +202,35 @@ void EditHdrDialog::FillInsGrid()
 {
     int n;
 
-    TrHdrDefList* hdrDefList = TraceHdrsSet.List(curtype);
+    TrHdrDefList *hdrDefList = TraceHdrsSet.List(curtype);
 
     int la = hdrDefList->count();
     int l;
 
-    for(n=l=0;n<la;n++)
-    {
+    for (n = l = 0; n < la; n++) {
         int edit = hdrDefList->item(n)->edit;
-        if(!edit) l++;
+        if (!edit)
+            l++;
     }
 
     insGrid.setRowCount(l);
 
-    for(n=l=0;n<la;n++)
-    {
-       int     edit = hdrDefList->item(n)->edit;
-       if(!edit)
-       {
-           QString desc = hdrDefList->item(n)->desc;
-           QString name = hdrDefList->item(n)->name;
-           QString estr = hdrDefList->item(n)->expr.ExprString();
-           int     frmt = hdrDefList->item(n)->frmt;
-           int     pos  = hdrDefList->item(n)->pos;
+    for (n = l = 0; n < la; n++) {
+        int edit = hdrDefList->item(n)->edit;
+        if (!edit) {
+            QString desc = hdrDefList->item(n)->desc;
+            QString name = hdrDefList->item(n)->name;
+            QString estr = hdrDefList->item(n)->expr.ExprString();
+            int frmt = hdrDefList->item(n)->frmt;
+            int pos = hdrDefList->item(n)->pos;
 
-           insGrid.setCell(l,0,name);
-           insGrid.setCell(l,1,desc);
-           insGrid.setTag (l,0,pos);
-           insGrid.setTag (l,1,frmt);
-           insGrid.setData(l,1,estr);
-           l++;
-       }
+            insGrid.setCell(l, 0, name);
+            insGrid.setCell(l, 1, desc);
+            insGrid.setTag(l, 0, pos);
+            insGrid.setTag(l, 1, frmt);
+            insGrid.setData(l, 1, estr);
+            l++;
+        }
     }
 }
 
@@ -259,22 +238,19 @@ int EditHdrDialog::findrow(QString name)
 {
     int n;
 
-    for(n=0;n<hdrGrid.RowCount();n++)
-    {
-        if(name==hdrGrid.Cell(n,0)) return n;
+    for (n = 0; n < hdrGrid.RowCount(); n++) {
+        if (name == hdrGrid.Cell(n, 0))
+            return n;
     }
 
     return -1;
 }
 
-void EditHdrDialog::on_btnClose_clicked()
-{
-    close();
-}
+void EditHdrDialog::on_btnClose_clicked() { close(); }
 
 void EditHdrDialog::on_cbSet_currentIndexChanged(int index)
 {
-    curtype=index+1;
+    curtype = index + 1;
     FillHdrGrid();
     FillInsGrid();
 }
@@ -282,20 +258,21 @@ void EditHdrDialog::on_cbSet_currentIndexChanged(int index)
 void EditHdrDialog::on_btnAddItem_clicked()
 {
     int i;
-    for(i=1;i<99999;i++)
-    {
-        QString name; name.sprintf("new%d",i);
+    for (i = 1; i < 99999; i++) {
+        QString name;
+        name.sprintf("new%d", i);
 
-        if(findrow(name) != -1) continue;
+        if (findrow(name) != -1)
+            continue;
 
         int nr = hdrGrid.RowCount();
 
-        hdrGrid.setRowCount(nr+1);
+        hdrGrid.setRowCount(nr + 1);
 
-        hdrGrid.setCell(nr,0,name);
-        hdrGrid.setCell(nr,1,name);
-        hdrGrid.setTag (nr,0,1);
-        hdrGrid.setTag (nr,1,2);
+        hdrGrid.setCell(nr, 0, name);
+        hdrGrid.setCell(nr, 1, name);
+        hdrGrid.setTag(nr, 0, 1);
+        hdrGrid.setTag(nr, 1, 2);
         hdrGrid.setCurCell(nr);
         setChanged(true);
 
@@ -303,19 +280,20 @@ void EditHdrDialog::on_btnAddItem_clicked()
     }
 }
 
-
 void EditHdrDialog::onUserInput()
 {
-    if(busy) return;
+    if (busy)
+        return;
 
-    if(hdrGrid.curRow()<0) return;
+    if (hdrGrid.curRow() < 0)
+        return;
 
     ui->btnUpdate->show();
-    ui->btnReset ->show();
+    ui->btnReset->show();
     hdrGrid.setEnabled(false);
-    ui->btnApply  ->setEnabled(false);
+    ui->btnApply->setEnabled(false);
     ui->btnDiscard->setEnabled(false);
-    ui->btnClose  ->setEnabled(false);
+    ui->btnClose->setEnabled(false);
 }
 
 void EditHdrDialog::on_cbSet_editTextChanged(const QString &arg1)
@@ -326,32 +304,34 @@ void EditHdrDialog::on_cbSet_editTextChanged(const QString &arg1)
 
 void EditHdrDialog::on_btnReset_clicked()
 {
-    if(hdrGrid.curRow()<0) return;
+    if (hdrGrid.curRow() < 0)
+        return;
 
     hdrTabEvent(hdrGrid.curRow(), 1);
     ui->btnUpdate->hide();
-    ui->btnReset ->hide();
+    ui->btnReset->hide();
     hdrGrid.setEnabled(true);
-    ui->btnApply  ->setEnabled(true);
+    ui->btnApply->setEnabled(true);
     ui->btnDiscard->setEnabled(true);
-    ui->btnClose  ->setEnabled(true);
+    ui->btnClose->setEnabled(true);
 
     ui->lbErr->setText("");
 }
 
 void EditHdrDialog::on_btnUpdate_clicked()
 {
-    int hdrl = 240; if(curtype==2) hdrl=256;
+    int hdrl = 240;
+    if (curtype == 2)
+        hdrl = 256;
 
-    bool   ok = true;
+    bool ok = true;
 
     QString name = ui->edName->text().trimmed();
 
     int crow = hdrGrid.curRow();
     int frow = findrow(name);
 
-    if(frow>=0 && frow!=crow)
-    {
+    if (frow >= 0 && frow != crow) {
         ui->lbErr->setText("Duplicate item name");
         return;
     }
@@ -361,23 +341,20 @@ void EditHdrDialog::on_btnUpdate_clicked()
 
     estr = estr.trimmed();
 
-    if(estr!="")
-    {
+    if (estr != "") {
         SeisTrExpr expr(estr);
-        if(expr.Error())
-        {
+        if (expr.Error()) {
             ui->lbErr->setText("Bad expression");
             return;
         }
     }
 
-    int fi  = ui->cbForm->currentIndex();
+    int fi = ui->cbForm->currentIndex();
     int frmt = FormatList::codei(fi);
-    int flen = frmt%10;
+    int flen = frmt % 10;
 
     int pos = ui->edPos->text().toInt(&ok);
-    if(!ok || pos<=0 || pos+flen-1>hdrl)
-    {
+    if (!ok || pos <= 0 || pos + flen - 1 > hdrl) {
         ui->lbErr->setText("Illegal Position value");
         return;
     }
@@ -386,24 +363,26 @@ void EditHdrDialog::on_btnUpdate_clicked()
 
     QString bstr;
 
-    if(estr=="") bstr.sprintf("%d-%d",pos,pos+flen-1);
-    else         bstr = "EXPR";
+    if (estr == "")
+        bstr.sprintf("%d-%d", pos, pos + flen - 1);
+    else
+        bstr = "EXPR";
 
-    hdrGrid.setCell(crow,0,name);
-    hdrGrid.setCell(crow,1,desc);
-    hdrGrid.setTag (crow,0,pos);
-    hdrGrid.setTag (crow,1,frmt);
-    hdrGrid.setData(crow,1,estr);
+    hdrGrid.setCell(crow, 0, name);
+    hdrGrid.setCell(crow, 1, desc);
+    hdrGrid.setTag(crow, 0, pos);
+    hdrGrid.setTag(crow, 1, frmt);
+    hdrGrid.setData(crow, 1, estr);
 
     ui->btnUpdate->hide();
-    ui->btnReset ->hide();
+    ui->btnReset->hide();
     hdrGrid.setEnabled(true);
 
     setChanged(true);
 
-    ui->btnApply  ->setEnabled(true);
+    ui->btnApply->setEnabled(true);
     ui->btnDiscard->setEnabled(true);
-    ui->btnClose  ->setEnabled(true);
+    ui->btnClose->setEnabled(true);
 }
 
 void EditHdrDialog::on_edName_textChanged(const QString &arg1)
@@ -411,32 +390,30 @@ void EditHdrDialog::on_edName_textChanged(const QString &arg1)
     onUserInput();
 }
 
-
 void EditHdrDialog::on_edDesc_textChanged(const QString &arg1)
 {
     onUserInput();
 }
 
-void EditHdrDialog::on_edPos_textChanged(const QString &arg1)
-{
-    onUserInput();
-}
+void EditHdrDialog::on_edPos_textChanged(const QString &arg1) { onUserInput(); }
 
 void EditHdrDialog::on_btnDelItem_clicked()
 {
     int row = hdrGrid.curRow();
 
-    if(row<0) return;
+    if (row < 0)
+        return;
 
     hdrGrid.delRow(row);
 
-    row=row+1; if(row>hdrGrid.RowCount()-1) row=hdrGrid.RowCount()-1;
+    row = row + 1;
+    if (row > hdrGrid.RowCount() - 1)
+        row = hdrGrid.RowCount() - 1;
 
     hdrGrid.setCurCell(row);
 
     setChanged(true);
 }
-
 
 void EditHdrDialog::on_btnDiscard_clicked()
 {
@@ -444,45 +421,40 @@ void EditHdrDialog::on_btnDiscard_clicked()
     setChanged(false);
 }
 
-
 void EditHdrDialog::on_btnApply_clicked()
 {
-    if(changed)
-    {
-        TrHdrDefList* hdrDefList = TraceHdrsSet.List(curtype);
+    if (changed) {
+        TrHdrDefList *hdrDefList = TraceHdrsSet.List(curtype);
 
         TrHdrDefList List;
-        TrHdrDef     Hdr;
+        TrHdrDef Hdr;
 
         List.setType(curtype);
 
         int la = hdrDefList->count();
-        int l,n;
+        int l, n;
 
-        for(n=l=0;n<la;n++)
-        {
+        for (n = l = 0; n < la; n++) {
             int edit = hdrDefList->item(n)->edit;
-            if(!edit)
-            {
+            if (!edit) {
                 List.add(*hdrDefList->item(n));
             }
         }
 
         int row;
 
-        for(row=0;row<hdrGrid.RowCount();row++)
-        {
-            Hdr.name = hdrGrid.Cell(row,0);
-            Hdr.desc = hdrGrid.Cell(row,1);
-            Hdr.edit = 1;//hdrGrid.Tag (row,0);
-            Hdr.pos  = hdrGrid.Tag (row,0);
-            Hdr.frmt = hdrGrid.Tag (row,1);
-            Hdr.expr = SeisTrExpr(hdrGrid.Data(row,1));
+        for (row = 0; row < hdrGrid.RowCount(); row++) {
+            Hdr.name = hdrGrid.Cell(row, 0);
+            Hdr.desc = hdrGrid.Cell(row, 1);
+            Hdr.edit = 1; // hdrGrid.Tag (row,0);
+            Hdr.pos = hdrGrid.Tag(row, 0);
+            Hdr.frmt = hdrGrid.Tag(row, 1);
+            Hdr.expr = SeisTrExpr(hdrGrid.Data(row, 1));
 
             List.add(Hdr);
         }
 
-        TraceHdrsSet[curtype]=List;
+        TraceHdrsSet[curtype] = List;
 
         emit changedEvent();
 
@@ -492,28 +464,25 @@ void EditHdrDialog::on_btnApply_clicked()
 
 void EditHdrDialog::on_txtExpr_textChanged()
 {
-    if(busy) return;
+    if (busy)
+        return;
 
-    int row = hdrGrid.curRow(); if(row<0) return;
+    int row = hdrGrid.curRow();
+    if (row < 0)
+        return;
 
     QString estr = ui->txtExpr->document()->toPlainText().trimmed();
 
-    if(estr!="")
-    {
+    if (estr != "") {
         SeisTrExpr expr(estr);
-        if(expr.Error())
-        {
+        if (expr.Error()) {
             ui->lbErr->setText("Bad expression");
-        }
-        else
-        {
+        } else {
             ui->lbErr->setText("");
         }
         ui->cbForm->setCurrentIndex(7);
-    }
-    else
-    {
-        int frmt = hdrGrid.Tag (row,1);
+    } else {
+        int frmt = hdrGrid.Tag(row, 1);
         int fidx = FormatList::index(frmt);
         ui->cbForm->setCurrentIndex(fidx);
     }
@@ -521,29 +490,26 @@ void EditHdrDialog::on_txtExpr_textChanged()
     onUserInput();
 }
 
-
 void EditHdrDialog::on_tabMode_currentChanged(int index)
 {
-    if(index==0)
-    {
+    if (index == 0) {
         ui->hdrsBox->setTitle("Select Header to edit");
-    }
-    else
-    {
+    } else {
         ui->hdrsBox->setTitle("Insert Header to expression");
     }
 }
 
 void EditHdrDialog::on_insBtn_clicked()
 {
-    int row = insGrid.curRow(); if(row<0) return;
+    int row = insGrid.curRow();
+    if (row < 0)
+        return;
 
-    int     pos  = insGrid.Tag (row,0);
-    int     frmt = insGrid.Tag (row,1);
+    int pos = insGrid.Tag(row, 0);
+    int frmt = insGrid.Tag(row, 1);
 
-    QString fun = "H(" +
-                  QString::number(pos)+","+
-                  QString::number(frmt)+")";
+    QString fun =
+        "H(" + QString::number(pos) + "," + QString::number(frmt) + ")";
 
     ui->txtExpr->insertPlainText(fun);
 }

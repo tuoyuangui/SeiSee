@@ -1,16 +1,16 @@
-#include <QWidget>
-#include <QWheelEvent>
 #include <QApplication>
 #include <QDebug>
+#include <QWheelEvent>
+#include <QWidget>
 
 #include "myscrollarea.h"
-
 
 MyScrollArea::MyScrollArea(QWidget *plt, int mrb)
 {
     plot = plt;
     setWidget(plot);
-    mv=0; mvrb=mrb;
+    mv = 0;
+    mvrb = mrb;
     setFrameStyle(0);
     rubberBand = NULL;
     setMouseTracking(true);
@@ -18,26 +18,19 @@ MyScrollArea::MyScrollArea(QWidget *plt, int mrb)
 
     ignore = false;
 
-    connect(
-             horizontalScrollBar(),
-             SIGNAL(valueChanged(int)),
-             this,
-             SLOT  (on_hScroll(int))
-           );
+    connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this,
+            SLOT(on_hScroll(int)));
 
-    connect(
-             verticalScrollBar(),
-             SIGNAL(valueChanged(int)),
-             this,
-             SLOT  (on_vScroll(int))
-           );
+    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this,
+            SLOT(on_vScroll(int)));
 }
 
-
-void MyScrollArea::wheelEvent(QWheelEvent* event)
+void MyScrollArea::wheelEvent(QWheelEvent *event)
 {
     double d = event->delta();
-    double z = 1+0.002*abs(d); if(d<0) z = 1/z;
+    double z = 1 + 0.002 * abs(d);
+    if (d < 0)
+        z = 1 / z;
 
     int xm = event->pos().x();
     int ym = event->pos().y();
@@ -45,26 +38,24 @@ void MyScrollArea::wheelEvent(QWheelEvent* event)
     double zx = z;
     double zy = z;
 
-    if((mvrb&1)==0) zy=1;
-    if((mvrb&2)==0) zx=1;
+    if ((mvrb & 1) == 0)
+        zy = 1;
+    if ((mvrb & 2) == 0)
+        zx = 1;
 
     emitZoomChanged(zx, zy, xm, ym);
 }
 
-void MyScrollArea::mousePressEvent ( QMouseEvent * event )
+void MyScrollArea::mousePressEvent(QMouseEvent *event)
 {
-    if(rubberBand)
-    {
-        if(event->button()==Qt::RightButton)
-        {
+    if (rubberBand) {
+        if (event->button() == Qt::RightButton) {
             setCursor(Qt::ArrowCursor);
 
             rubberBand->hide();
             delete rubberBand;
-            rubberBand=NULL;
-        }
-        else
-        {
+            rubberBand = NULL;
+        } else {
             origin = event->pos();
 
             rubberBand->setGeometry(QRect(origin, QSize()));
@@ -72,72 +63,68 @@ void MyScrollArea::mousePressEvent ( QMouseEvent * event )
         }
 
         return;
-    }
-    else if(mvrb && event->button()==Qt::RightButton)
-    {
-        xo=event->x();
-        yo=event->y();
-        mv=1;
+    } else if (mvrb && event->button() == Qt::RightButton) {
+        xo = event->x();
+        yo = event->y();
+        mv = 1;
         setCursor(Qt::OpenHandCursor);
     }
     emit mouseEvent(event);
 }
 
-void MyScrollArea::mouseReleaseEvent ( QMouseEvent * event )
+void MyScrollArea::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(rubberBand)
-    {
+    if (rubberBand) {
         setCursor(Qt::ArrowCursor);
 
         QRect r = rubberBand->geometry();
 
         rubberBand->hide();
         delete rubberBand;
-        rubberBand=NULL;
+        rubberBand = NULL;
 
         emit zoomW(r);
-    }
-    else if(event->button()==Qt::RightButton)
-    {
+    } else if (event->button() == Qt::RightButton) {
         setCursor(Qt::ArrowCursor);
-        mv=0;
+        mv = 0;
     }
 
     emit mouseEvent(event);
 }
 
-
-void MyScrollArea::mouseMoveEvent  ( QMouseEvent * event )
+void MyScrollArea::mouseMoveEvent(QMouseEvent *event)
 {
-    int x=event->x();
-    int y=event->y();
+    int x = event->x();
+    int y = event->y();
 
-    if(rubberBand)
-    {
+    if (rubberBand) {
         rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
         return;
-    }
-    else if(mv)
-    {
+    } else if (mv) {
         int dx = xo - x;
         int dy = yo - y;
 
-        if((mvrb&1)==0) dy=0;
-        if((mvrb&2)==0) dx=0;
+        if ((mvrb & 1) == 0)
+            dy = 0;
+        if ((mvrb & 2) == 0)
+            dx = 0;
 
-        setHscroll(Hscroll()+dx);
-        setVscroll(Vscroll()+dy);
+        setHscroll(Hscroll() + dx);
+        setVscroll(Vscroll() + dy);
 
-        xo=x;
-        yo=y;
+        xo = x;
+        yo = y;
 
-//      qDebug() << "Move x=" << x << "y=" << y << "dx=" << dx << "dy=" << dy;
+        //      qDebug() << "Move x=" << x << "y=" << y << "dx=" << dx << "dy="
+        //      << dy;
 
         x = Hscroll();
         y = Vscroll();
 
-        if((mvrb&1)==0) y = -1;
-        if((mvrb&2)==0) x = -1;
+        if ((mvrb & 1) == 0)
+            y = -1;
+        if ((mvrb & 2) == 0)
+            x = -1;
 
         emitZoomChanged(0, 0, x, y);
     }
@@ -145,32 +132,31 @@ void MyScrollArea::mouseMoveEvent  ( QMouseEvent * event )
     emit mouseEvent(event);
 }
 
-
 void MyScrollArea::on_vScroll(int)
 {
-    if(ignore) return;
+    if (ignore)
+        return;
 
-    int y = verticalScrollBar  ()->value();
+    int y = verticalScrollBar()->value();
 
     emitZoomChanged(0, 0, -1, y);
 }
 
 void MyScrollArea::on_hScroll(int)
 {
-    if(ignore) return;
+    if (ignore)
+        return;
 
     int x = horizontalScrollBar()->value();
 
     emitZoomChanged(0, 0, x, -1);
 }
 
-
 void MyScrollArea::keyPressEvent(QKeyEvent *event)
 {
     emit keyEvent(event);
     QWidget::keyPressEvent(event);
 }
-
 
 void MyScrollArea::scrollContentsBy(int dx, int dy)
 {
@@ -179,21 +165,17 @@ void MyScrollArea::scrollContentsBy(int dx, int dy)
 
 void MyScrollArea::setZoomW(int on)
 {
-    if(on && !rubberBand)
-    {
+    if (on && !rubberBand) {
         rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 
         QPixmap a = QPixmap(":/images/ZoomWCurs.xpm");
-        setCursor(QCursor(a,10,8));
-    }
-    else if(!on && rubberBand)
-    {
+        setCursor(QCursor(a, 10, 8));
+    } else if (!on && rubberBand) {
         rubberBand->hide();
         delete rubberBand;
-        rubberBand=NULL;
+        rubberBand = NULL;
     }
 }
-
 
 void MyScrollArea::emitZoomChanged(double zx, double zy, int x, int y)
 {
@@ -207,7 +189,8 @@ void MyScrollArea::setVscroll(int v)
 {
     ignore = true;
 
-    if((mvrb&1)==0) v=0;
+    if ((mvrb & 1) == 0)
+        v = 0;
 
     verticalScrollBar()->setValue(v);
 
@@ -218,7 +201,8 @@ void MyScrollArea::setHscroll(int v)
 {
     ignore = true;
 
-    if((mvrb&2)==0) v=0;
+    if ((mvrb & 2) == 0)
+        v = 0;
 
     horizontalScrollBar()->setValue(v);
 

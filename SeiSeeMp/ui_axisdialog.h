@@ -26,9 +26,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_AxisDialog
-{
-public:
+class Ui_AxisDialog {
+  public:
     QVBoxLayout *verticalLayout;
     QTabWidget *tabWidget;
     QWidget *tab;
@@ -82,7 +81,8 @@ public:
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(selHdrsBox->sizePolicy().hasHeightForWidth());
+        sizePolicy.setHeightForWidth(
+            selHdrsBox->sizePolicy().hasHeightForWidth());
         selHdrsBox->setSizePolicy(sizePolicy);
         selHdrsBox->setMaximumSize(QSize(120, 16777215));
 
@@ -90,7 +90,8 @@ public:
 
         groupBox_4 = new QGroupBox(groupBox_2);
         groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
-        sizePolicy.setHeightForWidth(groupBox_4->sizePolicy().hasHeightForWidth());
+        sizePolicy.setHeightForWidth(
+            groupBox_4->sizePolicy().hasHeightForWidth());
         groupBox_4->setSizePolicy(sizePolicy);
         groupBox_4->setMinimumSize(QSize(45, 0));
         addBtn = new QPushButton(groupBox_4);
@@ -104,7 +105,8 @@ public:
         addBtn->setMinimumSize(QSize(25, 25));
         addBtn->setMaximumSize(QSize(25, 25));
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/images/ToLeft.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/images/ToLeft.png"), QSize(),
+                     QIcon::Normal, QIcon::Off);
         addBtn->setIcon(icon);
         delBtn = new QPushButton(groupBox_4);
         delBtn->setObjectName(QString::fromUtf8("delBtn"));
@@ -114,17 +116,20 @@ public:
         delBtn->setMinimumSize(QSize(25, 25));
         delBtn->setMaximumSize(QSize(25, 25));
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/images/ToRight.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/images/ToRight.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         delBtn->setIcon(icon1);
         dellAllBtn = new QPushButton(groupBox_4);
         dellAllBtn->setObjectName(QString::fromUtf8("dellAllBtn"));
         dellAllBtn->setGeometry(QRect(10, 100, 25, 25));
-        sizePolicy1.setHeightForWidth(dellAllBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            dellAllBtn->sizePolicy().hasHeightForWidth());
         dellAllBtn->setSizePolicy(sizePolicy1);
         dellAllBtn->setMinimumSize(QSize(25, 25));
         dellAllBtn->setMaximumSize(QSize(25, 25));
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/images/ToLeftAll.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QString::fromUtf8(":/images/ToLeftAll.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         dellAllBtn->setIcon(icon2);
         upBtn = new QPushButton(groupBox_4);
         upBtn->setObjectName(QString::fromUtf8("upBtn"));
@@ -134,17 +139,20 @@ public:
         upBtn->setMinimumSize(QSize(25, 25));
         upBtn->setMaximumSize(QSize(25, 25));
         QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/images/ToUp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QString::fromUtf8(":/images/ToUp.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         upBtn->setIcon(icon3);
         downBtn = new QPushButton(groupBox_4);
         downBtn->setObjectName(QString::fromUtf8("downBtn"));
         downBtn->setGeometry(QRect(10, 170, 25, 25));
-        sizePolicy1.setHeightForWidth(downBtn->sizePolicy().hasHeightForWidth());
+        sizePolicy1.setHeightForWidth(
+            downBtn->sizePolicy().hasHeightForWidth());
         downBtn->setSizePolicy(sizePolicy1);
         downBtn->setMinimumSize(QSize(25, 25));
         downBtn->setMaximumSize(QSize(25, 25));
         QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/images/ToDn.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon4.addFile(QString::fromUtf8(":/images/ToDn.png"), QSize(),
+                      QIcon::Normal, QIcon::Off);
         downBtn->setIcon(icon4);
 
         horizontalLayout->addWidget(groupBox_4);
@@ -154,11 +162,11 @@ public:
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(aviHdrsBox->sizePolicy().hasHeightForWidth());
+        sizePolicy2.setHeightForWidth(
+            aviHdrsBox->sizePolicy().hasHeightForWidth());
         aviHdrsBox->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(aviHdrsBox);
-
 
         verticalLayout_5->addWidget(groupBox_2);
 
@@ -206,11 +214,14 @@ public:
         QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(groupBox_3->sizePolicy().hasHeightForWidth());
+        sizePolicy3.setHeightForWidth(
+            groupBox_3->sizePolicy().hasHeightForWidth());
         groupBox_3->setSizePolicy(sizePolicy3);
         horizontalLayout_2 = new QHBoxLayout(groupBox_3);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        horizontalSpacer = new QSpacerItem(203, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalLayout_2->setObjectName(
+            QString::fromUtf8("horizontalLayout_2"));
+        horizontalSpacer = new QSpacerItem(203, 20, QSizePolicy::Expanding,
+                                           QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer);
 
@@ -229,63 +240,86 @@ public:
 
         horizontalLayout_2->addWidget(closeButton);
 
-        horizontalSpacer_2 = new QSpacerItem(202, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(202, 20, QSizePolicy::Expanding,
+                                             QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
-
         verticalLayout->addWidget(groupBox_3);
-
 
         retranslateUi(AxisDialog);
 
         tabWidget->setCurrentIndex(0);
         dTCbx->setCurrentIndex(4);
 
-
         QMetaObject::connectSlotsByName(AxisDialog);
     } // setupUi
 
     void retranslateUi(QDialog *AxisDialog)
     {
-        AxisDialog->setWindowTitle(QCoreApplication::translate("AxisDialog", "Axes Setup", nullptr));
-        groupBox_2->setTitle(QCoreApplication::translate("AxisDialog", "Trace Header Axis", nullptr));
-        selHdrsBox->setTitle(QCoreApplication::translate("AxisDialog", "Selected Headers", nullptr));
+        AxisDialog->setWindowTitle(
+            QCoreApplication::translate("AxisDialog", "Axes Setup", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate(
+            "AxisDialog", "Trace Header Axis", nullptr));
+        selHdrsBox->setTitle(QCoreApplication::translate(
+            "AxisDialog", "Selected Headers", nullptr));
         groupBox_4->setTitle(QString());
         addBtn->setText(QString());
         delBtn->setText(QString());
         dellAllBtn->setText(QString());
         upBtn->setText(QString());
         downBtn->setText(QString());
-        aviHdrsBox->setTitle(QCoreApplication::translate("AxisDialog", "Available Headers", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("AxisDialog", "Header Axis", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("AxisDialog", "Time Axis", nullptr));
-        label->setText(QCoreApplication::translate("AxisDialog", "Axis Step", nullptr));
-        dTCbx->setItemText(0, QCoreApplication::translate("AxisDialog", "10", nullptr));
-        dTCbx->setItemText(1, QCoreApplication::translate("AxisDialog", "20", nullptr));
-        dTCbx->setItemText(2, QCoreApplication::translate("AxisDialog", "25", nullptr));
-        dTCbx->setItemText(3, QCoreApplication::translate("AxisDialog", "50", nullptr));
-        dTCbx->setItemText(4, QCoreApplication::translate("AxisDialog", "100", nullptr));
-        dTCbx->setItemText(5, QCoreApplication::translate("AxisDialog", "200", nullptr));
-        dTCbx->setItemText(6, QCoreApplication::translate("AxisDialog", "500", nullptr));
-        dTCbx->setItemText(7, QCoreApplication::translate("AxisDialog", "1000", nullptr));
-        dTCbx->setItemText(8, QCoreApplication::translate("AxisDialog", "2000", nullptr));
-        dTCbx->setItemText(9, QCoreApplication::translate("AxisDialog", "5000", nullptr));
-        dTCbx->setItemText(10, QCoreApplication::translate("AxisDialog", "New Item", nullptr));
+        aviHdrsBox->setTitle(QCoreApplication::translate(
+            "AxisDialog", "Available Headers", nullptr));
+        tabWidget->setTabText(
+            tabWidget->indexOf(tab),
+            QCoreApplication::translate("AxisDialog", "Header Axis", nullptr));
+        groupBox->setTitle(
+            QCoreApplication::translate("AxisDialog", "Time Axis", nullptr));
+        label->setText(
+            QCoreApplication::translate("AxisDialog", "Axis Step", nullptr));
+        dTCbx->setItemText(
+            0, QCoreApplication::translate("AxisDialog", "10", nullptr));
+        dTCbx->setItemText(
+            1, QCoreApplication::translate("AxisDialog", "20", nullptr));
+        dTCbx->setItemText(
+            2, QCoreApplication::translate("AxisDialog", "25", nullptr));
+        dTCbx->setItemText(
+            3, QCoreApplication::translate("AxisDialog", "50", nullptr));
+        dTCbx->setItemText(
+            4, QCoreApplication::translate("AxisDialog", "100", nullptr));
+        dTCbx->setItemText(
+            5, QCoreApplication::translate("AxisDialog", "200", nullptr));
+        dTCbx->setItemText(
+            6, QCoreApplication::translate("AxisDialog", "500", nullptr));
+        dTCbx->setItemText(
+            7, QCoreApplication::translate("AxisDialog", "1000", nullptr));
+        dTCbx->setItemText(
+            8, QCoreApplication::translate("AxisDialog", "2000", nullptr));
+        dTCbx->setItemText(
+            9, QCoreApplication::translate("AxisDialog", "5000", nullptr));
+        dTCbx->setItemText(
+            10, QCoreApplication::translate("AxisDialog", "New Item", nullptr));
 
-        label_2->setText(QCoreApplication::translate("AxisDialog", "Axis Step", nullptr));
-        ckTimLines->setText(QCoreApplication::translate("AxisDialog", "Show time lines", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("AxisDialog", "Time Axis", nullptr));
+        label_2->setText(
+            QCoreApplication::translate("AxisDialog", "Axis Step", nullptr));
+        ckTimLines->setText(QCoreApplication::translate(
+            "AxisDialog", "Show time lines", nullptr));
+        tabWidget->setTabText(
+            tabWidget->indexOf(tab_2),
+            QCoreApplication::translate("AxisDialog", "Time Axis", nullptr));
         groupBox_3->setTitle(QString());
-        okButton->setText(QCoreApplication::translate("AxisDialog", "OK", nullptr));
-        applyButton->setText(QCoreApplication::translate("AxisDialog", "Apply", nullptr));
-        closeButton->setText(QCoreApplication::translate("AxisDialog", "Close", nullptr));
+        okButton->setText(
+            QCoreApplication::translate("AxisDialog", "OK", nullptr));
+        applyButton->setText(
+            QCoreApplication::translate("AxisDialog", "Apply", nullptr));
+        closeButton->setText(
+            QCoreApplication::translate("AxisDialog", "Close", nullptr));
     } // retranslateUi
-
 };
 
 namespace Ui {
-    class AxisDialog: public Ui_AxisDialog {};
+class AxisDialog : public Ui_AxisDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE

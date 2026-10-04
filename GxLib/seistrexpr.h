@@ -13,10 +13,10 @@ typedef unsigned char byte;
 using namespace ExprEval;
 using namespace std;
 
-class TrcHdrNode : public FunctionNode
-{
-public:
-    TrcHdrNode(Expression *expr) : FunctionNode(expr)
+class TrcHdrNode : public FunctionNode {
+  public:
+    TrcHdrNode(Expression *expr)
+        : FunctionNode(expr)
     {
         SetArgumentCount(2, 2, 0, 0);
     }
@@ -24,56 +24,46 @@ public:
     double DoEvaluate();
 };
 
-class TrcHdrFactory : public FunctionFactory
-{
-public:
-    string GetName() const
-    {
-        return "H";
-    }
+class TrcHdrFactory : public FunctionFactory {
+  public:
+    string GetName() const { return "H"; }
 
-    FunctionNode *DoCreate(Expression *expr)
-    {
-        return new TrcHdrNode(expr);
-    }
+    FunctionNode *DoCreate(Expression *expr) { return new TrcHdrNode(expr); }
 };
 
+class SeisTrExpr : public Expression {
+  protected:
+    byte *Hdr; // Address of Header buffer
+    int Len;   // Header Len;
+    int Swp;   //
+    double L;  // Number traces in file
+    double N;  // Current trace index
 
-class SeisTrExpr : public Expression
-{
-protected:
-    byte*        Hdr; // Address of Header buffer
-    int          Len; // Header Len;
-    int          Swp; //
-    double       L;   // Number traces in file
-    double       N;   // Current trace index
-
-    ValueList    val_list;
+    ValueList val_list;
     FunctionList fun_list;
 
-    QString      ExprStr;
+    QString ExprStr;
 
     bool error;
 
     void Parse();
 
-public:
+  public:
+    double V; // Prev value for undo
 
-    double       V;   // Prev value for undo
+    SeisTrExpr(QString e = "");
+    SeisTrExpr(const SeisTrExpr &src);
 
-    SeisTrExpr(QString e="");
-    SeisTrExpr(const SeisTrExpr& src);
-
-    SeisTrExpr& operator= (const SeisTrExpr &src);
+    SeisTrExpr &operator=(const SeisTrExpr &src);
 
     bool Error();
 
     double Evaluate();
 
-    void   setHdr(byte* buf, int len, int swp, long long n, long long l);
+    void setHdr(byte *buf, int len, int swp, long long n, long long l);
 
     QString ExprString();
-    void    setExprString(QString str);
+    void setExprString(QString str);
 };
 
 #endif // SeisTrExpr_H

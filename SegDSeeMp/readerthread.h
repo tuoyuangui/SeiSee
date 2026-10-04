@@ -3,150 +3,125 @@
 
 #include "compatx.h"
 
-#include <QThread>
-#include <QEvent>
 #include <QCoreApplication>
+#include <QEvent>
+#include <QThread>
 
 #include "libSegD.h"
 
-class DirItem
-{
-public:
-    QString    fname;
-    int        ftype;  // 0 - dir, 1 - Sgd, 2 - ltod, 3 - file in ltod
-    int        ffid;
-    int        type;   // Sgd type
-    qint64     lpos;   // position in ltod
-    qint64     llen;   // file length in ltod
+class DirItem {
+  public:
+    QString fname;
+    int ftype; // 0 - dir, 1 - Sgd, 2 - ltod, 3 - file in ltod
+    int ffid;
+    int type;    // Sgd type
+    qint64 lpos; // position in ltod
+    qint64 llen; // file length in ltod
 };
 
 //---------------------------------------------------------------------------------------------
 
-class ReadThread : public QThread
-{
+class ReadThread : public QThread {
     Q_OBJECT
-public:
-
+  public:
     QList<DirItem> dlist;
-    QString        sstr;
+    QString sstr;
 
     explicit ReadThread(QObject *parent = 0);
 
     virtual void Stop() { stop = true; }
 
-protected:
-
-    QObject*   receiver;
-    bool       stop;
+  protected:
+    QObject *receiver;
+    bool stop;
 
     virtual void run() {}
 };
 
 //---------------------------------------------------------------------------------------------
 
-class SgdReadEvent : public QEvent
-{
-public:
-
+class SgdReadEvent : public QEvent {
+  public:
     int pers;
 
-    TSegD* segd;
+    TSegD *segd;
 
-    SgdReadEvent ()
+    SgdReadEvent()
         : QEvent((QEvent::Type)(QEvent::User + 1))
     {
-        segd=NULL;
+        segd = NULL;
     }
-
 };
 
-
-class SgdReadThread : public ReadThread
-{
+class SgdReadThread : public ReadThread {
     Q_OBJECT
-public:
+  public:
     explicit SgdReadThread(QObject *parent = 0);
 
     void Read(QString Fname, QObject *win);
 
-protected:
-
-    TSegD*     segd;
+  protected:
+    TSegD *segd;
     QByteArray qfn;
-    char*      fname;
+    char *fname;
 
     virtual void run();
-
 };
 
 //---------------------------------------------------------------------------------------------
 
-class LtdReadThread : public ReadThread
-{
+class LtdReadThread : public ReadThread {
     Q_OBJECT
-public:
+  public:
     explicit LtdReadThread(QObject *parent = 0);
 
     void Read(QString Fname, long long Pos, long long Len, QObject *win);
 
-protected:
-
-    TSegD*     segd;
+  protected:
+    TSegD *segd;
     QByteArray qfn;
-    char*      fname;
-    long long  lpos;
-    long long  llen;
+    char *fname;
+    long long lpos;
+    long long llen;
 
     virtual void run();
 };
 
-
-
-
-class DirScanEvent : public QEvent
-{
-public:
-
+class DirScanEvent : public QEvent {
+  public:
     int pers;
 
-    DirScanEvent ()
+    DirScanEvent()
         : QEvent((QEvent::Type)(QEvent::User + 2))
     {
     }
-
 };
 
-class FileCheckEvent : public QEvent
-{
-public:
-
-    int     pers;
-    int     nrow;
+class FileCheckEvent : public QEvent {
+  public:
+    int pers;
+    int nrow;
     DirItem di;
 
-    FileCheckEvent ()
+    FileCheckEvent()
         : QEvent((QEvent::Type)(QEvent::User + 4))
     {
     }
-
 };
 
 //---------------------------------------------------------------------------------------------
 
 DirItem FileTypeCheck(QString Dname, QString Fname);
 
-class FileCheckThread : public ReadThread
-{
+class FileCheckThread : public ReadThread {
     Q_OBJECT
-public:
-
+  public:
     explicit FileCheckThread(QObject *parent = 0);
 
     void Read(QString Dname, QList<DirItem> Dlist, QObject *win);
 
-protected:
-
-    QString        dname;
+  protected:
+    QString dname;
     QList<DirItem> dlist;
 
     virtual void run();
@@ -156,19 +131,15 @@ protected:
 
 //---------------------------------------------------------------------------------------------
 
-
-class DirScanThread : public ReadThread
-{
+class DirScanThread : public ReadThread {
     Q_OBJECT
-public:
-
+  public:
     explicit DirScanThread(QObject *parent = 0);
 
     void Read(QString Dname, QObject *win);
 
-protected:
-
-    QString    dname;
+  protected:
+    QString dname;
 
     virtual void run();
 
@@ -177,45 +148,32 @@ protected:
 
 //---------------------------------------------------------------------------------------------
 
-class LtdScanEvent : public QEvent
-{
-public:
-
+class LtdScanEvent : public QEvent {
+  public:
     int pers;
 
-    LtdScanEvent ()
+    LtdScanEvent()
         : QEvent((QEvent::Type)(QEvent::User + 3))
     {
     }
-
 };
 
-
-class LtdScanThread : public ReadThread
-{
+class LtdScanThread : public ReadThread {
     Q_OBJECT
-public:
-
+  public:
     explicit LtdScanThread(QObject *parent = 0);
 
     void Read(QString Fname, QObject *win);
 
-    void Stop()
-    {
-        stop = true;
-    }
+    void Stop() { stop = true; }
 
-protected:
-
-    char*      fname;
+  protected:
+    char *fname;
     QByteArray qfn;
 
     virtual void run();
 
     virtual void SendEvent(int pers);
 };
-
-
-
 
 #endif // SgdReadThread_H

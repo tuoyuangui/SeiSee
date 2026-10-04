@@ -1,16 +1,15 @@
-//#include <QDebug>
+// #include <QDebug>
 
 #include <stdio.h>
 
 #include "cwp.h"
 
 #ifdef _MSC_VER
-    #pragma warning( push )
-    #pragma warning( disable : 4244)
+#pragma warning(push)
+#pragma warning(disable : 4244)
 #else
-    #pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
-
 
 /* Copyright (c) Colorado School of Mines, 2011.*/
 /* All rights reserved.                       */
@@ -18,15 +17,15 @@
 /*********************** self documentation **********************/
 /*****************************************************************************
 INTSINC8 - Functions to interpolate uniformly-sampled data via 8-coeff. sinc
-		approximations:
+        approximations:
 
 ints8r	Interpolation of a uniformly-sampled real function y(x) via a
-		table of 8-coefficient sinc approximations
+        table of 8-coefficient sinc approximations
 
 ******************************************************************************
 Function Prototypes:
-void ints8r (int nxin, float dxin, float fxin, float yin[], 
-	float yinl, float yinr, int nxout, float xout[], float yout[]);
+void ints8r (int nxin, float dxin, float fxin, float yin[],
+    float yinl, float yinr, int nxout, float xout[], float yout[]);
 
 ******************************************************************************
 Input:
@@ -57,14 +56,14 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 /**************** end self doc ********************************/
 
-//#include "cwp.h"
+// #include "cwp.h"
 
 /* these are used by both ints8c and ints8r */
 #define LTABLE 8
 #define NTABLE 513
 
-void ints8r (int nxin, float dxin, float fxin, float yin[], 
-	float yinl, float yinr, int nxout, float xout[], float yout[])
+void ints8r(int nxin, float dxin, float fxin, float yin[], float yinl,
+            float yinr, int nxout, float xout[], float yout[])
 /*****************************************************************************
 Interpolation of a uniformly-sampled real function y(x) via a
 table of 8-coefficient sinc approximations; maximum error for frequiencies
@@ -93,31 +92,28 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 
 {
-	static float table[NTABLE][LTABLE];
-	static int tabled=0;
-	int jtable;
-	float frac;
+    static float table[NTABLE][LTABLE];
+    static int tabled = 0;
+    int jtable;
+    float frac;
 
-	/* tabulate sinc interpolation coefficients if not already tabulated */
-    if (!tabled)
-    {
-        for (jtable=1; jtable<NTABLE-1; jtable++)
-        {
-			frac = (float)jtable/(float)(NTABLE-1);
-			mksinc(frac,LTABLE,&table[jtable][0]);
-		}
-        for (jtable=0; jtable<LTABLE; jtable++)
-        {
-			table[0][jtable] = 0.0;
-			table[NTABLE-1][jtable] = 0.0;
-		}
-		table[0][LTABLE/2-1] = 1.0;
-		table[NTABLE-1][LTABLE/2] = 1.0;
-		tabled = 1;
-	}
+    /* tabulate sinc interpolation coefficients if not already tabulated */
+    if (!tabled) {
+        for (jtable = 1; jtable < NTABLE - 1; jtable++) {
+            frac = (float)jtable / (float)(NTABLE - 1);
+            mksinc(frac, LTABLE, &table[jtable][0]);
+        }
+        for (jtable = 0; jtable < LTABLE; jtable++) {
+            table[0][jtable] = 0.0;
+            table[NTABLE - 1][jtable] = 0.0;
+        }
+        table[0][LTABLE / 2 - 1] = 1.0;
+        table[NTABLE - 1][LTABLE / 2] = 1.0;
+        tabled = 1;
+    }
 
-	/* interpolate using tabulated coefficients */
-	intt8r(NTABLE,table,nxin,dxin,fxin,yin,yinl,yinr,nxout,xout,yout);
+    /* interpolate using tabulated coefficients */
+    intt8r(NTABLE, table, nxin, dxin, fxin, yin, yinl, yinr, nxout, xout, yout);
 }
 
 /* Copyright (c) Colorado School of Mines, 2011.*/
@@ -168,9 +164,9 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 /**************** end self doc ********************************/
 
-//#include "cwp.h"
+// #include "cwp.h"
 
-void mksinc (float d, int lsinc, float sinc[])
+void mksinc(float d, int lsinc, float sinc[])
 /*****************************************************************************
 Compute least-squares optimal sinc interpolation coefficients.
 ******************************************************************************
@@ -206,19 +202,19 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 {
     int j;
-    double s[20],a[20],c[20],work[20],fmax;
+    double s[20], a[20], c[20], work[20], fmax;
 
     /* compute auto-correlation and cross-correlation arrays */
-    fmax = 0.066+0.265*log((double)lsinc);
-    fmax = (fmax<1.0)?fmax:1.0;
-    for (j=0; j<lsinc; j++) {
-        a[j] = dsinc(fmax*j);
-        c[j] = dsinc(fmax*(lsinc/2-j-1+d));
+    fmax = 0.066 + 0.265 * log((double)lsinc);
+    fmax = (fmax < 1.0) ? fmax : 1.0;
+    for (j = 0; j < lsinc; j++) {
+        a[j] = dsinc(fmax * j);
+        c[j] = dsinc(fmax * (lsinc / 2 - j - 1 + d));
     }
 
     /* solve symmetric Toeplitz system for the sinc approximation */
-    stoepd(lsinc,a,c,s,work);
-    for (j=0; j<lsinc; j++)
+    stoepd(lsinc, a, c, s, work);
+    for (j = 0; j < lsinc; j++)
         sinc[j] = s[j];
 }
 
@@ -252,9 +248,9 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 /**************** end self doc ********************************/
 
-//#include "cwp.h"
+// #include "cwp.h"
 
-float fsinc (float x)
+float fsinc(float x)
 /*****************************************************************************
 Return sinc(x) = sin(PI*x)/(PI*x) (float version)
 ******************************************************************************
@@ -268,15 +264,15 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 {
     float pix;
 
-    if (x==0.0) {
+    if (x == 0.0) {
         return 1.0;
     } else {
-        pix = M_PI*x;
-        return sin(pix)/pix;
+        pix = M_PI * x;
+        return sin(pix) / pix;
     }
 }
 
-double dsinc (double x)
+double dsinc(double x)
 /*****************************************************************************
 Return sinc(x) = sin(PI*x)/(PI*x) (double version)
 ******************************************************************************
@@ -290,14 +286,13 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 {
     double pix;
 
-    if (x==0.0) {
+    if (x == 0.0) {
         return 1.0;
     } else {
-        pix = M_PI*x;
-        return sin(pix)/pix;
+        pix = M_PI * x;
+        return sin(pix) / pix;
     }
 }
-
 
 /* Copyright (c) Colorado School of Mines, 2011.*/
 /* All rights reserved.                       */
@@ -338,9 +333,9 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 /**************** end self doc ********************************/
 
-//#include "cwp.h"
+// #include "cwp.h"
 
-void stoepd (int n, double r[], double g[], double f[], double a[])
+void stoepd(int n, double r[], double g[], double f[], double a[])
 /*****************************************************************************
 Solve a symmetric Toeplitz linear system of equations Rf=g for f
 (double version)
@@ -364,40 +359,41 @@ row (as specified in r); i.e., the Toeplitz matrix is assumed symmetric.
 Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 {
-    int i,j;
-    double v,e,c,w,bot;
+    int i, j;
+    double v, e, c, w, bot;
 
-    if (r[0] == 0.0) return;
+    if (r[0] == 0.0)
+        return;
 
     a[0] = 1.0;
     v = r[0];
-    f[0] = g[0]/r[0];
+    f[0] = g[0] / r[0];
 
-    for (j=1; j<n; j++) {
+    for (j = 1; j < n; j++) {
 
         /* solve Ra=v as in Claerbout, FGDP, p. 57 */
         a[j] = 0.0;
         f[j] = 0.0;
-        for (i=0,e=0.0; i<j; i++)
-            e += a[i]*r[j-i];
-        c = e/v;
-        v -= c*e;
-        for (i=0; i<=j/2; i++) {
-            bot = a[j-i]-c*a[i];
-            a[i] -= c*a[j-i];
-            a[j-i] = bot;
+        for (i = 0, e = 0.0; i < j; i++)
+            e += a[i] * r[j - i];
+        c = e / v;
+        v -= c * e;
+        for (i = 0; i <= j / 2; i++) {
+            bot = a[j - i] - c * a[i];
+            a[i] -= c * a[j - i];
+            a[j - i] = bot;
         }
 
         /* use a and v above to get f[i], i = 0,1,2,...,j */
-        for (i=0,w=0.0; i<j; i++)
-            w += f[i]*r[j-i];
-        c = (w-g[j])/v;
-        for (i=0; i<=j; i++)
-            f[i] -= c*a[j-i];
+        for (i = 0, w = 0.0; i < j; i++)
+            w += f[i] * r[j - i];
+        c = (w - g[j]) / v;
+        for (i = 0; i <= j; i++)
+            f[i] -= c * a[j - i];
     }
 }
 
-void stoepf (int n, float r[], float g[], float f[], float a[])
+void stoepf(int n, float r[], float g[], float f[], float a[])
 /*****************************************************************************
 Solve a symmetric Toeplitz linear system of equations Rf=g for f
 (float version)
@@ -421,39 +417,39 @@ row (as specified in r); i.e., the Toeplitz matrix is assumed symmetric.
 Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 {
-    int i,j;
-    float v,e,c,w,bot;
+    int i, j;
+    float v, e, c, w, bot;
 
-    if (r[0] == 0.0) return;
+    if (r[0] == 0.0)
+        return;
 
     a[0] = 1.0;
     v = r[0];
-    f[0] = g[0]/r[0];
+    f[0] = g[0] / r[0];
 
-    for (j=1; j<n; j++) {
+    for (j = 1; j < n; j++) {
 
         /* solve Ra=v as in Claerbout, FGDP, p. 57 */
         a[j] = 0.0;
         f[j] = 0.0;
-        for (i=0,e=0.0; i<j; i++)
-            e += a[i]*r[j-i];
-        c = e/v;
-        v -= c*e;
-        for (i=0; i<=j/2; i++) {
-            bot = a[j-i]-c*a[i];
-            a[i] -= c*a[j-i];
-            a[j-i] = bot;
+        for (i = 0, e = 0.0; i < j; i++)
+            e += a[i] * r[j - i];
+        c = e / v;
+        v -= c * e;
+        for (i = 0; i <= j / 2; i++) {
+            bot = a[j - i] - c * a[i];
+            a[i] -= c * a[j - i];
+            a[j - i] = bot;
         }
 
         /* use a and v above to get f[i], i = 0,1,2,...,j */
-        for (i=0,w=0.0; i<j; i++)
-            w += f[i]*r[j-i];
-        c = (w-g[j])/v;
-        for (i=0; i<=j; i++)
-            f[i] -= c*a[j-i];
+        for (i = 0, w = 0.0; i < j; i++)
+            w += f[i] * r[j - i];
+        c = (w - g[j]) / v;
+        for (i = 0; i <= j; i++)
+            f[i] -= c * a[j - i];
     }
 }
-
 
 /* Copyright (c) Colorado School of Mines, 2011.*/
 /* All rights reserved.                       */
@@ -521,65 +517,55 @@ AUTHOR:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 /**************** end self doc ********************************/
 
-
-void intt8r (int ntable, float table[][8],
-    int nxin, float dxin, float fxin, float yin[], float yinl, float yinr,
-    int nxout, float xout[], float yout[])
+void intt8r(int ntable, float table[][8], int nxin, float dxin, float fxin,
+            float yin[], float yinl, float yinr, int nxout, float xout[],
+            float yout[])
 {
-    int ioutb,nxinm8,ixout,ixoutn,kyin,ktable,itable;
-    float xoutb,xoutf,xouts,xoutn,frac,fntablem1,yini,sum,
-        *yin0,*table00,*pyin,*ptable;
+    int ioutb, nxinm8, ixout, ixoutn, kyin, ktable, itable;
+    float xoutb, xoutf, xouts, xoutn, frac, fntablem1, yini, sum, *yin0,
+        *table00, *pyin, *ptable;
 
     /* compute constants */
-    ioutb = -3-8;
+    ioutb = -3 - 8;
     xoutf = fxin;
-    xouts = 1.0/dxin;
-    xoutb = 8.0-xoutf*xouts;
-    fntablem1 = (float)(ntable-1);
-    nxinm8 = nxin-8;
+    xouts = 1.0 / dxin;
+    xoutb = 8.0 - xoutf * xouts;
+    fntablem1 = (float)(ntable - 1);
+    nxinm8 = nxin - 8;
     yin0 = &yin[0];
     table00 = &table[0][0];
 
     /* loop over output samples */
-    for (ixout=0; ixout<nxout; ixout++)
-    {
-    /* determine pointers into table and yin */
-        xoutn = xoutb+xout[ixout]*xouts;
+    for (ixout = 0; ixout < nxout; ixout++) {
+        /* determine pointers into table and yin */
+        xoutn = xoutb + xout[ixout] * xouts;
         ixoutn = (int)xoutn;
-        kyin = ioutb+ixoutn;
-        pyin = yin0+kyin;
-        frac = xoutn-(float)ixoutn;
-        ktable = frac>=0.0?frac*fntablem1+0.5:(frac+1.0)*fntablem1-0.5;
-        ptable = table00+ktable*8;
+        kyin = ioutb + ixoutn;
+        pyin = yin0 + kyin;
+        frac = xoutn - (float)ixoutn;
+        ktable = frac >= 0.0 ? frac * fntablem1 + 0.5
+                             : (frac + 1.0) * fntablem1 - 0.5;
+        ptable = table00 + ktable * 8;
 
         /* if totally within input array, use fast method */
-        if (kyin>=0 && kyin<=nxinm8)
-        {
-            yout[ixout] =
-                pyin[0]*ptable[0]+
-                pyin[1]*ptable[1]+
-                pyin[2]*ptable[2]+
-                pyin[3]*ptable[3]+
-                pyin[4]*ptable[4]+
-                pyin[5]*ptable[5]+
-                pyin[6]*ptable[6]+
-                pyin[7]*ptable[7];
+        if (kyin >= 0 && kyin <= nxinm8) {
+            yout[ixout] = pyin[0] * ptable[0] + pyin[1] * ptable[1] +
+                          pyin[2] * ptable[2] + pyin[3] * ptable[3] +
+                          pyin[4] * ptable[4] + pyin[5] * ptable[5] +
+                          pyin[6] * ptable[6] + pyin[7] * ptable[7];
 
-        /* else handle end effects with care */
-        }
-        else
-        {
+            /* else handle end effects with care */
+        } else {
 
             /* sum over 8 tabulated coefficients */
-            for (itable=0,sum=0.0; itable<8; itable++,kyin++)
-            {
-                if (kyin<0)
+            for (itable = 0, sum = 0.0; itable < 8; itable++, kyin++) {
+                if (kyin < 0)
                     yini = yinl;
-                else if (kyin>=nxin)
+                else if (kyin >= nxin)
                     yini = yinr;
                 else
                     yini = yin[kyin];
-                sum += yini*(*ptable++);
+                sum += yini * (*ptable++);
             }
             yout[ixout] = sum;
         }
@@ -588,8 +574,8 @@ void intt8r (int ntable, float table[][8],
 
 //--------------------------------------------------------------
 
-void polygonalFilter(float *f, float *amps, int npoly,
-                int nfft, float dt, float *filter)
+void polygonalFilter(float *f, float *amps, int npoly, int nfft, float dt,
+                     float *filter)
 /*************************************************************************
 polygonalFilter -- polygonal filter with sin^2 tapering
 **************************************************************************
@@ -607,221 +593,206 @@ Notes: Filter is to be applied in the frequency domain
 **************************************************************************
 Author:  CWP: John Stockwell   1992
 *************************************************************************/
-#define PIBY2   1.57079632679490
+#define PIBY2 1.57079632679490
 {
-        int *intfr;             /* .... integerizations of f		*/
-        int icount,ifs;		    /* loop counting variables              */
-        int taper=0;		    /* flag counter				*/
-        int nf;                 /* number of frequencies (incl Nyq)     */
-        int nfm1;               /* nf-1                                 */
-        float onfft;            /* reciprocal of nfft                   */
-        float df;               /* frequency spacing (from dt)          */
+    int *intfr;      /* .... integerizations of f		*/
+    int icount, ifs; /* loop counting variables              */
+    int taper = 0;   /* flag counter				*/
+    int nf;          /* number of frequencies (incl Nyq)     */
+    int nfm1;        /* nf-1                                 */
+    float onfft;     /* reciprocal of nfft                   */
+    float df;        /* frequency spacing (from dt)          */
 
+    intfr = new int[npoly]; // alloc1int(npoly);
 
-    intfr=new int[npoly]; //alloc1int(npoly);
+    nf = nfft / 2 + 1;
+    nfm1 = nf - 1;
+    onfft = 1.0 / nfft;
 
-        nf = nfft/2 + 1;
-        nfm1 = nf - 1;
-        onfft = 1.0 / nfft;
-
-        /* Compute array of integerized frequencies that define the filter*/
-        df = onfft / dt;
-        for(ifs=0; ifs < npoly ; ++ifs) {
-                intfr[ifs] = NINT(f[ifs]/df);
-                if (intfr[ifs] > nfm1) intfr[ifs] = nfm1;
-        }
+    /* Compute array of integerized frequencies that define the filter*/
+    df = onfft / dt;
+    for (ifs = 0; ifs < npoly; ++ifs) {
+        intfr[ifs] = NINT(f[ifs] / df);
+        if (intfr[ifs] > nfm1)
+            intfr[ifs] = nfm1;
+    }
 
     /* Build filter, with scale, and taper specified by amps[] values*/
     /* Do low frequency end first*/
-    for(icount=0; icount < intfr[0] ; ++icount)
+    for (icount = 0; icount < intfr[0]; ++icount)
         filter[icount] = amps[0] * onfft;
 
     /* now do the middle frequencies */
-    for(ifs=0 ; ifs<npoly-1 ; ++ifs){
-       if(amps[ifs] < amps[ifs+1]) {
-        ++taper;
-        for(icount=intfr[ifs]; icount<=intfr[ifs+1]; ++icount) {
-            float c = PIBY2 / (intfr[ifs+1] - intfr[ifs] + 2);
-            float s = sin(c*(icount - intfr[ifs] + 1));
-            float adiff = amps[ifs+1] - amps[ifs];
-            filter[icount] = (amps[ifs] + adiff*s*s) * onfft;
-        }
-       } else if (amps[ifs] > amps[ifs+1]) {
-        ++taper;
-        for(icount=intfr[ifs]; icount<=intfr[ifs+1]; ++icount) {
-               float c = PIBY2 / (intfr[ifs+1] - intfr[ifs] + 2);
-                       float s = sin(c*(intfr[ifs+1] - icount + 1));
-               float adiff = amps[ifs] - amps[ifs+1];
-                       filter[icount] = (amps[ifs+1] + adiff*s*s) * onfft;
-          }
-       } else
-        if(!(taper)){
-        for(icount=intfr[ifs]; icount <= intfr[ifs+1]; ++icount)
-               filter[icount] = amps[ifs] * onfft;
+    for (ifs = 0; ifs < npoly - 1; ++ifs) {
+        if (amps[ifs] < amps[ifs + 1]) {
+            ++taper;
+            for (icount = intfr[ifs]; icount <= intfr[ifs + 1]; ++icount) {
+                float c = PIBY2 / (intfr[ifs + 1] - intfr[ifs] + 2);
+                float s = sin(c * (icount - intfr[ifs] + 1));
+                float adiff = amps[ifs + 1] - amps[ifs];
+                filter[icount] = (amps[ifs] + adiff * s * s) * onfft;
+            }
+        } else if (amps[ifs] > amps[ifs + 1]) {
+            ++taper;
+            for (icount = intfr[ifs]; icount <= intfr[ifs + 1]; ++icount) {
+                float c = PIBY2 / (intfr[ifs + 1] - intfr[ifs] + 2);
+                float s = sin(c * (intfr[ifs + 1] - icount + 1));
+                float adiff = amps[ifs] - amps[ifs + 1];
+                filter[icount] = (amps[ifs + 1] + adiff * s * s) * onfft;
+            }
+        } else if (!(taper)) {
+            for (icount = intfr[ifs]; icount <= intfr[ifs + 1]; ++icount)
+                filter[icount] = amps[ifs] * onfft;
         } else {
-        for(icount=intfr[ifs]+1; icount <= intfr[ifs+1]; ++icount)
-               filter[icount] = amps[ifs] * onfft;
+            for (icount = intfr[ifs] + 1; icount <= intfr[ifs + 1]; ++icount)
+                filter[icount] = amps[ifs] * onfft;
         }
     }
 
     /* finally do the high frequency end */
-    for(icount=intfr[npoly-1]+1; icount<nf; ++icount){
-        filter[icount] = amps[npoly-1] * onfft;
+    for (icount = intfr[npoly - 1] + 1; icount < nf; ++icount) {
+        filter[icount] = amps[npoly - 1] * onfft;
     }
 
-    delete [] intfr;
+    delete[] intfr;
 }
 
+#define PIBY2 1.57079632679490
+#define FRAC0 0.10     /* Ratio of default f1 to Nyquist */
+#define FRAC1 0.15     /* Ratio of default f2 to Nyquist */
+#define FRAC2 0.45     /* Ratio of default f3 to Nyquist */
+#define FRAC3 0.50     /* Ratio of default f4 to Nyquist */
+#define LOOKFAC 2      /* Look ahead factor for npfao    */
+#define PFA_MAX 720720 /* Largest allowed nfft           */
 
-#define PIBY2   1.57079632679490
-#define FRAC0   0.10    /* Ratio of default f1 to Nyquist */
-#define FRAC1   0.15    /* Ratio of default f2 to Nyquist */
-#define FRAC2   0.45    /* Ratio of default f3 to Nyquist */
-#define FRAC3   0.50    /* Ratio of default f4 to Nyquist */
-#define LOOKFAC 2       /* Look ahead factor for npfao    */
-#define PFA_MAX 720720  /* Largest allowed nfft           */
-
-
-int CwpFilter::Init(int Nsmp, float Dt, int Nf, float* F, int Na, float* Amps)
+int CwpFilter::Init(int Nsmp, float Dt, int Nf, float *F, int Na, float *Amps)
 {
     Clear();
 
-    int icount,ifs,iamps;   /* loop counting variables              */
-    nt  = Nsmp;
-    dt  = Dt;
-    nyq = 0.5/dt;
+    int icount, ifs, iamps; /* loop counting variables              */
+    nt = Nsmp;
+    dt = Dt;
+    nyq = 0.5 / dt;
 
     // Set up FFT parameters
     nfft = npfaro(nt, LOOKFAC * nt);
-/*
-    if (nfft >= SU_NFLTS || nfft >= PFA_MAX)
-    {
-       Err("Padded nt -- too big");
-       return -1;
-    }
-*/
-    nf = nfft/2 + 1;
+    /*
+        if (nfft >= SU_NFLTS || nfft >= PFA_MAX)
+        {
+           Err("Padded nt -- too big");
+           return -1;
+        }
+    */
+    nf = nfft / 2 + 1;
 
-    if(Nf==0)
-    {
+    if (Nf == 0) {
         npoly = 4;
         f = new float[npoly];
         f[0] = FRAC0 * nyq;
         f[1] = FRAC1 * nyq;
         f[2] = FRAC2 * nyq;
         f[3] = FRAC3 * nyq;
-    }
-    else
-    {
+    } else {
         npoly = Nf;
         f = new float[npoly];
-        memcpy(f,F,sizeof(float)*npoly);
+        memcpy(f, F, sizeof(float) * npoly);
     }
 
     // Check f values
-    if(npoly < 2)
-    {
-        //warn("Only %d value defining filter",npoly);
+    if (npoly < 2) {
+        // warn("Only %d value defining filter",npoly);
     }
 
-    for(ifs=0; ifs < npoly-1; ++ifs)
-    {
-        if(f[ifs] < 0.0 || f[ifs] > f[ifs+1])
-        {
-          Err("Bad filter parameters");
-          return -2;
+    for (ifs = 0; ifs < npoly - 1; ++ifs) {
+        if (f[ifs] < 0.0 || f[ifs] > f[ifs + 1]) {
+            Err("Bad filter parameters");
+            return -2;
         }
     }
 
-
-    if(Na!=0)
-    {
-        namps=Na;
+    if (Na != 0) {
+        namps = Na;
         amps = new float[Na];
-        memcpy(amps,Amps,sizeof(float)*namps);
-    }
-    else
-    {
+        memcpy(amps, Amps, sizeof(float) * namps);
+    } else {
         namps = npoly;
         amps = new float[namps];
 
         // default is a trapezoidal bandpass filter
-        for(iamps=0; iamps<namps; ++iamps) amps[iamps]=1.;
-        amps[0]=0.; amps[namps-1]=0.;
+        for (iamps = 0; iamps < namps; ++iamps)
+            amps[iamps] = 1.;
+        amps[0] = 0.;
+        amps[namps - 1] = 0.;
     }
 
-
-    if (!(namps==npoly))
-    {
+    if (!(namps == npoly)) {
         Err("number of f values must = number of amps values");
         return -3;
     }
 
     // Check amps values
-    for(iamps = 0, icount=0; iamps < namps ; ++iamps)
-    {
-        if( amps[iamps] > 0. ) ++icount;
+    for (iamps = 0, icount = 0; iamps < namps; ++iamps) {
+        if (amps[iamps] > 0.)
+            ++icount;
 
-        if( amps[iamps] < 0.)
-        {
+        if (amps[iamps] < 0.) {
             Err("amp values must be positive");
             return -4;
         }
     }
 
-    if (icount==0)
-    {
+    if (icount == 0) {
         Err("All amps values are zero");
         return -5;
     }
 
-    for(iamps = 0, icount=0; iamps < namps-1 ; ++iamps)
-    {
-      if(!(amps[iamps]==amps[iamps+1])) ++icount;
+    for (iamps = 0, icount = 0; iamps < namps - 1; ++iamps) {
+        if (!(amps[iamps] == amps[iamps + 1]))
+            ++icount;
     }
 
-    if (icount==0)
-    {
-        //warn("All amps values are the same");
+    if (icount == 0) {
+        // warn("All amps values are the same");
     }
-
 
     // Allocate fft arrays
-    rt     = new float[nfft]; //ealloc1float(nfft);
-    ct     = new complex[nf]; //ealloc1complex(nf);
-    filter = new float  [nf]; //ealloc1float(nf);
+    rt = new float[nfft];   // ealloc1float(nfft);
+    ct = new complex[nf];   // ealloc1complex(nf);
+    filter = new float[nf]; // ealloc1float(nf);
 
     // Build the polygonal filter
-    polygonalFilter(f,amps,npoly,nfft,dt,filter);
+    polygonalFilter(f, amps, npoly, nfft, dt, filter);
 
-    ok=1;
+    ok = 1;
 
     return 1;
 }
 
-int CwpFilter::Apply(float* Inp, float* Out)
+int CwpFilter::Apply(float *Inp, float *Out)
 {
     int i;
 
-    if(Out==NULL) Out=Inp;
+    if (Out == NULL)
+        Out = Inp;
 
-    if(ok<1)
-    {
-        if(Out!=Inp) memcpy(Out,Inp,sizeof(float)*nt);
+    if (ok < 1) {
+        if (Out != Inp)
+            memcpy(Out, Inp, sizeof(float) * nt);
         return ok;
     }
 
-    memcpy((void *) rt, (const void *) Inp, nt*sizeof(float));
-    memset((void *) (rt + nt), 0 , (nfft-nt)*sizeof(float));
-
+    memcpy((void *)rt, (const void *)Inp, nt * sizeof(float));
+    memset((void *)(rt + nt), 0, (nfft - nt) * sizeof(float));
 
     // FFT, filter, inverse FFT
     pfarc(1, nfft, rt, ct);
-    for (i = 0; i < nf; ++i)  ct[i] = crmul(ct[i], filter[i]);
+    for (i = 0; i < nf; ++i)
+        ct[i] = crmul(ct[i], filter[i]);
     pfacr(-1, nfft, ct, rt);
 
     // Load traces back in, recall filter had nfft factor
-    for (i = 0; i < nt; ++i)  Out[i] = rt[i];
+    for (i = 0; i < nt; ++i)
+        Out[i] = rt[i];
 
     return 1;
 }
@@ -871,8 +842,8 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 /**************** end self doc ********************************/
 
-void yxtoxy (int nx, float dx, float fx, float y[],
-    int ny, float dy, float fy, float xylo, float xyhi, float x[])
+void yxtoxy(int nx, float dx, float fx, float y[], int ny, float dy, float fy,
+            float xylo, float xyhi, float x[])
 /*****************************************************************************
 Compute a regularly-sampled, monotonically increasing function x(y) from a
 regularly-sampled, monotonically increasing function y(x) by inverse linear
@@ -900,40 +871,39 @@ User must ensure that:
 Author:  Dave Hale, Colorado School of Mines, 06/02/89
 *****************************************************************************/
 {
-    int nxi,nyo,jxi1,jxi2,jyo;
-    float dxi,fxi,dyo,fyo,fyi,yo,xi1,yi1,yi2;
+    int nxi, nyo, jxi1, jxi2, jyo;
+    float dxi, fxi, dyo, fyo, fyi, yo, xi1, yi1, yi2;
 
-    nxi = nx; dxi = dx; fxi = fx;
-    nyo = ny; dyo = dy; fyo = fy;
+    nxi = nx;
+    dxi = dx;
+    fxi = fx;
+    nyo = ny;
+    dyo = dy;
+    fyo = fy;
     fyi = y[0];
 
     /* loop over output y less than smallest input y */
-    for (jyo=0,yo=fyo; jyo<nyo; jyo++,yo+=dyo)
-    {
-        if (yo>=fyi) break;
+    for (jyo = 0, yo = fyo; jyo < nyo; jyo++, yo += dyo) {
+        if (yo >= fyi)
+            break;
         x[jyo] = xylo;
     }
 
     /* loop over output y between smallest and largest input y */
-    if (jyo==nyo-1 && yo==fyi)
-    {
+    if (jyo == nyo - 1 && yo == fyi) {
         x[jyo++] = fxi;
         yo += dyo;
     }
     jxi1 = 0;
     jxi2 = 1;
     xi1 = fxi;
-    while (jxi2<nxi && jyo<nyo)
-    {
+    while (jxi2 < nxi && jyo < nyo) {
         yi1 = y[jxi1];
         yi2 = y[jxi2];
-        if (yi1<=yo && yo<=yi2)
-        {
-            x[jyo++] = xi1+dxi*(yo-yi1)/(yi2-yi1);
+        if (yi1 <= yo && yo <= yi2) {
+            x[jyo++] = xi1 + dxi * (yo - yi1) / (yi2 - yi1);
             yo += dyo;
-        }
-        else
-        {
+        } else {
             jxi1++;
             jxi2++;
             xi1 += dxi;
@@ -941,12 +911,12 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
     }
 
     /* loop over output y greater than largest input y */
-    while (jyo<nyo) x[jyo++] = xyhi;
+    while (jyo < nyo)
+        x[jyo++] = xyhi;
 }
 
-
 static void zttz(int nt, float dt, float ft, float zt[], float vft, float vlt,
-    int nz, float dz, float fz, float tz[])
+                 int nz, float dz, float fz, float tz[])
 /************************************************************************
 zttz - compute t(z) from z(t)
 *************************************************************************
@@ -966,25 +936,25 @@ tz[] 	array of time values as a function of depth
 Author: CWP: Dave Hale (c. 1992)
 ************************************************************************/
 {
-    int iz;				/* depth counter */
-    float z;			/* depth */
-    float lt=ft+(nt-1)*dt;		/* last time */
-    float lz=fz+(nz-1)*dz;		/* last depth */
+    int iz;                        /* depth counter */
+    float z;                       /* depth */
+    float lt = ft + (nt - 1) * dt; /* last time */
+    float lz = fz + (nz - 1) * dz; /* last depth */
 
     /* switch from z(t) to t(z) */
-    yxtoxy(nt,dt,ft,zt,nz,dz,fz,0.0,0.0,tz);
+    yxtoxy(nt, dt, ft, zt, nz, dz, fz, 0.0, 0.0, tz);
 
     /* for z values before fz, use first velocity to calculate t(z) */
-    for (iz=0,z=fz; z<=zt[0]; iz++,z+=dz)
-        tz[iz] = 2.0*z/vft;
+    for (iz = 0, z = fz; z <= zt[0]; iz++, z += dz)
+        tz[iz] = 2.0 * z / vft;
 
     /* for z values from lz down to fz, calculate t(z) */
-    for (iz=nz-1,z=lz; z>=zt[nt-1]; iz--,z-=dz)
-        tz[iz] = lt+2.0*(z-zt[nt-1])/vlt;
+    for (iz = nz - 1, z = lz; z >= zt[nt - 1]; iz--, z -= dz)
+        tz[iz] = lt + 2.0 * (z - zt[nt - 1]) / vlt;
 }
 
-void maketz (int nt, float dt, float ft, float v[],
-    int nz, float dz, float fz, float t[])
+void maketz(int nt, float dt, float ft, float v[], int nz, float dz, float fz,
+            float t[])
 /************************************************************************
 maketz - compute t(z) from v(t)
 *************************************************************************
@@ -1002,33 +972,32 @@ t[]	array of t values as a function of z
 Author: CWP: Dave Hale (c. 1992)
 *************************************************************************/
 {
-    int it;			    /* counter */
-    float vft;		    /* velocity at the first time sample */
-    float vlt;		    /* velocity at the last time sample */
-    float *z=NULL;		/* array of depth values as a function of t */
+    int it;          /* counter */
+    float vft;       /* velocity at the first time sample */
+    float vlt;       /* velocity at the last time sample */
+    float *z = NULL; /* array of depth values as a function of t */
 
     /* allocate space */
     z = new float[nt];
 
     /* calculate z(t) from v(t) */
-    z[0] = 0.5*ft*v[0];
+    z[0] = 0.5 * ft * v[0];
 
-    for (it=1; it<nt; it++)
-    {
-        z[it] = z[it-1]+0.5*dt*v[it-1];
+    for (it = 1; it < nt; it++) {
+        z[it] = z[it - 1] + 0.5 * dt * v[it - 1];
     }
 
     vft = v[0];
-    vlt = v[nt-1];
+    vlt = v[nt - 1];
 
     /* compute t(z) from z(t) */
-    zttz(nt,dt,ft,z,vft,vlt,nz,dz,fz,t);
+    zttz(nt, dt, ft, z, vft, vlt, nz, dz, fz, t);
 
-    delete [] z;
+    delete[] z;
 }
 
-void maketz2(int nt, float dt, float ft, float v[],
-    int nz, float dz, float fz, float t[])
+void maketz2(int nt, float dt, float ft, float v[], int nz, float dz, float fz,
+             float t[])
 /************************************************************************
 maketz - compute t(z) from v(t)
 *************************************************************************
@@ -1046,29 +1015,28 @@ t[]	array of t values as a function of z
 Глубины вычисляются как t*v*0.5 (PSI 2017)
 *************************************************************************/
 {
-    int it;			    /* counter */
-    float vft;		    /* velocity at the first time sample */
-    float vlt;		    /* velocity at the last time sample */
-    float *z=NULL;		/* array of depth values as a function of t */
+    int it;          /* counter */
+    float vft;       /* velocity at the first time sample */
+    float vlt;       /* velocity at the last time sample */
+    float *z = NULL; /* array of depth values as a function of t */
 
     /* allocate space */
     z = new float[nt];
 
     /* calculate z(t) from v(t) */
-    z[0] = 0.5*ft*v[0];
+    z[0] = 0.5 * ft * v[0];
 
-    for (it=1; it<nt; it++)
-    {
-        z[it] = (it*dt*0.5+ft)*v[it];
+    for (it = 1; it < nt; it++) {
+        z[it] = (it * dt * 0.5 + ft) * v[it];
     }
 
     vft = v[0];
-    vlt = v[nt-1];
+    vlt = v[nt - 1];
 
     /* compute t(z) from z(t) */
-    zttz(nt,dt,ft,z,vft,vlt,nz,dz,fz,t);
+    zttz(nt, dt, ft, z, vft, vlt, nz, dz, fz, t);
 
-    delete [] z;
+    delete[] z;
 }
 
 /*********************** self documentation **********************/
@@ -1145,7 +1113,7 @@ Author:  Dave Hale, Colorado School of Mines, 12/25/89
 *****************************************************************************/
 /**************** end self doc ********************************/
 
-void xindex (int nx, float ax[], float x, int *index)
+void xindex(int nx, float ax[], float x, int *index)
 /*****************************************************************************
 determine index of x with respect to an array of x values
 ******************************************************************************
@@ -1169,60 +1137,66 @@ returned from one call should be used in the next.
 Author:  Dave Hale, Colorado School of Mines, 12/25/89
 *****************************************************************************/
 {
-    int lower,upper,middle,step;
+    int lower, upper, middle, step;
 
     /* initialize lower and upper indices and step */
     lower = *index;
-    if (lower<0) lower = 0;
-    if (lower>=nx) lower = nx-1;
-    upper = lower+1;
+    if (lower < 0)
+        lower = 0;
+    if (lower >= nx)
+        lower = nx - 1;
+    upper = lower + 1;
     step = 1;
 
     /* if x values increasing */
-    if (ax[nx-1]>ax[0]) {
+    if (ax[nx - 1] > ax[0]) {
 
         /* find indices such that ax[lower] <= x < ax[upper] */
-        while (lower>0 && ax[lower]>x) {
+        while (lower > 0 && ax[lower] > x) {
             upper = lower;
             lower -= step;
             step += step;
         }
-        if (lower<0) lower = 0;
-        while (upper<nx && ax[upper]<=x) {
+        if (lower < 0)
+            lower = 0;
+        while (upper < nx && ax[upper] <= x) {
             lower = upper;
             upper += step;
             step += step;
         }
-        if (upper>nx) upper = nx;
+        if (upper > nx)
+            upper = nx;
 
         /* find index via bisection */
-        while ((middle=(lower+upper)>>1)!=lower) {
-            if (x>=ax[middle])
+        while ((middle = (lower + upper) >> 1) != lower) {
+            if (x >= ax[middle])
                 lower = middle;
             else
                 upper = middle;
         }
 
-    /* else, if not increasing */
+        /* else, if not increasing */
     } else {
 
         /* find indices such that ax[lower] >= x > ax[upper] */
-        while (lower>0 && ax[lower]<x) {
+        while (lower > 0 && ax[lower] < x) {
             upper = lower;
             lower -= step;
             step += step;
         }
-        if (lower<0) lower = 0;
-        while (upper<nx && ax[upper]>=x) {
+        if (lower < 0)
+            lower = 0;
+        while (upper < nx && ax[upper] >= x) {
             lower = upper;
             upper += step;
             step += step;
         }
-        if (upper>nx) upper = nx;
+        if (upper > nx)
+            upper = nx;
 
         /* find index via bisection */
-        while ((middle=(lower+upper)>>1)!=lower) {
-            if (x<=ax[middle])
+        while ((middle = (lower + upper) >> 1) != lower) {
+            if (x <= ax[middle])
                 lower = middle;
             else
                 upper = middle;
@@ -1233,11 +1207,10 @@ Author:  Dave Hale, Colorado School of Mines, 12/25/89
     *index = lower;
 }
 
-
 #include "cwp.h"
 
-void intlin (int nin, float xin[], float yin[], float yinl, float yinr,
-    int nout, float xout[], float yout[])
+void intlin(int nin, float xin[], float yin[], float yinl, float yinr, int nout,
+            float xout[], float yout[])
 /*****************************************************************************
 evaluate y(x) via linear interpolation of y(x[0]), y(x[1]), ...
 ******************************************************************************
@@ -1275,83 +1248,78 @@ Author:  Dave Hale, Colorado School of Mines, 06/02/89
     float x;
 
     /* if input x values are monotonically increasing, then */
-    if (xin[0]<=xin[nin-1])
-    {
-        for (jout=0; jout<nout; jout++)
-        {
+    if (xin[0] <= xin[nin - 1]) {
+        for (jout = 0; jout < nout; jout++) {
             x = xout[jout];
-            if (x<xin[0])
+            if (x < xin[0])
                 yout[jout] = yinl;
-            else if (x>xin[nin-1])
+            else if (x > xin[nin - 1])
                 yout[jout] = yinr;
-            else if (x==xin[nin-1] || nin==1)
-                yout[jout] = yin[nin-1];
+            else if (x == xin[nin - 1] || nin == 1)
+                yout[jout] = yin[nin - 1];
             else {
-                xindex(nin,xin,x,&idx);
-                yout[jout] = yin[idx]+(x-xin[idx])
-                    *(yin[idx+1]-yin[idx])
-                    /(xin[idx+1]-xin[idx]);
+                xindex(nin, xin, x, &idx);
+                yout[jout] = yin[idx] + (x - xin[idx]) *
+                                            (yin[idx + 1] - yin[idx]) /
+                                            (xin[idx + 1] - xin[idx]);
             }
         }
 
-    /* else, if input x values are monotonically decreasing, then */
+        /* else, if input x values are monotonically decreasing, then */
     } else {
-        for (jout=0; jout<nout; jout++) {
+        for (jout = 0; jout < nout; jout++) {
             x = xout[jout];
-            if (x>xin[0])
+            if (x > xin[0])
                 yout[jout] = yinl;
-            else if (x<xin[nin-1])
+            else if (x < xin[nin - 1])
                 yout[jout] = yinr;
-            else if (x==xin[nin-1] || nin==1)
-                yout[jout] = yin[nin-1];
+            else if (x == xin[nin - 1] || nin == 1)
+                yout[jout] = yin[nin - 1];
             else {
-                xindex(nin,xin,x,&idx);
-                yout[jout] = yin[idx]+(x-xin[idx])
-                    *(yin[idx+1]-yin[idx])
-                    /(xin[idx+1]-xin[idx]);
+                xindex(nin, xin, x, &idx);
+                yout[jout] = yin[idx] + (x - xin[idx]) *
+                                            (yin[idx + 1] - yin[idx]) /
+                                            (xin[idx + 1] - xin[idx]);
             }
         }
     }
 }
 
-
-
 void suttoz()
 {
-    int nt;		// number of time samples
-    int it;		// counter
-    int nz;		// numer of depth samples
+    int nt; // number of time samples
+    int it; // counter
+    int nz; // numer of depth samples
 
-    int ntpar;	// number of getparred time values for velocities
-    int nvpar;	// number of getparred velocity values
-    int itpar;	// counter
+    int ntpar; // number of getparred time values for velocities
+    int nvpar; // number of getparred velocity values
+    int itpar; // counter
 
-    float dt;	// time sampling interval
-    float ft;	// first time value
-    float dz;	// depth sampling interval for velocities
-    float fz;	// first depth value
-    float t;	// timevalues for velocities
-    float vmin;	// minimum velocity
-    float vmax;	// maximum velocity
+    float dt;   // time sampling interval
+    float ft;   // first time value
+    float dz;   // depth sampling interval for velocities
+    float fz;   // first depth value
+    float t;    // timevalues for velocities
+    float vmin; // minimum velocity
+    float vmax; // maximum velocity
 
-    float *tpar=NULL;	// values of t getparred
-    float *vpar=NULL;	// values of v getparred
+    float *tpar = NULL; // values of t getparred
+    float *vpar = NULL; // values of v getparred
 
-    float *vt=NULL;		// v(t) velocity as a function of t
-    float *tz=NULL;		// t(z) time as a function of z
-    float *temp=NULL;	// temporary storage array
+    float *vt = NULL;   // v(t) velocity as a function of t
+    float *tz = NULL;   // t(z) time as a function of z
+    float *temp = NULL; // temporary storage array
 
-    float *trs;         // trace samples
+    float *trs; // trace samples
 
+    //    v=0.0,.15,.2 v=1500,2000,3000
 
-//    v=0.0,.15,.2 v=1500,2000,3000
-
-    ntpar=nvpar = 3;
+    ntpar = nvpar = 3;
 
     vpar = new float[nvpar];
     tpar = new float[ntpar];
 
-    nt = 1000; //tr.ns;
+    nt = 1000; // tr.ns;
 
     vt = new float[nt];
 
@@ -1363,50 +1331,49 @@ void suttoz()
     vpar[1] = 2000;
     vpar[2] = 3000;
 
-    for (it=0,t=0.0; it<nt; ++it,t+=dt)
-          intlin(ntpar,tpar,vpar,vpar[0],vpar[ntpar-1], 1,&t,&vt[it]);
+    for (it = 0, t = 0.0; it < nt; ++it, t += dt)
+        intlin(ntpar, tpar, vpar, vpar[0], vpar[ntpar - 1], 1, &t, &vt[it]);
 
-    delete [] vpar;
-    delete [] tpar;
-    delete [] vt;
+    delete[] vpar;
+    delete[] tpar;
+    delete[] vt;
 
     return;
 
     /* determine minimum and maximum velocities */
-    for (it=1,vmin=vmax=vt[0]; it<nt; ++it)
-    {
-        if (vt[it]<vmin) vmin = vt[it];
-        if (vt[it]>vmax) vmax = vt[it];
+    for (it = 1, vmin = vmax = vt[0]; it < nt; ++it) {
+        if (vt[it] < vmin)
+            vmin = vt[it];
+        if (vt[it] > vmax)
+            vmax = vt[it];
     }
 
     // allocate workspace
-    tz   = new float[nz];
+    tz = new float[nz];
     temp = new float[nt];
 
     // make t(z) function
-    maketz(nt,dt,ft,vt,nz,dz,fz,tz);
+    maketz(nt, dt, ft, vt, nz, dz, fz, tz);
 
-
-/*
-    tr.trid = TRID_DEPTH;
-    tr.ns = nz;
-    tr.d1 = dz;
-    tr.f1 = fz;
-*/
+    /*
+        tr.trid = TRID_DEPTH;
+        tr.ns = nz;
+        tr.d1 = dz;
+        tr.f1 = fz;
+    */
     // resample //
-    memcpy((void *) temp, (const void *) trs,nt*sizeof(float));
-    ints8r(nt,dt,ft,temp,0.0,0.0,nz,tz,trs);
+    memcpy((void *)temp, (const void *)trs, nt * sizeof(float));
+    ints8r(nt, dt, ft, temp, 0.0, 0.0, nz, tz, trs);
 
-    delete [] vpar;
-    delete [] tpar;
+    delete[] vpar;
+    delete[] tpar;
 }
 
-
-int CwpTimeToDepth::Exec(
-        int Nt, float Dt, int Nv, float* V, float* T, float Dz, float* Ttr, float* Dtr)
+int CwpTimeToDepth::Exec(int Nt, float Dt, int Nv, float *V, float *T, float Dz,
+                         float *Ttr, float *Dtr)
 {
-    int    it;
-    float  t;
+    int it;
+    float t;
 
     Clear();
 
@@ -1416,30 +1383,28 @@ int CwpTimeToDepth::Exec(
 
     vt = new float[nt];
 
-    for (it=0,t=0.0; it<nt; ++it,t+=dt)
-          intlin(Nv,T,V,V[0],V[Nv-1], 1,&t,&vt[it]);
+    for (it = 0, t = 0.0; it < nt; ++it, t += dt)
+        intlin(Nv, T, V, V[0], V[Nv - 1], 1, &t, &vt[it]);
 
     // determine minimum and maximum velocities
-    for (it=1,vmin=vmax=vt[0]; it<nt; ++it)
-    {
-        if (vt[it]<vmin) vmin = vt[it];
-        if (vt[it]>vmax) vmax = vt[it];
+    for (it = 1, vmin = vmax = vt[0]; it < nt; ++it) {
+        if (vt[it] < vmin)
+            vmin = vt[it];
+        if (vt[it] > vmax)
+            vmax = vt[it];
     }
 
-    //ft = tr.delrt/1000.0;
+    // ft = tr.delrt/1000.0;
 
     ft = 0;
-    dz = vmin*dt/2.0;
-    fz = vt[0]*ft/2.0;
-    nz = 1+(nt-1)*dt*vmax/(2.0*dz);
+    dz = vmin * dt / 2.0;
+    fz = vt[0] * ft / 2.0;
+    nz = 1 + (nt - 1) * dt * vmax / (2.0 * dz);
 
     // allocate workspace
-    tz   = new float[nz];
+    tz = new float[nz];
 
-    ints8r(nt,dt,ft,Ttr,0.0,0.0,nz,tz,Dtr);
+    ints8r(nt, dt, ft, Ttr, 0.0, 0.0, nz, tz, Dtr);
 
     return nz;
 }
-
-
-

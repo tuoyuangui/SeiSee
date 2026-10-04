@@ -1,132 +1,116 @@
 #ifndef MYHUGETABLE_H
 #define MYHUGETABLE_H
 
-#include <QWidget>
 #include <QFrame>
-#include <QScrollBar>
 #include <QGridLayout>
-#include <QPainter>
 #include <QLineEdit>
+#include <QPainter>
+#include <QScrollBar>
+#include <QWidget>
 
 class MyHugeTable;
 
-class MyHtWidget : public QWidget
-{
+class MyHtWidget : public QWidget {
     Q_OBJECT
 
-friend class MyHugeTable;
+    friend class MyHugeTable;
 
-private:
+  private:
+    MyHugeTable *p;
 
-    MyHugeTable* p;
-
-    void paintEvent     (QPaintEvent *event);
-    void keyPressEvent  (QKeyEvent   *event);
+    void paintEvent(QPaintEvent *event);
+    void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
-    void wheelEvent     (QWheelEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
-    QLineEdit*  lEdit;
+    QLineEdit *lEdit;
 
-protected:
+  protected:
     void scrollToCurRow();
 
-    int xy2cr(int x, int y, int &c, qint64& r);
+    int xy2cr(int x, int y, int &c, qint64 &r);
 
-public:
-    explicit MyHtWidget(MyHugeTable* parent);
+  public:
+    explicit MyHtWidget(MyHugeTable *parent);
 
-signals:
+  signals:
 
-public slots:
+  public slots:
 
-    void on_lEdit_editingFinished()
-    {
-        lEdit->hide();
-    }
-
+    void on_lEdit_editingFinished() { lEdit->hide(); }
 };
-
 
 class MyHcWidget : public QWidget // Column header
 {
     Q_OBJECT
 
-friend class MyHugeTable;
+    friend class MyHugeTable;
 
-private:
+  private:
+    MyHugeTable *p;
 
-    MyHugeTable* p;
-
-    void paintEvent     (QPaintEvent *event);
-    void keyPressEvent  (QKeyEvent   *event);
+    void paintEvent(QPaintEvent *event);
+    void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void wheelEvent     (QWheelEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
-protected:
+  protected:
     int x2c(int x);
 
-public:
-    explicit MyHcWidget(MyHugeTable* parent);
+  public:
+    explicit MyHcWidget(MyHugeTable *parent);
 
-signals:
-    void colEvent (int col);
+  signals:
+    void colEvent(int col);
 
-public slots:
-
+  public slots:
 };
 
-
-
-
-class MyCol
-{
-public:
+class MyCol {
+  public:
     QString hdr;
-    int     width;
-    int     tag;
-    QColor  hbgc;
+    int width;
+    int tag;
+    QColor hbgc;
 
     MyCol()
     {
         width = 0;
-        tag   = 0;
-        hbgc  = Qt::white;
+        tag = 0;
+        hbgc = Qt::white;
     }
 };
 
-class MyHugeTable : public QWidget
-{
+class MyHugeTable : public QWidget {
     Q_OBJECT
 
-private:
-
+  private:
     QVector<MyCol> m_cols;
 
-    QScrollBar* vScrollBar;
-    QScrollBar* hScrollBar;
-    MyHcWidget* cWidget;
-    MyHtWidget* tWidget;
-    QWidget*    txWidget; // corner box for grid
-    QWidget*    cxWidget; // corner box for column header
+    QScrollBar *vScrollBar;
+    QScrollBar *hScrollBar;
+    MyHcWidget *cWidget;
+    MyHtWidget *tWidget;
+    QWidget *txWidget; // corner box for grid
+    QWidget *cxWidget; // corner box for column header
 
-    qint64      m_nrows;
-    qint64      m_crow;
-    int         m_ccol;
+    qint64 m_nrows;
+    qint64 m_crow;
+    int m_ccol;
 
     int colsW(); //  total width of columns
 
-    void resizeEvent    (QResizeEvent * event);
+    void resizeEvent(QResizeEvent *event);
 
-public:
-
+  public:
     friend class MyHtWidget;
     friend class MyHcWidget;
 
     explicit MyHugeTable(QWidget *parent = NULL);
 
-    qint64 rowCount() {return m_nrows;}
-    int    colCount();
+    qint64 rowCount() { return m_nrows; }
+    int colCount();
 
     void setRowCount(qint64 n);
     void setColCount(int n);
@@ -138,33 +122,31 @@ public:
 
     void setColHdrBgc(int n, QColor v = Qt::white);
 
-    int  colTag(int n);
-    void setColTag  (int n, int v);
+    int colTag(int n);
+    void setColTag(int n, int v);
 
-    qint64  curCol() { return m_ccol;}
+    qint64 curCol() { return m_ccol; }
 
-    qint64  curRow() { return m_crow;}
+    qint64 curRow() { return m_crow; }
     void setCurRow(qint64 row);
 
-    void setCurCell(qint64 row, int col= -1);
+    void setCurCell(qint64 row, int col = -1);
 
     QString getCellData(int nrow, int ncol);
-    void    sendRowEvent(qint64 nrow, int mode);
+    void sendRowEvent(qint64 nrow, int mode);
 
-public slots:
+  public slots:
 
     void vChanged(int val);
     void hChanged(int val);
 
     void hcCol(int col);
 
-
-signals:
-    void cellDataRequest(int nrow, int ncol, QString& val);
+  signals:
+    void cellDataRequest(int nrow, int ncol, QString &val);
     void headerEvent(int col);
-    void rowEvent (qint64 row, int mode);
+    void rowEvent(qint64 row, int mode);
     void cellEvent(qint64 row, int col, int mode);
-
 };
 
 #endif // MYHUGETABLE_H
