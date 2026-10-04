@@ -610,7 +610,10 @@ void MainWindow::hdrElstDtGridDataEvent(int r, int c, QString &v)
     }
 }
 
-void MainWindow::txtEditChanged() { checkTxtHdrChange(); }
+void MainWindow::txtEditChanged()
+{
+    checkTxtHdrChange();
+}
 
 void MainWindow::txtEditKeyEvent(int tag, QKeyEvent *event)
 {
@@ -838,9 +841,15 @@ void MainWindow::x_delay(int dmin, int dmax)
     InitSeisView();
 }
 
-void MainWindow::x_progr(int pers, QString mess) { ShowProgress(mess, pers); }
+void MainWindow::x_progr(int pers, QString mess)
+{
+    ShowProgress(mess, pers);
+}
 
-void MainWindow::x_fin(QString mess) { ShowProgress(mess, -1); }
+void MainWindow::x_fin(QString mess)
+{
+    ShowProgress(mess, -1);
+}
 
 void MainWindow::ScanLtod()
 {
@@ -1744,7 +1753,10 @@ void MainWindow::on_ckNorm_toggled(bool checked)
     ResetSrc();
 }
 
-void MainWindow::on_ckFilt_toggled(bool) { ResetSrc(); }
+void MainWindow::on_ckFilt_toggled(bool)
+{
+    ResetSrc();
+}
 
 void MainWindow::on_ckWiggle_toggled(bool checked)
 {
@@ -2411,11 +2423,20 @@ bool  MainWindow::event(QEvent *evt)
 }
 */
 
-void MainWindow::on_zoomWinBtn_pressed() { seisScrl->setZoomW(1); }
+void MainWindow::on_zoomWinBtn_pressed()
+{
+    seisScrl->setZoomW(1);
+}
 
-void MainWindow::on_actionOpen_Directory_triggered() { on_selDirBtn_pressed(); }
+void MainWindow::on_actionOpen_Directory_triggered()
+{
+    on_selDirBtn_pressed();
+}
 
-void MainWindow::on_actionAbout_triggered() { AboutDlg.show(); }
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutDlg.show();
+}
 
 void MainWindow::on_TrSlider_valueChanged(int p)
 {
@@ -2471,7 +2492,10 @@ void MainWindow::on_TmSlider_valueChanged(int p)
     }
 }
 
-void MainWindow::on_GnSlider_sliderPressed() { gss = seisSct.Gw(); }
+void MainWindow::on_GnSlider_sliderPressed()
+{
+    gss = seisSct.Gw();
+}
 
 void MainWindow::on_GnSlider_sliderReleased()
 {
@@ -2515,7 +2539,10 @@ void MainWindow::on_axisBtn_pressed()
     AxisDlg.show();
 }
 
-void MainWindow::on_actionAxes_Setup_triggered() { on_axisBtn_pressed(); }
+void MainWindow::on_actionAxes_Setup_triggered()
+{
+    on_axisBtn_pressed();
+}
 
 void MainWindow::axesDlgEvent()
 {
@@ -2601,11 +2628,20 @@ void MainWindow::hdreDlgEvent()
     FillHdrElstGrids();
 }
 
-void MainWindow::on_actionParameters_triggered() { on_procParmBtn_pressed(); }
+void MainWindow::on_actionParameters_triggered()
+{
+    on_procParmBtn_pressed();
+}
 
-void MainWindow::on_actionHeader_Editor_triggered() { on_btnEdHdr_clicked(); }
+void MainWindow::on_actionHeader_Editor_triggered()
+{
+    on_btnEdHdr_clicked();
+}
 
-void MainWindow::on_btnEdHdr_clicked() { EdHdrDlg.show(); }
+void MainWindow::on_btnEdHdr_clicked()
+{
+    EdHdrDlg.show();
+}
 
 void MainWindow::checkTxtHdrChange()
 {
@@ -2811,7 +2847,10 @@ void MainWindow::on_btnLastTr_clicked()
     hdrListDtGrid.setCurCell(hdrListDtGrid.rowCount() - 1);
 }
 
-void MainWindow::on_btnFirstTr_clicked() { hdrListDtGrid.setCurCell(0); }
+void MainWindow::on_btnFirstTr_clicked()
+{
+    hdrListDtGrid.setCurCell(0);
+}
 
 void MainWindow::SaveSval()
 {
@@ -2959,13 +2998,25 @@ void MainWindow::on_cbSidx_currentIndexChanged(const QString &arg1)
     SetSearchControls(true);
 }
 
-void MainWindow::on_btnSbin_clicked() { FindTrace("="); }
+void MainWindow::on_btnSbin_clicked()
+{
+    FindTrace("=");
+}
 
-void MainWindow::on_btnSfwd_clicked() { FindTrace(">"); }
+void MainWindow::on_btnSfwd_clicked()
+{
+    FindTrace(">");
+}
 
-void MainWindow::on_btnSbkw_clicked() { FindTrace("<"); }
+void MainWindow::on_btnSbkw_clicked()
+{
+    FindTrace("<");
+}
 
-void MainWindow::on_btnSstop_clicked() { emit stop_find(); }
+void MainWindow::on_btnSstop_clicked()
+{
+    emit stop_find();
+}
 
 void MainWindow::on_btnUpdTrh_clicked()
 {
@@ -3265,7 +3316,10 @@ void MainWindow::on_btnLastTr_2_clicked()
     hdrElstDtGrid.setCurCell(hdrListDtGrid.rowCount() - 1);
 }
 
-void MainWindow::on_btnFirstTr_2_clicked() { hdrElstDtGrid.setCurCell(0); }
+void MainWindow::on_btnFirstTr_2_clicked()
+{
+    hdrElstDtGrid.setCurCell(0);
+}
 
 void MainWindow::on_autoGainBtn_clicked()
 {
@@ -3322,7 +3376,10 @@ void MainWindow::on_rbDirRev_toggled(bool checked)
     }
 }
 
-void MainWindow::on_ckTimLines_toggled(bool checked) { seisSct.setTl(checked); }
+void MainWindow::on_ckTimLines_toggled(bool checked)
+{
+    seisSct.setTl(checked);
+}
 
 void MainWindow::on_actionOpen_File_triggered()
 {

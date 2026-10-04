@@ -49,9 +49,15 @@ class GfxObjSeis : public GfxObj {
         Update();
     }
 
-    virtual double Gc() { return m_Gc / 128.; }
+    virtual double Gc()
+    {
+        return m_Gc / 128.;
+    }
 
-    virtual double Gw() { return m_Gw; }
+    virtual double Gw()
+    {
+        return m_Gw;
+    }
 
     virtual void setGw(double v)
     {
@@ -65,7 +71,10 @@ class GfxObjSeis : public GfxObj {
         Update();
     }
 
-    virtual bool DispWig() { return m_DispWig; }
+    virtual bool DispWig()
+    {
+        return m_DispWig;
+    }
 
     virtual void setDispCol(bool v)
     {
@@ -73,7 +82,10 @@ class GfxObjSeis : public GfxObj {
         Update();
     }
 
-    virtual bool DispCol() { return m_DispCol; }
+    virtual bool DispCol()
+    {
+        return m_DispCol;
+    }
 
     virtual void setWFill(int v)
     {
@@ -81,7 +93,10 @@ class GfxObjSeis : public GfxObj {
         Update();
     }
 
-    virtual int WFill() { return m_WFill; }
+    virtual int WFill()
+    {
+        return m_WFill;
+    }
 
     virtual void setWLcolor(QRgb v)
     {
@@ -130,7 +145,10 @@ class GfxObjSeis : public GfxObj {
         setPal(p);
     }
 
-    QList<QRgb> *Pal() { return &m_Pal; }
+    QList<QRgb> *Pal()
+    {
+        return &m_Pal;
+    }
 
     virtual void setSrc(GfxSrcSeis *v);
 };

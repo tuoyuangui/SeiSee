@@ -55,7 +55,10 @@ class GfxSrcSeis : public GfxSrc {
             return 0;
     }
 
-    virtual float *Ts(int) { return NULL; }
+    virtual float *Ts(int)
+    {
+        return NULL;
+    }
 
     virtual Ttr Tt(long long ntr)
     {
@@ -63,25 +66,52 @@ class GfxSrcSeis : public GfxSrc {
         return tr;
     }
 
-    virtual double To() { return m_To; }
+    virtual double To()
+    {
+        return m_To;
+    }
 
-    virtual double Th(int, int) { return 0; }
+    virtual double Th(int, int)
+    {
+        return 0;
+    }
 
-    virtual double Th(int, QString) { return 0; }
+    virtual double Th(int, QString)
+    {
+        return 0;
+    }
 
-    virtual double Si() { return m_Si; }
+    virtual double Si()
+    {
+        return m_Si;
+    }
 
-    virtual double Ti() { return m_Ti; }
+    virtual double Ti()
+    {
+        return m_Ti;
+    }
 
-    virtual int Nt() { return m_Nt; }
+    virtual int Nt()
+    {
+        return m_Nt;
+    }
 
-    virtual int Ns() { return m_Ns; }
+    virtual int Ns()
+    {
+        return m_Ns;
+    }
 
-    virtual void setTh(int, int, double) {}
+    virtual void setTh(int, int, double)
+    {
+    }
 
-    virtual void setNt(int) {}
+    virtual void setNt(int)
+    {
+    }
 
-    virtual void setNs(int) {}
+    virtual void setNs(int)
+    {
+    }
 
     void setSi(double si)
     {

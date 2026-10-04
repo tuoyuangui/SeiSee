@@ -36,9 +36,15 @@ AxisDialog::AxisDialog(QWidget *parent)
     ui->aviHdrsBox->setLayout(aviGridLayout);
 }
 
-AxisDialog::~AxisDialog() { delete ui; }
+AxisDialog::~AxisDialog()
+{
+    delete ui;
+}
 
-void AxisDialog::on_closeButton_pressed() { close(); }
+void AxisDialog::on_closeButton_pressed()
+{
+    close();
+}
 
 void AxisDialog::FillAviGrid()
 {

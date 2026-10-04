@@ -813,7 +813,10 @@ void MainWindow::hdrGridEvent(int row, int mode)
     ui->logText->setPlainText(obj->get_inf().c_str());
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) { SaveRegInfo(); }
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    SaveRegInfo();
+}
 
 #pragma GCC diagnostic warning "-Wunused-parameter"
 
@@ -1307,7 +1310,10 @@ void MainWindow::on_ckNorm_toggled(bool checked)
     ResetSrc();
 }
 
-void MainWindow::on_ckFilt_toggled(bool) { ResetSrc(); }
+void MainWindow::on_ckFilt_toggled(bool)
+{
+    ResetSrc();
+}
 
 void MainWindow::on_ckWiggle_toggled(bool checked)
 {
@@ -2110,11 +2116,20 @@ bool MainWindow::event(QEvent *evt)
     return QMainWindow::event(evt);
 }
 
-void MainWindow::on_zoomWinBtn_pressed() { seisScrl->setZoomW(1); }
+void MainWindow::on_zoomWinBtn_pressed()
+{
+    seisScrl->setZoomW(1);
+}
 
-void MainWindow::on_actionOpen_Directory_triggered() { on_selDirBtn_pressed(); }
+void MainWindow::on_actionOpen_Directory_triggered()
+{
+    on_selDirBtn_pressed();
+}
 
-void MainWindow::on_actionAbout_triggered() { AboutDlg.show(); }
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutDlg.show();
+}
 
 void MainWindow::on_TrSlider_valueChanged(int p)
 {
@@ -2170,7 +2185,10 @@ void MainWindow::on_TmSlider_valueChanged(int p)
     }
 }
 
-void MainWindow::on_GnSlider_sliderPressed() { gss = sctList.Gw(); }
+void MainWindow::on_GnSlider_sliderPressed()
+{
+    gss = sctList.Gw();
+}
 
 void MainWindow::on_GnSlider_sliderReleased()
 {
@@ -2229,7 +2247,10 @@ void MainWindow::on_splitter_splitterMoved(int pos, int index)
 }
 #pragma GCC diagnostic warning "-Wunused-parameter"
 
-void MainWindow::on_hdrsTopBtn_clicked() { hdrGrid.setCurCell(0); }
+void MainWindow::on_hdrsTopBtn_clicked()
+{
+    hdrGrid.setCurCell(0);
+}
 
 void MainWindow::on_hdrsBtmBtn_clicked()
 {
@@ -2237,7 +2258,10 @@ void MainWindow::on_hdrsBtmBtn_clicked()
     hdrGrid.setCurCell(nr - 1);
 }
 
-void MainWindow::on_actionParameters_triggered() { on_procParmBtn_pressed(); }
+void MainWindow::on_actionParameters_triggered()
+{
+    on_procParmBtn_pressed();
+}
 
 void MainWindow::on_actionUser_Manual_triggered()
 {

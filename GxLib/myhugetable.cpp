@@ -186,7 +186,10 @@ void MyHugeTable::setColCount(int n)
     cWidget->update();
 }
 
-int MyHugeTable::colCount() { return m_cols.count(); }
+int MyHugeTable::colCount()
+{
+    return m_cols.count();
+}
 
 void MyHugeTable::vChanged(int val)
 {

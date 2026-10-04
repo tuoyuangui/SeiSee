@@ -14,8 +14,14 @@ class GfxObjSeisHdrs : public GfxObjSeis {
     virtual void DoDraw();
 
   public:
-    virtual double Y1() { return 0; }
-    virtual double Y2() { return pix2y(gfx->H()); }
+    virtual double Y1()
+    {
+        return 0;
+    }
+    virtual double Y2()
+    {
+        return pix2y(gfx->H());
+    }
 
     GfxObjSeisHdrs(QObject *parent = 0);
 

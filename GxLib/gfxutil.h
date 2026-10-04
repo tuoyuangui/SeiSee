@@ -21,7 +21,9 @@ class zdata {
         ys = yys;
     }
 
-    zdata() {}
+    zdata()
+    {
+    }
 };
 
 char *q2s(QString qs);

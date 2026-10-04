@@ -26,7 +26,9 @@ class GfxSrcSeisTest : public GfxSrcSeis {
         return 0;
     }
 
-    virtual void setTh(int, int, double) {}
+    virtual void setTh(int, int, double)
+    {
+    }
 
     //   virtual double  GetNTraceByPos(double p);
 

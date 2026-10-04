@@ -12,7 +12,10 @@ class GfxSctList : public GfxObjSeisSect {
 
     ~GfxSctList();
 
-    virtual void Update() { setAll(); }
+    virtual void Update()
+    {
+        setAll();
+    }
 
     void setItem(int n)
     {
@@ -42,9 +45,15 @@ class GfxSctList : public GfxObjSeisSect {
         }
     }
 
-    int count() { return items.count(); }
+    int count()
+    {
+        return items.count();
+    }
 
-    GfxObjSeisSect *operator[](int i) { return items.value(i, NULL); }
+    GfxObjSeisSect *operator[](int i)
+    {
+        return items.value(i, NULL);
+    }
 
     void append(GfxObjSeisSect *v)
     {

@@ -27,7 +27,10 @@ Worker::Worker(QObject *parent)
     m_stop = false;
 }
 
-void Worker::stop() { m_stop = true; }
+void Worker::stop()
+{
+    m_stop = true;
+}
 
 int Worker::xprintf(const char *fmt, ...)
 {
@@ -336,7 +339,9 @@ ChangeThExprWorker::ChangeThExprWorker(SeisFile *sf,
     m_mode = mode;
 }
 
-ChangeThExprWorker::~ChangeThExprWorker() {}
+ChangeThExprWorker::~ChangeThExprWorker()
+{
+}
 
 //---------------------------------------------------------------------------------------------
 

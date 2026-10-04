@@ -18,9 +18,15 @@
 #define ormsby 1
 #define butterworth 2
 
-static float *MAlloc(long size) { return (float *)malloc(size); }
+static float *MAlloc(long size)
+{
+    return (float *)malloc(size);
+}
 
-static void MFree(float *m) { free(m); }
+static void MFree(float *m)
+{
+    free(m);
+}
 
 void FastFourierTransformation(float *cxxr, float *cxxi, int lx, int isign)
 {

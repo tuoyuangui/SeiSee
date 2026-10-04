@@ -4,3 +4,4 @@ BreakConstructorInitializers: BeforeComma
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterFunction: true
+AllowShortFunctionsOnASingleLine: None

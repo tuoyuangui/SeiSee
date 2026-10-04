@@ -42,9 +42,15 @@ class Worker : public QObject {
   protected:
     bool m_stop;
 
-    virtual void xprint(QString str) { emit eprint(str); }
+    virtual void xprint(QString str)
+    {
+        emit eprint(str);
+    }
 
-    virtual void xprogr(int pers, QString str = "") { emit eprogr(pers, str); }
+    virtual void xprogr(int pers, QString str = "")
+    {
+        emit eprogr(pers, str);
+    }
 
     virtual void xpers(int pers, QString str = "")
     {

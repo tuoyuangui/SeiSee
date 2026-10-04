@@ -30,7 +30,9 @@ Node::Node(Expression *expr)
 }
 
 // Destructor
-Node::~Node() {}
+Node::~Node()
+{
+}
 
 // Evaluate
 double Node::Evaluate()
@@ -65,7 +67,10 @@ FunctionNode::~FunctionNode()
 }
 
 // Get name
-string FunctionNode::GetName() const { return m_factory->GetName(); }
+string FunctionNode::GetName() const
+{
+    return m_factory->GetName();
+}
 
 // Set argument count
 void FunctionNode::SetArgumentCount(long argMin, long argMax, long refMin,
@@ -370,7 +375,10 @@ AssignNode::~AssignNode()
 }
 
 // Evaluate
-double AssignNode::DoEvaluate() { return (*m_var = m_rhs->Evaluate()); }
+double AssignNode::DoEvaluate()
+{
+    return (*m_var = m_rhs->Evaluate());
+}
 
 // Parse
 void AssignNode::Parse(Parser &parser, Parser::size_type start,
@@ -452,7 +460,10 @@ AddNode::~AddNode()
 }
 
 // Evaluate
-double AddNode::DoEvaluate() { return m_lhs->Evaluate() + m_rhs->Evaluate(); }
+double AddNode::DoEvaluate()
+{
+    return m_lhs->Evaluate() + m_rhs->Evaluate();
+}
 
 // Parse
 void AddNode::Parse(Parser &parser, Parser::size_type start,
@@ -637,7 +648,10 @@ NegateNode::~NegateNode()
 }
 
 // Evaluate
-double NegateNode::DoEvaluate() { return -(m_rhs->Evaluate()); }
+double NegateNode::DoEvaluate()
+{
+    return -(m_rhs->Evaluate());
+}
 
 // Parse
 void NegateNode::Parse(Parser &parser, Parser::size_type start,
@@ -722,10 +736,15 @@ VariableNode::VariableNode(Expression *expr)
 }
 
 // Destructor
-VariableNode::~VariableNode() {}
+VariableNode::~VariableNode()
+{
+}
 
 // Evaluate
-double VariableNode::DoEvaluate() { return *m_var; }
+double VariableNode::DoEvaluate()
+{
+    return *m_var;
+}
 
 // Parse
 void VariableNode::Parse(Parser &parser, Parser::size_type start,
@@ -785,10 +804,15 @@ ValueNode::ValueNode(Expression *expr)
 }
 
 // Destructor
-ValueNode::~ValueNode() {}
+ValueNode::~ValueNode()
+{
+}
 
 // Evaluate
-double ValueNode::DoEvaluate() { return m_val; }
+double ValueNode::DoEvaluate()
+{
+    return m_val;
+}
 
 // Parse
 void ValueNode::Parse(Parser &parser, Parser::size_type start,

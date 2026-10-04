@@ -43,7 +43,10 @@ class ptrAry {
     int _nalloc;
 
   public:
-    int getCount() { return _nitems; }
+    int getCount()
+    {
+        return _nitems;
+    }
 
     ptrAry();
     ptrAry(ptrAry &src);
@@ -69,8 +72,14 @@ class byteAry {
     int _nitems;
 
   public:
-    int get_count() { return _nitems; }
-    byte *get_data() { return _data; }
+    int get_count()
+    {
+        return _nitems;
+    }
+    byte *get_data()
+    {
+        return _data;
+    }
 
     byteAry();
     byteAry(byteAry &src);
@@ -100,9 +109,15 @@ class TMyObjList {
     ptrAry _obj;
 
   public:
-    int getCount() { return _obj.getCount(); }
+    int getCount()
+    {
+        return _obj.getCount();
+    }
 
-    void Add(TMyObj *pobj) { _obj.Add(pobj); }
+    void Add(TMyObj *pobj)
+    {
+        _obj.Add(pobj);
+    }
 
     void Del(TMyObj *pobj)
     {
@@ -142,11 +157,20 @@ class TMyObjList {
         return (TMyObj *)_obj[n];
     }
 
-    TMyObjList() { OwnsObjects = true; }
+    TMyObjList()
+    {
+        OwnsObjects = true;
+    }
 
-    TMyObjList(bool AOwnsObjects) { OwnsObjects = AOwnsObjects; }
+    TMyObjList(bool AOwnsObjects)
+    {
+        OwnsObjects = AOwnsObjects;
+    }
 
-    ~TMyObjList() { Clear(); }
+    ~TMyObjList()
+    {
+        Clear();
+    }
 };
 
 //---------------------------------------------------------------------------
@@ -195,8 +219,14 @@ class TSegD {
     void close();
     int seek(int pos, int from);
     int tell();
-    byte *getbuf() { return _buf; }
-    int getlen() { return _len; }
+    byte *getbuf()
+    {
+        return _buf;
+    }
+    int getlen()
+    {
+        return _len;
+    }
 
     int find_trcx(int ppos, short ffff, int fn);
 
@@ -261,7 +291,10 @@ class TSegD {
     int get_nobj(int type = -1);
     int get_ncs();
 
-    string get_err() { return _err; }
+    string get_err()
+    {
+        return _err;
+    }
 
     TCs *get_csi(int idx);
     int find_csi(int csn, int stn);
@@ -332,7 +365,9 @@ class TSegDObj : public TMyObj {
         _segd->objs->Add(this);
     }
 
-    ~TSegDObj() {}
+    ~TSegDObj()
+    {
+    }
 
     void set_len(int l)
     {
@@ -341,10 +376,19 @@ class TSegDObj : public TMyObj {
         len = l;
     }
 
-    byte *get_buf() { return _segd->getbuf() + _pos; }
+    byte *get_buf()
+    {
+        return _segd->getbuf() + _pos;
+    }
 
-    virtual string get_inf() { return _inf; }
-    virtual string get_err() { return _err; }
+    virtual string get_inf()
+    {
+        return _inf;
+    }
+    virtual string get_err()
+    {
+        return _err;
+    }
 };
 
 class TSegdInfo : public TSegDObj {
@@ -541,7 +585,10 @@ class TTrList : public TMyObjList {
     {
     }
 
-    TTr *get_tr(int trn) { return (TTr *)getObj(trn); }
+    TTr *get_tr(int trn)
+    {
+        return (TTr *)getObj(trn);
+    }
 };
 
 class TCs : public TSegDObj {
@@ -573,10 +620,19 @@ class TCs : public TSegDObj {
     TCs(TSegD *segd);
     ~TCs();
 
-    int get_ntr() { return _trc->getCount(); }
+    int get_ntr()
+    {
+        return _trc->getCount();
+    }
 
-    void set_ntr(int v) { _ntr = v; }
-    TTrList *get_trc() { return _trc; }
+    void set_ntr(int v)
+    {
+        _ntr = v;
+    }
+    TTrList *get_trc()
+    {
+        return _trc;
+    }
 };
 
 class TCsD : public TCs {

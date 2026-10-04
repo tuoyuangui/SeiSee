@@ -45,8 +45,14 @@ class MyScrollArea : public QScrollArea {
     void setVscroll(int v);
     void setHscroll(int v);
 
-    int Vscroll() { return verticalScrollBar()->value(); }
-    int Hscroll() { return horizontalScrollBar()->value(); }
+    int Vscroll()
+    {
+        return verticalScrollBar()->value();
+    }
+    int Hscroll()
+    {
+        return horizontalScrollBar()->value();
+    }
 
   signals:
     void zoomChanged(double zx, double zy, int x, int y);

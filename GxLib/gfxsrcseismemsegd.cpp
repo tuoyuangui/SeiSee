@@ -117,4 +117,6 @@ float *GfxSrcSeisMemSegd::Ts(int tidx)
     return ts;
 }
 
-void GfxSrcSeisMemSegd::setSmp(int, int, float) {}
+void GfxSrcSeisMemSegd::setSmp(int, int, float)
+{
+}

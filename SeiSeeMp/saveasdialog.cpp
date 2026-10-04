@@ -30,7 +30,10 @@ SaveAsDialog::SaveAsDialog(QWidget *parent)
             SLOT(hdrListEvent(int, int)));
 }
 
-SaveAsDialog::~SaveAsDialog() { delete ui; }
+SaveAsDialog::~SaveAsDialog()
+{
+    delete ui;
+}
 
 void SaveAsDialog::on_btnSave_clicked()
 {
@@ -124,9 +127,15 @@ void SaveAsDialog::x_fin(QString mess)
     ui->edMess->setText(mess);
 }
 
-void SaveAsDialog::x_progr(int pers, QString mess) { ShowProgress(mess, pers); }
+void SaveAsDialog::x_progr(int pers, QString mess)
+{
+    ShowProgress(mess, pers);
+}
 
-void SaveAsDialog::on_btnClose_clicked() { close(); }
+void SaveAsDialog::on_btnClose_clicked()
+{
+    close();
+}
 
 void SaveAsDialog::FillHdrListGrid()
 {
@@ -228,11 +237,20 @@ void SaveAsDialog::hdrListEvent(int row, int mode)
     }
 }
 
-void SaveAsDialog::on_ckTrAll_clicked() { FillLimits(); }
+void SaveAsDialog::on_ckTrAll_clicked()
+{
+    FillLimits();
+}
 
-void SaveAsDialog::on_ckTmAll_clicked() { FillLimits(); }
+void SaveAsDialog::on_ckTmAll_clicked()
+{
+    FillLimits();
+}
 
-void SaveAsDialog::on_btnTrMin_clicked() { ui->edTrMin->setText("1"); }
+void SaveAsDialog::on_btnTrMin_clicked()
+{
+    ui->edTrMin->setText("1");
+}
 
 void SaveAsDialog::on_btnTrMax_clicked()
 {
@@ -240,7 +258,10 @@ void SaveAsDialog::on_btnTrMax_clicked()
     ui->edTrMax->setText(QString::number(tr2));
 }
 
-void SaveAsDialog::on_btnTrStp_clicked() { ui->edTrStp->setText("0"); }
+void SaveAsDialog::on_btnTrStp_clicked()
+{
+    ui->edTrStp->setText("0");
+}
 
 void SaveAsDialog::on_btnTmMin_clicked()
 {

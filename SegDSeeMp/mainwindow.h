@@ -47,7 +47,9 @@ class myEventCatcher : public QObject {
     {
         _tag = tag;
     }
-    ~myEventCatcher() {}
+    ~myEventCatcher()
+    {
+    }
 
     bool eventFilter(QObject *object, QEvent *event)
     {

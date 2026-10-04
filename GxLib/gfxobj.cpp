@@ -186,9 +186,15 @@ void GfxObj::DoDraw()
     */
 }
 
-double GfxObj::WidthMM() { return fabs(m_X2 - m_X1) * m_Xs; }
+double GfxObj::WidthMM()
+{
+    return fabs(m_X2 - m_X1) * m_Xs;
+}
 
-double GfxObj::HeightMM() { return fabs(m_Y2 - m_Y1) * m_Ys; }
+double GfxObj::HeightMM()
+{
+    return fabs(m_Y2 - m_Y1) * m_Ys;
+}
 
 double GfxObj::WidthPix()
 {

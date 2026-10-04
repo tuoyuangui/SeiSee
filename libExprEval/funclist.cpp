@@ -17,10 +17,14 @@ using namespace ExprEval;
 //------------------------------------------------------------------------------
 
 // Constructor
-FunctionFactory::FunctionFactory() {}
+FunctionFactory::FunctionFactory()
+{
+}
 
 // Destructor
-FunctionFactory::~FunctionFactory() {}
+FunctionFactory::~FunctionFactory()
+{
+}
 
 // Create
 FunctionNode *FunctionFactory::Create(Expression *expr)
@@ -36,7 +40,9 @@ FunctionNode *FunctionFactory::Create(Expression *expr)
 //------------------------------------------------------------------------------
 
 // Constructor
-FunctionList::FunctionList() {}
+FunctionList::FunctionList()
+{
+}
 
 // Destructor
 FunctionList::~FunctionList()

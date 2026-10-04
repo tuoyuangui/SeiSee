@@ -42,11 +42,23 @@ class GfxView : public QWidget {
 
     ~GfxView();
 
-    double Xpmm() { return m_Xpmm; }
-    double Ypmm() { return m_Ypmm; }
+    double Xpmm()
+    {
+        return m_Xpmm;
+    }
+    double Ypmm()
+    {
+        return m_Ypmm;
+    }
 
-    double Xs() { return m_Xs; }
-    double Ys() { return m_Ys; }
+    double Xs()
+    {
+        return m_Xs;
+    }
+    double Ys()
+    {
+        return m_Ys;
+    }
 
     void setXs(double v)
     {
@@ -68,7 +80,10 @@ class GfxView : public QWidget {
 
     void UnRegisterLink(GfxObj *v);
 
-    Gfx *getGfx() { return &m_gfx; }
+    Gfx *getGfx()
+    {
+        return &m_gfx;
+    }
 
   signals:
     void OnPrevDraw(GfxView *view);

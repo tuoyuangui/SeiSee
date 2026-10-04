@@ -16,7 +16,10 @@ GfxSrcSeis::GfxSrcSeis(QObject *parent)
     m_Ns = 0;
 }
 
-GfxSrcSeis::~GfxSrcSeis() { Clear(); }
+GfxSrcSeis::~GfxSrcSeis()
+{
+    Clear();
+}
 
 void GfxSrcSeis::Invalidate(void)
 {

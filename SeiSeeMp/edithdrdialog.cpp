@@ -72,7 +72,10 @@ EditHdrDialog::EditHdrDialog(QWidget *parent)
     enableEdit(true);
 }
 
-EditHdrDialog::~EditHdrDialog() { delete ui; }
+EditHdrDialog::~EditHdrDialog()
+{
+    delete ui;
+}
 
 void EditHdrDialog::setChanged(bool v)
 {
@@ -246,7 +249,10 @@ int EditHdrDialog::findrow(QString name)
     return -1;
 }
 
-void EditHdrDialog::on_btnClose_clicked() { close(); }
+void EditHdrDialog::on_btnClose_clicked()
+{
+    close();
+}
 
 void EditHdrDialog::on_cbSet_currentIndexChanged(int index)
 {
@@ -395,7 +401,10 @@ void EditHdrDialog::on_edDesc_textChanged(const QString &arg1)
     onUserInput();
 }
 
-void EditHdrDialog::on_edPos_textChanged(const QString &arg1) { onUserInput(); }
+void EditHdrDialog::on_edPos_textChanged(const QString &arg1)
+{
+    onUserInput();
+}
 
 void EditHdrDialog::on_btnDelItem_clicked()
 {

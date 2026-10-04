@@ -22,7 +22,9 @@ class XHeaderView : public QHeaderView {
 
   public:
     XHeaderView(QWidget *parent = 0);
-    ~XHeaderView() {}
+    ~XHeaderView()
+    {
+    }
 };
 
 class MxStringTableDelegate : public QStyledItemDelegate {
@@ -72,7 +74,10 @@ class MxStringTableRow {
 
     QVector<MxStringTableCell> cells;
 
-    explicit MxStringTableRow() { sel = false; }
+    explicit MxStringTableRow()
+    {
+        sel = false;
+    }
 };
 
 class MxStringTableCol {
@@ -158,7 +163,10 @@ class MxStringTable : public QTableView {
 
     virtual QSize sizeHint() const;
 
-    void setColumnWidth(int c, int w) { QTableView::setColumnWidth(c, w); }
+    void setColumnWidth(int c, int w)
+    {
+        QTableView::setColumnWidth(c, w);
+    }
 
     void paintEvent(QPaintEvent *event);
     /*
@@ -218,10 +226,16 @@ class MxStringTable : public QTableView {
     void setColLabel(int c, QString);
     void setColLabBg(int c, QColor v = QColor());
 
-    QColor Color() { return _color; }
+    QColor Color()
+    {
+        return _color;
+    }
     void setColor(QColor);
 
-    QColor Textc() { return _textc; }
+    QColor Textc()
+    {
+        return _textc;
+    }
     void setTextc(QColor);
 
     QString Cell(int r, int c);
@@ -264,7 +278,10 @@ class MxStringTable : public QTableView {
 
   public slots:
 
-    void hHeaderPressed(int logicalIndex) { emit hHeaderEvent(logicalIndex); }
+    void hHeaderPressed(int logicalIndex)
+    {
+        emit hHeaderEvent(logicalIndex);
+    }
 };
 
 #endif // MxStringTable_H

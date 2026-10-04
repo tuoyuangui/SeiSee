@@ -1189,7 +1189,10 @@ off64_t getfilesize64(const char *filename)
     return -1;
 }
 
-off64_t tell64(int fd) { return lseek64(fd, 0, SEEK_CUR); }
+off64_t tell64(int fd)
+{
+    return lseek64(fd, 0, SEEK_CUR);
+}
 
 string Sprintf(const char *fmt, ...)
 {
@@ -1651,7 +1654,10 @@ int is_month(byte *mnam)
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
-double hypot2(double a, double b) { return a * a + b * b; }
+double hypot2(double a, double b)
+{
+    return a * a + b * b;
+}
 
 double VertPtDist(double x1, double y1, double x2, double y2, double ax,
                   double ay)

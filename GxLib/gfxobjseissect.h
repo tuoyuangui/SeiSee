@@ -38,7 +38,10 @@ class GfxObjSeisSect : public GfxObjSeis {
         Update();
     }
 
-    bool Tl() { return m_Tl; }
+    bool Tl()
+    {
+        return m_Tl;
+    }
 
     void setSelTr(int v)
     {
@@ -46,7 +49,10 @@ class GfxObjSeisSect : public GfxObjSeis {
         Update();
     }
 
-    int selTr() { return m_SelTr; }
+    int selTr()
+    {
+        return m_SelTr;
+    }
 
     float getSelMaxAmp();
 };

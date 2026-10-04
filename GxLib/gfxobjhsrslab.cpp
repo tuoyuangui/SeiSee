@@ -5,7 +5,9 @@ GfxObjHsrsLab::GfxObjHsrsLab(QObject *parent)
 {
 }
 
-GfxObjHsrsLab::~GfxObjHsrsLab() {}
+GfxObjHsrsLab::~GfxObjHsrsLab()
+{
+}
 
 void GfxObjHsrsLab::setHdrList(QList<QString> v)
 {

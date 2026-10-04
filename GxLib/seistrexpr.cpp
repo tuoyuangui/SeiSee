@@ -93,7 +93,10 @@ void SeisTrExpr::setExprString(QString str)
     Parse();
 }
 
-QString SeisTrExpr::ExprString() { return ExprStr; }
+QString SeisTrExpr::ExprString()
+{
+    return ExprStr;
+}
 
 double SeisTrExpr::Evaluate()
 {

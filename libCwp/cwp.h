@@ -93,7 +93,10 @@ class CwpFilter {
         ct = NULL;
     }
 
-    ~CwpFilter() { Clear(); }
+    ~CwpFilter()
+    {
+        Clear();
+    }
 
     void Clear()
     {
@@ -159,7 +162,10 @@ class CwpTimeToDepth {
         tz = NULL;
     }
 
-    ~CwpTimeToDepth() { Clear(); }
+    ~CwpTimeToDepth()
+    {
+        Clear();
+    }
 
     void Clear()
     {

@@ -17,4 +17,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     ui->label_rev->setText(txt);
 }
 
-AboutDialog::~AboutDialog() { delete ui; }
+AboutDialog::~AboutDialog()
+{
+    delete ui;
+}

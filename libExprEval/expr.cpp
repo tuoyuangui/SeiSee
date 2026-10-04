@@ -36,16 +36,28 @@ Expression::~Expression()
 }
 
 // Set value list
-void Expression::SetValueList(ValueList *vlist) { m_vlist = vlist; }
+void Expression::SetValueList(ValueList *vlist)
+{
+    m_vlist = vlist;
+}
 
 // Get value list
-ValueList *Expression::GetValueList() const { return m_vlist; }
+ValueList *Expression::GetValueList() const
+{
+    return m_vlist;
+}
 
 // Set function list
-void Expression::SetFunctionList(FunctionList *flist) { m_flist = flist; }
+void Expression::SetFunctionList(FunctionList *flist)
+{
+    m_flist = flist;
+}
 
 // Get function list
-FunctionList *Expression::GetFunctionList() const { return m_flist; }
+FunctionList *Expression::GetFunctionList() const
+{
+    return m_flist;
+}
 
 // Test for an abort
 bool Expression::DoTestAbort()

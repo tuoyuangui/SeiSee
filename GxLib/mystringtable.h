@@ -22,7 +22,9 @@ class MyHeaderView : public QHeaderView {
 
   public:
     MyHeaderView(QWidget *parent = 0);
-    ~MyHeaderView() {}
+    ~MyHeaderView()
+    {
+    }
 };
 
 class MyStringTableDelegate : public QStyledItemDelegate {
@@ -72,7 +74,10 @@ class MyStringTableRow {
 
     QVector<MyStringTableCell> cells;
 
-    explicit MyStringTableRow() { sel = false; }
+    explicit MyStringTableRow()
+    {
+        sel = false;
+    }
 };
 
 class MyStringTableCol {
@@ -155,7 +160,10 @@ class MyStringTable : public QTableView {
 
     virtual QSize sizeHint() const;
 
-    void setColumnWidth(int c, int w) { QTableView::setColumnWidth(c, w); }
+    void setColumnWidth(int c, int w)
+    {
+        QTableView::setColumnWidth(c, w);
+    }
 
   public:
     MyStringTableModel *_model;
@@ -205,10 +213,16 @@ class MyStringTable : public QTableView {
     void setColLabel(int c, QString);
     void setColLabBg(int c, QColor v = QColor());
 
-    QColor Color() { return _color; }
+    QColor Color()
+    {
+        return _color;
+    }
     void setColor(QColor);
 
-    QColor Textc() { return _textc; }
+    QColor Textc()
+    {
+        return _textc;
+    }
     void setTextc(QColor);
 
     QString Cell(int r, int c);
@@ -251,7 +265,10 @@ class MyStringTable : public QTableView {
 
   public slots:
 
-    void hHeaderPressed(int logicalIndex) { emit hHeaderEvent(logicalIndex); }
+    void hHeaderPressed(int logicalIndex)
+    {
+        emit hHeaderEvent(logicalIndex);
+    }
 };
 
 #endif // MYSTRINGTABLE_H

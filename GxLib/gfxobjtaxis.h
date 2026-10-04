@@ -25,10 +25,19 @@ class GfxObjTAxis : public GfxObj {
         Update();
     }
 
-    double Ti() { return m_Ti; }
+    double Ti()
+    {
+        return m_Ti;
+    }
 
-    virtual double X1() { return 0; }
-    virtual double X2() { return pix2x(gfx->W()); }
+    virtual double X1()
+    {
+        return 0;
+    }
+    virtual double X2()
+    {
+        return pix2x(gfx->W());
+    }
 };
 
 #endif // GFXOBJTAXIS_H

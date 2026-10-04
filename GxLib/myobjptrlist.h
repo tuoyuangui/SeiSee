@@ -14,11 +14,20 @@ class MyObjPtrList : public QObject {
 
     ~MyObjPtrList();
 
-    int count() { return items.count(); }
+    int count()
+    {
+        return items.count();
+    }
 
-    QObject *operator[](int i) { return items.value(i, NULL); }
+    QObject *operator[](int i)
+    {
+        return items.value(i, NULL);
+    }
 
-    void append(QObject *v) { items.append(v); }
+    void append(QObject *v)
+    {
+        items.append(v);
+    }
 
     void clear()
     {

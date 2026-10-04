@@ -18,9 +18,17 @@ GfxSrc::~GfxSrc()
 }
 // ----------------------------------------------------------------------
 
-void GfxSrc::RegisterLink(GfxObj *v) { m_links.append(v); }
+void GfxSrc::RegisterLink(GfxObj *v)
+{
+    m_links.append(v);
+}
 
-void GfxSrc::UnRegisterLink(GfxObj *v) { m_links.removeAll(v); }
+void GfxSrc::UnRegisterLink(GfxObj *v)
+{
+    m_links.removeAll(v);
+}
 
 // ----------------------------------------------------------------------
-void GfxSrc::Clear(void) {}
+void GfxSrc::Clear(void)
+{
+}

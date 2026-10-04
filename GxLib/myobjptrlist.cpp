@@ -5,4 +5,7 @@ MyObjPtrList::MyObjPtrList(QObject *parent)
 {
 }
 
-MyObjPtrList::~MyObjPtrList() { clear(); }
+MyObjPtrList::~MyObjPtrList()
+{
+    clear();
+}

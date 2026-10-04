@@ -40,7 +40,10 @@ SgyFile::SgyFile(QObject *parent)
     _f = -1;
 }
 
-SgyFile::~SgyFile() { Close(); }
+SgyFile::~SgyFile()
+{
+    Close();
+}
 
 //---------------------------------------------------------------------------
 bool SgyFile::ReadTxtHed()

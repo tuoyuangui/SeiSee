@@ -29,13 +29,18 @@ class ReadThread : public QThread {
 
     explicit ReadThread(QObject *parent = 0);
 
-    virtual void Stop() { stop = true; }
+    virtual void Stop()
+    {
+        stop = true;
+    }
 
   protected:
     QObject *receiver;
     bool stop;
 
-    virtual void run() {}
+    virtual void run()
+    {
+    }
 };
 
 //---------------------------------------------------------------------------------------------
@@ -165,7 +170,10 @@ class LtdScanThread : public ReadThread {
 
     void Read(QString Fname, QObject *win);
 
-    void Stop() { stop = true; }
+    void Stop()
+    {
+        stop = true;
+    }
 
   protected:
     char *fname;

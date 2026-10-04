@@ -10,9 +10,15 @@ ProcParmDialog::ProcParmDialog(QWidget *parent)
     ui->setupUi(this);
 }
 
-ProcParmDialog::~ProcParmDialog() { delete ui; }
+ProcParmDialog::~ProcParmDialog()
+{
+    delete ui;
+}
 
-void ProcParmDialog::on_closeButton_pressed() { close(); }
+void ProcParmDialog::on_closeButton_pressed()
+{
+    close();
+}
 
 void ProcParmDialog::on_okButton_pressed()
 {

@@ -59,7 +59,10 @@ void GfxView::Preset()
 
 // ----------------------------------------------------------------------
 
-static bool myLessThan(GfxObj *a, GfxObj *b) { return a->Layer() < b->Layer(); }
+static bool myLessThan(GfxObj *a, GfxObj *b)
+{
+    return a->Layer() < b->Layer();
+}
 
 void GfxView::paintEvent(QPaintEvent *pe)
 {

@@ -88,17 +88,35 @@ class GfxObj : public QObject {
         return y;
     }
 
-    double x2pix(double x) { return round(x2mm(x) * xpmm); }
+    double x2pix(double x)
+    {
+        return round(x2mm(x) * xpmm);
+    }
 
-    double y2pix(double y) { return round(y2mm(y) * ypmm); }
+    double y2pix(double y)
+    {
+        return round(y2mm(y) * ypmm);
+    }
 
-    double pix2x(int xx) { return mm2x(xx / xpmm); }
+    double pix2x(int xx)
+    {
+        return mm2x(xx / xpmm);
+    }
 
-    double pix2y(int yy) { return mm2y(yy / ypmm); }
+    double pix2y(int yy)
+    {
+        return mm2y(yy / ypmm);
+    }
 
-    double x2fpix(double x) { return x2mm(x) * xpmm; }
+    double x2fpix(double x)
+    {
+        return x2mm(x) * xpmm;
+    }
 
-    double y2fpix(double y) { return y2mm(y) * ypmm; }
+    double y2fpix(double y)
+    {
+        return y2mm(y) * ypmm;
+    }
 
     virtual void setXo(double v);
     virtual void setYo(double v);
@@ -111,16 +129,40 @@ class GfxObj : public QObject {
     virtual void setY2(double v);
     virtual void setYs(double v);
 
-    virtual double Xo() { return m_Xo; }
-    virtual double Yo() { return m_Yo; }
+    virtual double Xo()
+    {
+        return m_Xo;
+    }
+    virtual double Yo()
+    {
+        return m_Yo;
+    }
 
-    virtual double X1() { return m_X1; }
-    virtual double X2() { return m_X2; }
-    virtual double Xs() { return m_Xs; }
+    virtual double X1()
+    {
+        return m_X1;
+    }
+    virtual double X2()
+    {
+        return m_X2;
+    }
+    virtual double Xs()
+    {
+        return m_Xs;
+    }
 
-    virtual double Y1() { return m_Y1; }
-    virtual double Y2() { return m_Y2; }
-    virtual double Ys() { return m_Ys; }
+    virtual double Y1()
+    {
+        return m_Y1;
+    }
+    virtual double Y2()
+    {
+        return m_Y2;
+    }
+    virtual double Ys()
+    {
+        return m_Ys;
+    }
 
     int WidthView();
     int HeightView();
@@ -135,9 +177,15 @@ class GfxObj : public QObject {
     void setSrc(GfxSrc *v);
 
     void setLayer(int layer);
-    int Layer() { return m_Layer; }
+    int Layer()
+    {
+        return m_Layer;
+    }
 
-    bool Trim() { return m_trim; }
+    bool Trim()
+    {
+        return m_trim;
+    }
     void setTrim(bool v);
 
     void Draw();
@@ -145,7 +193,10 @@ class GfxObj : public QObject {
     virtual void Update();
     void Preset();
 
-    virtual void DoPreset() { _preset = false; }
+    virtual void DoPreset()
+    {
+        _preset = false;
+    }
     virtual void DoDraw();
 
   signals:

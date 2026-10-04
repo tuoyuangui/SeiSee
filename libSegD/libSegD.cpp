@@ -495,7 +495,10 @@ ptrAry::ptrAry(ptrAry &src)
         memcpy(_data, src._data, _nalloc * sizeof(void *));
 }
 
-ptrAry::~ptrAry() { delete[] _data; }
+ptrAry::~ptrAry()
+{
+    delete[] _data;
+}
 
 void *&ptrAry::operator[](int i)
 {
@@ -531,7 +534,10 @@ int ptrAry::IndexOf(void *v)
     return -1;
 }
 
-void ptrAry::Del(void *v) { Del(IndexOf(v)); }
+void ptrAry::Del(void *v)
+{
+    Del(IndexOf(v));
+}
 
 void ptrAry::Del(int i)
 {
@@ -784,7 +790,10 @@ int TSegD::get_nobj(int type)
     return n;
 }
 
-TCs *TSegD::get_csi(int idx) { return (TCs *)(csl->getObj(idx)); }
+TCs *TSegD::get_csi(int idx)
+{
+    return (TCs *)(csl->getObj(idx));
+}
 
 int TSegD::find_csi(int csn, int stn)
 {
@@ -804,7 +813,10 @@ TSegDObj *TSegD::get_obj(int idx)
     return (TSegDObj *)(objs->getObj(idx));
 }
 
-int TSegD::get_ncs() { return csl->getCount(); }
+int TSegD::get_ncs()
+{
+    return csl->getCount();
+}
 
 int TSegD::Parse(byte *buf, int len, bool HeadersOnly, bool keep_buf)
 
@@ -2251,7 +2263,10 @@ TCs *TCsList::get_cs(int csn)
     return NULL;
 }
 
-TCs *TCsList::get_csi(int idx) { return (TCs *)getObj(idx); }
+TCs *TCsList::get_csi(int idx)
+{
+    return (TCs *)getObj(idx);
+}
 
 TCs *TCsList::find(int stn, int csn)
 {
@@ -2565,7 +2580,10 @@ TCs::TCs(TSegD *segd)
     _segd->csl->Add(this);
 }
 
-TCs::~TCs() { delete _trc; }
+TCs::~TCs()
+{
+    delete _trc;
+}
 
 //---------------------------------------------------------------------------
 
@@ -4084,7 +4102,10 @@ TMux::TMux(TSegD *segd)
     type = 4;
 }
 
-TMux::~TMux() { delete traces; }
+TMux::~TMux()
+{
+    delete traces;
+}
 
 //---------------------------------------------------------------------------
 
@@ -4273,7 +4294,10 @@ string TGenHedAll::get_inf()
 
 //---------------------------------------------------------------------------
 
-string TSegdWarn::get_inf() { return _inf; }
+string TSegdWarn::get_inf()
+{
+    return _inf;
+}
 
 TSegdWarn::TSegdWarn(TSegD *segd, string warn)
     : TSegDObj(segd)
@@ -4292,7 +4316,10 @@ TSegdEof::TSegdEof(TSegD *segd, string warn)
     _inf = warn;
 }
 
-string TSegdEof::get_inf() { return _inf; }
+string TSegdEof::get_inf()
+{
+    return _inf;
+}
 
 //---------------------------------------------------------------------------
 
@@ -4370,7 +4397,10 @@ int TSegD::seek(int pos, int from)
     return pos;
 }
 
-int TSegD::tell() { return _pos; }
+int TSegD::tell()
+{
+    return _pos;
+}
 
 int TSegD::find_trcx(int ppos, short ffff, int fn)
 {

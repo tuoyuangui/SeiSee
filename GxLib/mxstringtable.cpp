@@ -566,9 +566,15 @@ void MxStringTable::setColCount(int v, bool reset)
     update();
 }
 
-QSize MxStringTable::sizeHint() const { return QSize(200, 100); }
+QSize MxStringTable::sizeHint() const
+{
+    return QSize(200, 100);
+}
 
-QColor MxStringTable::SelColor() { return _selcolor; }
+QColor MxStringTable::SelColor()
+{
+    return _selcolor;
+}
 
 void MxStringTable::setSelColor(QColor v)
 {
@@ -576,7 +582,10 @@ void MxStringTable::setSelColor(QColor v)
     update();
 }
 
-bool MxStringTable::HideFoc() { return _hidefoc; }
+bool MxStringTable::HideFoc()
+{
+    return _hidefoc;
+}
 
 void MxStringTable::setHideFoc(bool v)
 {
@@ -1044,7 +1053,9 @@ int MxStringTable::curCol()
     return index.column();
 }
 
-void MxStringTable::editorDestroyed(QObject * /*editor*/) {}
+void MxStringTable::editorDestroyed(QObject * /*editor*/)
+{
+}
 
 void MxStringTable::setColEdit(int c, bool v)
 {

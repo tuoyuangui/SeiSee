@@ -5,4 +5,7 @@ GfxSctList::GfxSctList(QObject *parent)
 {
 }
 
-GfxSctList::~GfxSctList() { GfxSctList::clear(); }
+GfxSctList::~GfxSctList()
+{
+    GfxSctList::clear();
+}

@@ -91,7 +91,10 @@ class GfxSrcSeisMem : public GfxSrcSeis {
         _th[nn] = v;
     }
 
-    virtual double Tp(int tidx) { return tidx; }
+    virtual double Tp(int tidx)
+    {
+        return tidx;
+    }
 
     virtual void setSmp(int nt, int ns, float v)
     {

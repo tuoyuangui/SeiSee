@@ -26,9 +26,15 @@ class TrcHdrNode : public FunctionNode {
 
 class TrcHdrFactory : public FunctionFactory {
   public:
-    string GetName() const { return "H"; }
+    string GetName() const
+    {
+        return "H";
+    }
 
-    FunctionNode *DoCreate(Expression *expr) { return new TrcHdrNode(expr); }
+    FunctionNode *DoCreate(Expression *expr)
+    {
+        return new TrcHdrNode(expr);
+    }
 };
 
 class SeisTrExpr : public Expression {

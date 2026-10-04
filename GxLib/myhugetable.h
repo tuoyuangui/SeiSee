@@ -38,7 +38,10 @@ class MyHtWidget : public QWidget {
 
   public slots:
 
-    void on_lEdit_editingFinished() { lEdit->hide(); }
+    void on_lEdit_editingFinished()
+    {
+        lEdit->hide();
+    }
 };
 
 class MyHcWidget : public QWidget // Column header
@@ -109,7 +112,10 @@ class MyHugeTable : public QWidget {
 
     explicit MyHugeTable(QWidget *parent = NULL);
 
-    qint64 rowCount() { return m_nrows; }
+    qint64 rowCount()
+    {
+        return m_nrows;
+    }
     int colCount();
 
     void setRowCount(qint64 n);
@@ -125,9 +131,15 @@ class MyHugeTable : public QWidget {
     int colTag(int n);
     void setColTag(int n, int v);
 
-    qint64 curCol() { return m_ccol; }
+    qint64 curCol()
+    {
+        return m_ccol;
+    }
 
-    qint64 curRow() { return m_crow; }
+    qint64 curRow()
+    {
+        return m_crow;
+    }
     void setCurRow(qint64 row);
 
     void setCurCell(qint64 row, int col = -1);

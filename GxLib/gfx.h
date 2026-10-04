@@ -49,7 +49,10 @@ class Ttr {
         return *this;
     }
 
-    Ttr &operator=(const Ttr &src) { return Assign(src); }
+    Ttr &operator=(const Ttr &src)
+    {
+        return Assign(src);
+    }
 };
 
 class Gfx {
@@ -145,11 +148,23 @@ class Gfx {
     void DrawText(int x, int y, QString str, int color = 0, double rotate = 0,
                   int size = -1, bool fill_bg = true);
 
-    int Xo() { return m_x; }
-    int Yo() { return m_y; }
+    int Xo()
+    {
+        return m_x;
+    }
+    int Yo()
+    {
+        return m_y;
+    }
 
-    int H() { return m_h; }
-    int W() { return m_w; }
+    int H()
+    {
+        return m_h;
+    }
+    int W()
+    {
+        return m_w;
+    }
 
     void SetPixel(int v, int x, int y);
 

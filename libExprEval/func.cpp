@@ -33,12 +33,18 @@ class abs_FunctionNode : public FunctionNode {
         SetArgumentCount(1, 1, 0, 0);
     }
 
-    double DoEvaluate() { return fabs(m_nodes[0]->Evaluate()); }
+    double DoEvaluate()
+    {
+        return fabs(m_nodes[0]->Evaluate());
+    }
 };
 
 class abs_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "abs"; }
+    string GetName() const
+    {
+        return "abs";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -73,7 +79,10 @@ class mod_FunctionNode : public FunctionNode {
 
 class mod_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "mod"; }
+    string GetName() const
+    {
+        return "mod";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -103,7 +112,10 @@ class ipart_FunctionNode : public FunctionNode {
 
 class ipart_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "ipart"; }
+    string GetName() const
+    {
+        return "ipart";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -131,7 +143,10 @@ class fpart_FunctionNode : public FunctionNode {
 
 class fpart_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "fpart"; }
+    string GetName() const
+    {
+        return "fpart";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -167,7 +182,10 @@ class min_FunctionNode : public FunctionNode {
 
 class min_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "min"; }
+    string GetName() const
+    {
+        return "min";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -203,7 +221,10 @@ class max_FunctionNode : public FunctionNode {
 
 class max_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "max"; }
+    string GetName() const
+    {
+        return "max";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -236,7 +257,10 @@ class sqrt_FunctionNode : public FunctionNode {
 
 class sqrt_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "sqrt"; }
+    string GetName() const
+    {
+        return "sqrt";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -269,7 +293,10 @@ class sin_FunctionNode : public FunctionNode {
 
 class sin_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "sin"; }
+    string GetName() const
+    {
+        return "sin";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -302,7 +329,10 @@ class cos_FunctionNode : public FunctionNode {
 
 class cos_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "cos"; }
+    string GetName() const
+    {
+        return "cos";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -335,7 +365,10 @@ class tan_FunctionNode : public FunctionNode {
 
 class tan_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "tan"; }
+    string GetName() const
+    {
+        return "tan";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -368,7 +401,10 @@ class sinh_FunctionNode : public FunctionNode {
 
 class sinh_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "sinh"; }
+    string GetName() const
+    {
+        return "sinh";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -401,7 +437,10 @@ class cosh_FunctionNode : public FunctionNode {
 
 class cosh_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "cosh"; }
+    string GetName() const
+    {
+        return "cosh";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -434,7 +473,10 @@ class tanh_FunctionNode : public FunctionNode {
 
 class tanh_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "tanh"; }
+    string GetName() const
+    {
+        return "tanh";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -467,7 +509,10 @@ class asin_FunctionNode : public FunctionNode {
 
 class asin_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "asin"; }
+    string GetName() const
+    {
+        return "asin";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -500,7 +545,10 @@ class acos_FunctionNode : public FunctionNode {
 
 class acos_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "acos"; }
+    string GetName() const
+    {
+        return "acos";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -533,7 +581,10 @@ class atan_FunctionNode : public FunctionNode {
 
 class atan_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "atan"; }
+    string GetName() const
+    {
+        return "atan";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -566,7 +617,10 @@ class atan2_FunctionNode : public FunctionNode {
 
 class atan2_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "atan2"; }
+    string GetName() const
+    {
+        return "atan2";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -599,7 +653,10 @@ class log_FunctionNode : public FunctionNode {
 
 class log_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "log"; }
+    string GetName() const
+    {
+        return "log";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -632,7 +689,10 @@ class ln_FunctionNode : public FunctionNode {
 
 class ln_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "ln"; }
+    string GetName() const
+    {
+        return "ln";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -665,7 +725,10 @@ class exp_FunctionNode : public FunctionNode {
 
 class exp_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "exp"; }
+    string GetName() const
+    {
+        return "exp";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -705,7 +768,10 @@ class logn_FunctionNode : public FunctionNode {
 
 class logn_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "logn"; }
+    string GetName() const
+    {
+        return "logn";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -723,12 +789,18 @@ class ceil_FunctionNode : public FunctionNode {
         SetArgumentCount(1, 1, 0, 0);
     }
 
-    double DoEvaluate() { return ceil(m_nodes[0]->Evaluate()); }
+    double DoEvaluate()
+    {
+        return ceil(m_nodes[0]->Evaluate());
+    }
 };
 
 class ceil_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "ceil"; }
+    string GetName() const
+    {
+        return "ceil";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -746,12 +818,18 @@ class floor_FunctionNode : public FunctionNode {
         SetArgumentCount(1, 1, 0, 0);
     }
 
-    double DoEvaluate() { return floor(m_nodes[0]->Evaluate()); }
+    double DoEvaluate()
+    {
+        return floor(m_nodes[0]->Evaluate());
+    }
 };
 
 class floor_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "floor"; }
+    string GetName() const
+    {
+        return "floor";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -779,12 +857,18 @@ class rand_FunctionNode : public FunctionNode {
         SetArgumentCount(0, 0, 1, 1);
     }
 
-    double DoEvaluate() { return NextRandom(m_refs[0]); }
+    double DoEvaluate()
+    {
+        return NextRandom(m_refs[0]);
+    }
 };
 
 class rand_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "rand"; }
+    string GetName() const
+    {
+        return "rand";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -813,7 +897,10 @@ class random_FunctionNode : public FunctionNode {
 
 class random_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "random"; }
+    string GetName() const
+    {
+        return "random";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -845,7 +932,10 @@ class randomize_FunctionNode : public FunctionNode {
 
 class randomize_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "randomize"; }
+    string GetName() const
+    {
+        return "randomize";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -863,12 +953,18 @@ class deg_FunctionNode : public FunctionNode {
         SetArgumentCount(1, 1, 0, 0);
     }
 
-    double DoEvaluate() { return (m_nodes[0]->Evaluate() * 180.0) / M_PI; }
+    double DoEvaluate()
+    {
+        return (m_nodes[0]->Evaluate() * 180.0) / M_PI;
+    }
 };
 
 class deg_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "deg"; }
+    string GetName() const
+    {
+        return "deg";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -886,12 +982,18 @@ class rad_FunctionNode : public FunctionNode {
         SetArgumentCount(1, 1, 0, 0);
     }
 
-    double DoEvaluate() { return (m_nodes[0]->Evaluate() * M_PI) / 180.0; }
+    double DoEvaluate()
+    {
+        return (m_nodes[0]->Evaluate() * M_PI) / 180.0;
+    }
 };
 
 class rad_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "rad"; }
+    string GetName() const
+    {
+        return "rad";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -934,7 +1036,10 @@ class rect2pol_FunctionNode : public FunctionNode {
 
 class rect2pol_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "rect2pol"; }
+    string GetName() const
+    {
+        return "rect2pol";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -974,7 +1079,10 @@ class pol2rect_FunctionNode : public FunctionNode {
 
 class pol2rect_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "pol2rect"; }
+    string GetName() const
+    {
+        return "pol2rect";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1005,7 +1113,10 @@ class if_FunctionNode : public FunctionNode {
 
 class if_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "if"; }
+    string GetName() const
+    {
+        return "if";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1042,7 +1153,10 @@ class select_FunctionNode : public FunctionNode {
 
 class select_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "select"; }
+    string GetName() const
+    {
+        return "select";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1071,7 +1185,10 @@ class equal_FunctionNode : public FunctionNode {
 
 class equal_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "equal"; }
+    string GetName() const
+    {
+        return "equal";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1100,7 +1217,10 @@ class above_FunctionNode : public FunctionNode {
 
 class above_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "above"; }
+    string GetName() const
+    {
+        return "above";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1129,7 +1249,10 @@ class below_FunctionNode : public FunctionNode {
 
 class below_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "below"; }
+    string GetName() const
+    {
+        return "below";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1164,7 +1287,10 @@ class clip_FunctionNode : public FunctionNode {
 
 class clip_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "clip"; }
+    string GetName() const
+    {
+        return "clip";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1203,7 +1329,10 @@ class clamp_FunctionNode : public FunctionNode {
 
 class clamp_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "clamp"; }
+    string GetName() const
+    {
+        return "clamp";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1240,7 +1369,10 @@ class rescale_FunctionNode : public FunctionNode {
 
 class rescale_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "rescale"; }
+    string GetName() const
+    {
+        return "rescale";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1287,7 +1419,10 @@ class poly_FunctionNode : public FunctionNode {
 
 class poly_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "poly"; }
+    string GetName() const
+    {
+        return "poly";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1316,7 +1451,10 @@ class and_FunctionNode : public FunctionNode {
 
 class and_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "and"; }
+    string GetName() const
+    {
+        return "and";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1345,7 +1483,10 @@ class or_FunctionNode : public FunctionNode {
 
 class or_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "or"; }
+    string GetName() const
+    {
+        return "or";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {
@@ -1374,7 +1515,10 @@ class not_FunctionNode : public FunctionNode {
 
 class not_FunctionFactory : public FunctionFactory {
   public:
-    string GetName() const { return "not"; }
+    string GetName() const
+    {
+        return "not";
+    }
 
     FunctionNode *DoCreate(Expression *expr)
     {

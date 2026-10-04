@@ -1336,7 +1336,10 @@ int Gfx::GetTextHeight(int size)
     return fm.height();
 }
 
-QFontMetrics Gfx::GetFontMetrics() { return _ipainter.fontMetrics(); }
+QFontMetrics Gfx::GetFontMetrics()
+{
+    return _ipainter.fontMetrics();
+}
 
 void Gfx::SetTrim(int x1, int x2, int y1, int y2)
 {
@@ -1360,7 +1363,10 @@ void Gfx::SetTrim(int x1, int x2, int y1, int y2)
     _ipainter.setClipping(_trim);
 }
 
-void Gfx::ClrTrim() { _trim = false; }
+void Gfx::ClrTrim()
+{
+    _trim = false;
+}
 
 void Gfx::SetPalette(QList<QRgb> pal)
 {
@@ -1381,7 +1387,10 @@ void Gfx::SetFontSize(int size)
     _font.setPointSize(size);
 }
 
-void Gfx::setFont(const QFont &font) { _font = font; }
+void Gfx::setFont(const QFont &font)
+{
+    _font = font;
+}
 
 int Gfx::GetPalColor(int cidx)
 {

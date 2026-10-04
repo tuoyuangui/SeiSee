@@ -18,19 +18,39 @@ Exception::Exception()
     m_type = Type_Exception;
 }
 
-Exception::~Exception() throw() {}
+Exception::~Exception() throw()
+{
+}
 
-Exception::Type Exception::GetType() const { return m_type; }
+Exception::Type Exception::GetType() const
+{
+    return m_type;
+}
 
-const string &Exception::GetValue() const { return m_value; }
+const string &Exception::GetValue() const
+{
+    return m_value;
+}
 
-void Exception::SetStart(string::size_type start) { m_start = start; }
+void Exception::SetStart(string::size_type start)
+{
+    m_start = start;
+}
 
-void Exception::SetEnd(string::size_type end) { m_end = end; }
+void Exception::SetEnd(string::size_type end)
+{
+    m_end = end;
+}
 
-string::size_type Exception::GetStart() const { return m_start; }
+string::size_type Exception::GetStart() const
+{
+    return m_start;
+}
 
-string::size_type Exception::GetEnd() const { return m_end; }
+string::size_type Exception::GetEnd() const
+{
+    return m_end;
+}
 
 // Not found exception
 //------------------------------------------------------------------------------
@@ -87,7 +107,10 @@ NoFunctionListException::NoFunctionListException()
 
 // Expression abort
 //------------------------------------------------------------------------------
-AbortException::AbortException() { m_type = Type_AbortException; }
+AbortException::AbortException()
+{
+    m_type = Type_AbortException;
+}
 
 // Empty expression
 //------------------------------------------------------------------------------
@@ -130,7 +153,10 @@ ConstantReferenceException::ConstantReferenceException(const string &value)
 
 // Syntax error exception
 //------------------------------------------------------------------------------
-SyntaxException::SyntaxException() { m_type = Type_SyntaxException; }
+SyntaxException::SyntaxException()
+{
+    m_type = Type_SyntaxException;
+}
 
 // Unmatched parenthesis
 //------------------------------------------------------------------------------

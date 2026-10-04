@@ -45,7 +45,10 @@ class GfxSrcFile : public GfxSrcSeis {
         Invalidate();
     }
 
-    SeisFile *Sfile() { return m_Sfile; }
+    SeisFile *Sfile()
+    {
+        return m_Sfile;
+    }
 
     virtual double Tp(int tidx)
     {

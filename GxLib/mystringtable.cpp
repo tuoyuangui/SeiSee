@@ -380,9 +380,15 @@ void MyStringTable::setColCount(int v, bool reset)
         _model->endResetModel();
 }
 
-QSize MyStringTable::sizeHint() const { return QSize(200, 100); }
+QSize MyStringTable::sizeHint() const
+{
+    return QSize(200, 100);
+}
 
-QColor MyStringTable::SelColor() { return _selcolor; }
+QColor MyStringTable::SelColor()
+{
+    return _selcolor;
+}
 
 void MyStringTable::setSelColor(QColor v)
 {
@@ -390,7 +396,10 @@ void MyStringTable::setSelColor(QColor v)
     update();
 }
 
-bool MyStringTable::HideFoc() { return _hidefoc; }
+bool MyStringTable::HideFoc()
+{
+    return _hidefoc;
+}
 
 void MyStringTable::setHideFoc(bool v)
 {
@@ -398,9 +407,15 @@ void MyStringTable::setHideFoc(bool v)
     update();
 }
 
-int MyStringTable::RowCount() { return _rows.count(); }
+int MyStringTable::RowCount()
+{
+    return _rows.count();
+}
 
-int MyStringTable::ColCount() { return _cols.count(); }
+int MyStringTable::ColCount()
+{
+    return _cols.count();
+}
 
 QString MyStringTable::Cell(int r, int c)
 {
@@ -827,7 +842,9 @@ int MyStringTable::curCol()
     return index.column();
 }
 
-void MyStringTable::editorDestroyed(QObject * /*editor*/) {}
+void MyStringTable::editorDestroyed(QObject * /*editor*/)
+{
+}
 
 void MyStringTable::setColEdit(int c, bool v)
 {

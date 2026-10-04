@@ -37,9 +37,15 @@ class CkList {
         return 0;
     }
 
-    void clear() { Items.clear(); }
+    void clear()
+    {
+        Items.clear();
+    }
 
-    void del(QString i) { Items.removeAll(i); }
+    void del(QString i)
+    {
+        Items.removeAll(i);
+    }
 
     void set(QString i)
     {
@@ -48,9 +54,15 @@ class CkList {
         }
     }
 
-    QStringList List() { return Items; }
+    QStringList List()
+    {
+        return Items;
+    }
 
-    void setList(QStringList list) { Items = list; }
+    void setList(QStringList list)
+    {
+        Items = list;
+    }
 };
 
 class CkListSet {
@@ -59,23 +71,50 @@ class CkListSet {
     QMap<int, CkList> Items;
 
   public:
-    CkListSet() { cidx = 0; }
+    CkListSet()
+    {
+        cidx = 0;
+    }
 
-    void setListIdx(int i) { cidx = i; }
+    void setListIdx(int i)
+    {
+        cidx = i;
+    }
 
-    int listIdx() { return cidx; }
+    int listIdx()
+    {
+        return cidx;
+    }
 
-    int operator[](QString i) { return Items[cidx][i]; }
+    int operator[](QString i)
+    {
+        return Items[cidx][i];
+    }
 
-    void clear() { Items[cidx].clear(); }
+    void clear()
+    {
+        Items[cidx].clear();
+    }
 
-    void set(QString i) { Items[cidx].set(i); }
+    void set(QString i)
+    {
+        Items[cidx].set(i);
+    }
 
-    void del(QString i) { Items[cidx].del(i); }
+    void del(QString i)
+    {
+        Items[cidx].del(i);
+    }
 
-    QStringList List() { return Items[cidx].List(); }
+    QStringList List()
+    {
+        return Items[cidx].List();
+    }
 
-    void setList(QStringList list) { Items[cidx].setList(list); }
+    void setList(QStringList list)
+    {
+        Items[cidx].setList(list);
+    }
 };
 
 static QString _fname[] = {"Integer 8-bit",           "Integer 16-bit",
@@ -152,7 +191,10 @@ class FormatList {
         return -1;
     }
 
-    static int count() { return sizeof(_fcode) / sizeof(int); }
+    static int count()
+    {
+        return sizeof(_fcode) / sizeof(int);
+    }
 };
 
 class TrHdrDef {
@@ -192,7 +234,10 @@ class TrHdrDefList {
     }
 
   public:
-    QStringList NameList() { return Hidx.keys(); }
+    QStringList NameList()
+    {
+        return Hidx.keys();
+    }
 
     TrHdrDefList &Assign(const TrHdrDefList &src)
     {
@@ -206,7 +251,10 @@ class TrHdrDefList {
         return *this;
     }
 
-    TrHdrDefList &operator=(const TrHdrDefList &src) { return Assign(src); }
+    TrHdrDefList &operator=(const TrHdrDefList &src)
+    {
+        return Assign(src);
+    }
 
     explicit TrHdrDefList(int type = 0);
 
@@ -281,11 +329,20 @@ class TrHdrDefList {
         Hdrs[i].pos = hdr.pos;
     }
 
-    int count() { return Hdrs.count(); }
+    int count()
+    {
+        return Hdrs.count();
+    }
 
-    void setType(int t) { Type = t; }
+    void setType(int t)
+    {
+        Type = t;
+    }
 
-    int type() { return Type; }
+    int type()
+    {
+        return Type;
+    }
 };
 
 class TrHdrsMap : public QObject {
@@ -314,9 +371,15 @@ class TrHdrsMap : public QObject {
         return NULL;
     }
 
-    void setListIdx(int i) { cidx = i; }
+    void setListIdx(int i)
+    {
+        cidx = i;
+    }
 
-    int listIdx() { return cidx; }
+    int listIdx()
+    {
+        return cidx;
+    }
 };
 
 #endif // HDRDEF_H

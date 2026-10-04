@@ -27,8 +27,14 @@ class SgyFile : public SeisFile {
 
     float *Rs(long long ntr, byte *hed);
 
-    virtual QString typeName() { return "SEG-Y"; }
-    virtual int typIdx() { return 1; }
+    virtual QString typeName()
+    {
+        return "SEG-Y";
+    }
+    virtual int typIdx()
+    {
+        return 1;
+    }
 
     int ReadRawTrace(byte *&buf, long long ntr, bool header_only = false);
     int WriteRawTrace(byte *buf, long long ntr, bool header_only = false);
@@ -69,8 +75,14 @@ class SuFile : public SgyFile {
     int ReadRawTrace(byte *&buf, long long ntr, bool header_only = false);
     int WriteRawTrace(byte *buf, long long ntr, bool header_only = false);
 
-    virtual QString typeName() { return "SU"; }
-    virtual int typeIdx() { return 2; }
+    virtual QString typeName()
+    {
+        return "SU";
+    }
+    virtual int typeIdx()
+    {
+        return 2;
+    }
 
   signals:
 
@@ -94,8 +106,14 @@ class CstFile : public SgyFile {
     explicit CstFile(QObject *parent = 0);
     virtual ~CstFile();
 
-    virtual QString typeName() { return "CST"; }
-    virtual int typeIdx() { return 3; }
+    virtual QString typeName()
+    {
+        return "CST";
+    }
+    virtual int typeIdx()
+    {
+        return 3;
+    }
 
     int ReadRawTrace(byte *&buf, long long ntr, bool header_only = false);
     int WriteRawTrace(byte *buf, long long ntr, bool header_only = false);

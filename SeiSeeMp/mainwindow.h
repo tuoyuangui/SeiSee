@@ -71,7 +71,9 @@ class myEventCatcher : public QObject {
     {
         _tag = tag;
     }
-    ~myEventCatcher() {}
+    ~myEventCatcher()
+    {
+    }
 
     bool eventFilter(QObject *object, QEvent *event)
     {
@@ -102,7 +104,9 @@ class myTextEditEventCatcher : public QObject {
     {
         _tag = tag;
     }
-    ~myTextEditEventCatcher() {}
+    ~myTextEditEventCatcher()
+    {
+    }
 
     bool eventFilter(QObject *object, QEvent *event)
     {

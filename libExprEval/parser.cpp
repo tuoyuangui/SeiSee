@@ -24,7 +24,10 @@ bool expreval_isalpha(char c)
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-bool expreval_isdigit(char c) { return (c >= '0' && c <= '9'); }
+bool expreval_isdigit(char c)
+{
+    return (c >= '0' && c <= '9');
+}
 
 bool expreval_isalnum(char c)
 {
@@ -110,18 +113,33 @@ Token::Token(double value, string::size_type start, string::size_type end)
 }
 
 // Get type
-Token::TokenType Token::GetType() const { return m_type; }
+Token::TokenType Token::GetType() const
+{
+    return m_type;
+}
 
 // Get identifier
-const string &Token::GetIdentifier() const { return m_ident; }
+const string &Token::GetIdentifier() const
+{
+    return m_ident;
+}
 
 // Get value
-double Token::GetValue() const { return m_value; }
+double Token::GetValue() const
+{
+    return m_value;
+}
 
 // Get start
-string::size_type Token::GetStart() const { return m_start; }
+string::size_type Token::GetStart() const
+{
+    return m_start;
+}
 
-string::size_type Token::GetEnd() const { return m_end; }
+string::size_type Token::GetEnd() const
+{
+    return m_end;
+}
 
 // Parser
 //------------------------------------------------------------------------------
@@ -135,7 +153,9 @@ Parser::Parser(Expression *expr)
 }
 
 // Destructor
-Parser::~Parser() {}
+Parser::~Parser()
+{
+}
 
 // Parse an expression string
 Node *Parser::Parse(const string &exstr)

@@ -42,13 +42,22 @@ ValueListItem::ValueListItem(const string &name, double *ptr, double def,
 }
 
 // Get the name
-const string &ValueListItem::GetName() const { return m_name; }
+const string &ValueListItem::GetName() const
+{
+    return m_name;
+}
 
 // Return if it is constant
-bool ValueListItem::IsConstant() const { return m_constant; }
+bool ValueListItem::IsConstant() const
+{
+    return m_constant;
+}
 
 // Get value address
-double *ValueListItem::GetAddress() { return m_ptr ? m_ptr : &m_value; }
+double *ValueListItem::GetAddress()
+{
+    return m_ptr ? m_ptr : &m_value;
+}
 
 // Reset to default value
 void ValueListItem::Reset()
@@ -63,10 +72,15 @@ void ValueListItem::Reset()
 //------------------------------------------------------------------------------
 
 // Constructor
-ValueList::ValueList() {}
+ValueList::ValueList()
+{
+}
 
 // Destructor
-ValueList::~ValueList() { Clear(); }
+ValueList::~ValueList()
+{
+    Clear();
+}
 
 // Add value to list
 void ValueList::Add(const string &name, double def, bool constant)
@@ -133,7 +147,10 @@ bool ValueList::IsConstant(const string &name) const
 }
 
 // Number of values in the list
-ValueList::size_type ValueList::Count() const { return m_values.size(); }
+ValueList::size_type ValueList::Count() const
+{
+    return m_values.size();
+}
 
 // Get an item
 void ValueList::Item(size_type pos, string *name, double *value) const

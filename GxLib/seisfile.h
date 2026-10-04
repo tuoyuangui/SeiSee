@@ -38,9 +38,14 @@ class DataStorageTrace {
     float *_smp;
     int _len;
 
-    float operator[](int n) { return _buf[n]; }
+    float operator[](int n)
+    {
+        return _buf[n];
+    }
 
-    DataStorageTrace() {}
+    DataStorageTrace()
+    {
+    }
 };
 
 class DataStorage {
@@ -62,11 +67,17 @@ class DataStorage {
     DataStorage &Assign(const DataStorage &src);
 
     DataStorage();
-    DataStorage(DataStorage &src) { Assign(src); }
+    DataStorage(DataStorage &src)
+    {
+        Assign(src);
+    }
 
     ~DataStorage();
 
-    DataStorage &operator=(const DataStorage &src) { return Assign(src); }
+    DataStorage &operator=(const DataStorage &src)
+    {
+        return Assign(src);
+    }
 
     void Init(int nobj, int olen, int strl);
 
@@ -78,7 +89,10 @@ class DataStorage {
     byte *getObject(int n, int *dly = NULL);
     byte *putObject(int n, int *dly = NULL);
 
-    int nsmp() { return _nsmp; }
+    int nsmp()
+    {
+        return _nsmp;
+    }
 
     //  DataStorageTrace getTrace(int n);
 };
@@ -103,7 +117,10 @@ class BinHed {
     void set(int swap, int si, int ns, int frmt);
     void set(int swap, int frmt, BinHed *src);
 
-    byte *buf() { return _buf; }
+    byte *buf()
+    {
+        return _buf;
+    }
 
     bool update(QVector<QString> vals);
 
@@ -163,16 +180,26 @@ class SeisFile : public QObject {
     BinHed _binh;
     char _txthed[3200];
 
-    virtual void Open(string /*fn*/) {}
-    virtual void Close() {}
+    virtual void Open(string /*fn*/)
+    {
+    }
+    virtual void Close()
+    {
+    }
 
     void Invalidate();
 
   public:
     explicit SeisFile(QObject *parent = 0);
 
-    virtual QString typeName() { return "SeisFile"; }
-    virtual int typeIdx() { return 0; }
+    virtual QString typeName()
+    {
+        return "SeisFile";
+    }
+    virtual int typeIdx()
+    {
+        return 0;
+    }
 
     virtual ~SeisFile();
 
@@ -188,13 +215,19 @@ class SeisFile : public QObject {
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 
-    BinHed *binHed() { return &_binh; }
+    BinHed *binHed()
+    {
+        return &_binh;
+    }
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-    int TrLength() { return _trl; }
+    int TrLength()
+    {
+        return _trl;
+    }
 
     QString TxtHed()
     {
@@ -233,7 +266,10 @@ class SeisFile : public QObject {
         Invalidate();
     }
 
-    void setFname(string fname) { _Fname = fname; }
+    void setFname(string fname)
+    {
+        _Fname = fname;
+    }
 
     void setFname(QString fname)
     {
@@ -241,17 +277,35 @@ class SeisFile : public QObject {
         _Fname = qfn.data();
     }
 
-    void setDly(int on) { _dly = on; }
+    void setDly(int on)
+    {
+        _dly = on;
+    }
 
-    int Dly() { return _dly; }
+    int Dly()
+    {
+        return _dly;
+    }
 
-    string Fname() { return _Fname; }
+    string Fname()
+    {
+        return _Fname;
+    }
 
-    int Format() { return _Format; }
+    int Format()
+    {
+        return _Format;
+    }
 
-    int Swap() { return _swap; }
+    int Swap()
+    {
+        return _swap;
+    }
 
-    virtual bool Active() { return false; }
+    virtual bool Active()
+    {
+        return false;
+    }
 
     virtual void setActive(bool v)
     {
@@ -262,19 +316,40 @@ class SeisFile : public QObject {
         Invalidate();
     }
 
-    virtual int Nt() { return _Nt; }
+    virtual int Nt()
+    {
+        return _Nt;
+    }
 
-    virtual int Ns() { return _Ns; }
+    virtual int Ns()
+    {
+        return _Ns;
+    }
 
-    virtual double Si() { return _Si; }
+    virtual double Si()
+    {
+        return _Si;
+    }
 
-    virtual int Jnk() { return _jnk; }
+    virtual int Jnk()
+    {
+        return _jnk;
+    }
 
-    virtual double Ti() { return _Ti; }
+    virtual double Ti()
+    {
+        return _Ti;
+    }
 
-    virtual double Co() { return _Co; }
+    virtual double Co()
+    {
+        return _Co;
+    }
 
-    virtual double Po() { return _Po; }
+    virtual double Po()
+    {
+        return _Po;
+    }
 
     virtual void setPo(double v)
     {
@@ -282,7 +357,10 @@ class SeisFile : public QObject {
         Invalidate();
     }
 
-    virtual double Pm() { return _Pm; }
+    virtual double Pm()
+    {
+        return _Pm;
+    }
 
     virtual void setPm(double v)
     {
@@ -292,13 +370,25 @@ class SeisFile : public QObject {
         Invalidate();
     }
 
-    virtual double Tp(long long tidx) { return tidx * _Pm + _Po; }
+    virtual double Tp(long long tidx)
+    {
+        return tidx * _Pm + _Po;
+    }
 
-    virtual double Tmin() { return 0; }
+    virtual double Tmin()
+    {
+        return 0;
+    }
 
-    virtual double Tmax() { return _Si * _Ns; }
+    virtual double Tmax()
+    {
+        return _Si * _Ns;
+    }
 
-    virtual void ReadTrace(long long ntr) { Q_UNUSED(ntr); }
+    virtual void ReadTrace(long long ntr)
+    {
+        Q_UNUSED(ntr);
+    }
 
     virtual int ReadRawTrace(byte *&buf, long long ntr,
                              bool header_only = false)
@@ -334,7 +424,10 @@ class SeisFile : public QObject {
         return true;
     }
 
-    int TxtCode() { return _txtcode; }
+    int TxtCode()
+    {
+        return _txtcode;
+    }
 
     virtual bool UpdateTxtHed(QString v)
     {
