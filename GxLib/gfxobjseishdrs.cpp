@@ -54,15 +54,15 @@ void GfxObjSeisHdrs::DoDraw()
 
     if(!s_src || s_src->Nt()<1) return;
 
-    QFont labelFont;
-    labelFont.setPixelSize(11);
-    labelFont.setStyleHint(QFont::Courier);
-    QFontMetrics labelMetrics(labelFont);
+    // QFont labelFont;
+    // labelFont.setPixelSize(11);
+    // labelFont.setStyleHint(QFont::Courier);
+    // QFontMetrics labelMetrics(labelFont);
 
-    int ht = labelMetrics.height();
-    int labelAscent = labelMetrics.ascent();
-    int labelDescent = labelMetrics.descent();
-    int wto = gfx->GetTextWidth("123456789", 11);
+    int ht = gfx->GetFontMetrics().height();
+    int labelAscent = gfx->GetFontMetrics().ascent();
+    int labelDescent = gfx->GetFontMetrics().descent();
+    int wto = gfx->GetTextWidth("123456789");
 
     int traceCount = s_src->Nt();
     if(traceCount < 2) return;

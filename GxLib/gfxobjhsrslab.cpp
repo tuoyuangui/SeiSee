@@ -29,13 +29,13 @@ void GfxObjHsrsLab::DoDraw()
    int ya = 0;
    int yb = m_view->height()-1;
 
-   QFont labelFont;
-   labelFont.setPixelSize(11);
-   labelFont.setStyleHint(QFont::Courier);
-   QFontMetrics labelMetrics(labelFont);
+//    QFont labelFont;
+//    labelFont.setPixelSize(11);
+//    labelFont.setStyleHint(QFont::Courier);
+//    QFontMetrics labelMetrics(labelFont);
 
-   int rowHeight = labelMetrics.height() + 2;
-   int labelDescent = labelMetrics.descent();
+   int rowHeight = gfx->GetFontMetrics().height() + 2;
+   int labelDescent = gfx->GetFontMetrics().descent();
    int nh;
    int Nh = m_hdrs.count();
 

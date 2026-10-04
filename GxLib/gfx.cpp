@@ -1443,6 +1443,11 @@ int Gfx::GetTextHeight(int size)
     return fm.height();
 }
 
+QFontMetrics Gfx::GetFontMetrics()
+{
+    return _ipainter.fontMetrics();
+}
+
 void Gfx::SetTrim(int x1, int x2, int y1, int y2)
 {
     if (x1 > x2)

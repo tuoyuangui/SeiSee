@@ -178,6 +178,8 @@ public:
     int GetTextHeight();
     int GetTextHeight(int size);
 
+    QFontMetrics GetFontMetrics();
+
     void SetTrim(int x1, int x2, int y1, int y2);
     void ClrTrim();
 
