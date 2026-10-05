@@ -36,8 +36,11 @@ EditHdrDialog::EditHdrDialog(QWidget *parent)
     hdrGrid.verticalHeader()->setVisible(false);
     hdrGrid.setColLabel(0, "Name");
     hdrGrid.setColLabel(1, "Description");
-    hdrGrid.setColWidth(0, GfxStyle::EditHeaderValueColumnWidth);
-    hdrGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
+    hdrGrid.setColWidthInCharacters(
+        0, GfxStyle::HeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    hdrGrid.setColWidthToStretch(
+        1, GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *hdrGridLayout = new QVBoxLayout;
     hdrGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -54,8 +57,11 @@ EditHdrDialog::EditHdrDialog(QWidget *parent)
     insGrid.verticalHeader()->setVisible(false);
     insGrid.setColLabel(0, "Name");
     insGrid.setColLabel(1, "Description");
-    insGrid.setColWidth(0, GfxStyle::EditHeaderValueColumnWidth);
-    insGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
+    insGrid.setColWidthInCharacters(
+        0, GfxStyle::HeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    insGrid.setColWidthToStretch(
+        1, GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *insGridLayout = new QVBoxLayout;
     insGridLayout->setMargin(GfxStyle::CompactLayoutMargin);

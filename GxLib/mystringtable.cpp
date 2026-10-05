@@ -6,6 +6,7 @@
 #include <QStyle>
 #include <QTimer>
 
+#include "gfxstyle.h"
 #include "mystringtable.h"
 
 void MyStringTableDelegate::paint(QPainter *painter,
@@ -305,7 +306,8 @@ MyStringTable::MyStringTable(QWidget *parent)
 
     setHorizontalHeader(new MyHeaderView(this));
 
-    verticalHeader()->setDefaultSectionSize(qRound(18 * m_interfaceScale));
+    verticalHeader()->setDefaultSectionSize(
+        qRound(GfxStyle::MyStringTableRowHeight * m_interfaceScale));
 
     horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
     horizontalHeader()->setHighlightSections(false);
@@ -341,7 +343,8 @@ MyStringTable::MyStringTable(QWidget *parent)
 void MyStringTable::setInterfaceScale(qreal scale)
 {
     m_interfaceScale = qMax<qreal>(0.1, scale);
-    verticalHeader()->setDefaultSectionSize(qRound(18 * m_interfaceScale));
+    verticalHeader()->setDefaultSectionSize(
+        qRound(GfxStyle::MyStringTableRowHeight * m_interfaceScale));
     updateColumnWidths();
 }
 
