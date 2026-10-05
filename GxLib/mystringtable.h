@@ -88,17 +88,29 @@ public:
 class MyStringTableCol
 {
 public:
+    enum WidthMode {
+        FixedWidth,
+        CharacterWidth,
+        ContentsWidth,
+        StretchWidth,
+        CheckIndicatorWidth
+    };
+
     bool chkbx; // show check
     QString label;
     QColor labbg;
     QString imgnm;
     int width;
+    int widthMode;
+    int characterCount;
     bool edit;
 
     explicit MyStringTableCol()
     {
         chkbx = false;
         width = 0;
+        widthMode = StretchWidth;
+        characterCount = 0;
         edit = false;
     }
 };
@@ -155,6 +167,7 @@ protected:
 
     bool _changed;
     qreal m_interfaceScale;
+    bool m_columnWidthUpdatePending;
 
     virtual void resizeEvent(QResizeEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
@@ -168,6 +181,10 @@ protected:
                                   const QItemSelection &deselected);
 
     virtual QSize sizeHint() const;
+
+    void updateColumnWidths();
+    int contentColumnWidth(int column);
+    void scheduleColumnWidthUpdate();
 
     void setColumnWidth(int c, int w)
     {
@@ -218,6 +235,11 @@ public:
 
     int ColWidth(int c);
     void setColWidth(int c, int);
+    void setColWidthInCharacters(int c, int characterCount,
+                                 int horizontalPadding = 8);
+    void setColWidthToContents(int c, int horizontalPadding = 8);
+    void setColWidthToStretch(int c, int horizontalPadding = 8);
+    void setColWidthToCheckIndicator(int c, int horizontalPadding = 8);
 
     QString ColLabel(int c);
     void setColLabel(int c, QString);

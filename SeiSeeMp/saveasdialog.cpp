@@ -27,7 +27,9 @@ SaveAsDialog::SaveAsDialog(QWidget *parent)
     hdrListGrid.verticalHeader()->setVisible(false);
     hdrListGrid.setColLabel(0, "Name");
     hdrListGrid.setColLabel(1, "Description");
-    hdrListGrid.setColWidth(0, GfxStyle::SaveHeaderNameColumnWidth);
+    hdrListGrid.setColWidthInCharacters(
+        0, GfxStyle::HeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
     hdrListGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
 
     QVBoxLayout *hdrListCkLayout = new QVBoxLayout;

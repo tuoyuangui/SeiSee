@@ -335,7 +335,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     dirGrid.setColLabel(0, "Name");
     dirGrid.setColLabel(1, "Type");
-    dirGrid.setColWidth(1, GfxStyle::DirectoryTypeColumnWidth);
+    dirGrid.setColWidthInCharacters(
+        1, GfxStyle::DirectoryTypeCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    dirGrid.setColWidthToStretch(
+        0, GfxStyle::TableColumnHorizontalPadding);
     // 增加鼠标滑过文件名的tips
     dirGrid.setMouseTracking(true);
     dirGrid.viewport()->setMouseTracking(true);
@@ -399,9 +403,14 @@ MainWindow::MainWindow(QWidget *parent)
     binHdrGrid.setColLabel(0, "Value");
     binHdrGrid.setColLabel(1, "Description");
     binHdrGrid.setColLabel(2, "Bytes");
-    binHdrGrid.setColWidth(0, GfxStyle::HeaderValueColumnWidth);
-    binHdrGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
-    binHdrGrid.setColWidth(2, GfxStyle::BinaryHeaderBytesColumnWidth);
+    binHdrGrid.setColWidthInCharacters(
+        0, GfxStyle::BinaryHeaderValueCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    binHdrGrid.setColWidthToContents(
+        1, GfxStyle::TableColumnHorizontalPadding);
+    binHdrGrid.setColWidthInCharacters(
+        2, GfxStyle::HeaderBytesCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *binHdrLayout = new QVBoxLayout;
     binHdrLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -416,9 +425,14 @@ MainWindow::MainWindow(QWidget *parent)
     trcHdrGrid.setColLabel(0, "Value");
     trcHdrGrid.setColLabel(1, "Description");
     trcHdrGrid.setColLabel(2, "Bytes");
-    trcHdrGrid.setColWidth(0, GfxStyle::HeaderValueColumnWidth);
-    trcHdrGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
-    trcHdrGrid.setColWidth(2, GfxStyle::TraceHeaderBytesColumnWidth);
+    trcHdrGrid.setColWidthInCharacters(
+        0, GfxStyle::TraceHeaderValueCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    trcHdrGrid.setColWidthToContents(
+        1, GfxStyle::TableColumnHorizontalPadding);
+    trcHdrGrid.setColWidthInCharacters(
+        2, GfxStyle::HeaderBytesCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *trcHdrLayout = new QVBoxLayout;
     trcHdrLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -433,9 +447,14 @@ MainWindow::MainWindow(QWidget *parent)
     trcDatGrid.setColLabel(0, "Index");
     trcDatGrid.setColLabel(1, "Time");
     trcDatGrid.setColLabel(2, "Sample");
-    trcDatGrid.setColWidth(0, GfxStyle::TraceDataColumnWidth);
-    trcDatGrid.setColWidth(1, GfxStyle::TraceDataColumnWidth);
-    trcDatGrid.setColWidth(2, GfxStyle::HiddenTableColumnWidth);
+    trcDatGrid.setColWidthInCharacters(
+        0, GfxStyle::TraceDataIndexCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    trcDatGrid.setColWidthInCharacters(
+        1, GfxStyle::TraceDataTimeCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    trcDatGrid.setColWidthToStretch(
+        2, GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *trcDatLayout = new QVBoxLayout;
     trcDatLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -451,10 +470,16 @@ MainWindow::MainWindow(QWidget *parent)
     hdrListCkGrid.setColLabel(1, "Bytes");
     hdrListCkGrid.setColLabel(2, "Name");
     hdrListCkGrid.setColLabel(3, "Description");
-    hdrListCkGrid.setColWidth(0, GfxStyle::HeaderCheckColumnWidth);
-    hdrListCkGrid.setColWidth(1, GfxStyle::TraceHeaderBytesColumnWidth);
-    hdrListCkGrid.setColWidth(2, GfxStyle::TraceHeaderNameColumnWidth);
-    hdrListCkGrid.setColWidth(3, GfxStyle::HiddenTableColumnWidth);
+    hdrListCkGrid.setColWidthToCheckIndicator(
+        0, GfxStyle::TableColumnHorizontalPadding);
+    hdrListCkGrid.setColWidthInCharacters(
+        1, GfxStyle::HeaderBytesCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    hdrListCkGrid.setColWidthInCharacters(
+        2, GfxStyle::HeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    hdrListCkGrid.setColWidthToContents(
+        3, GfxStyle::TableColumnHorizontalPadding);
     hdrListCkGrid.setColChkbx(0, true);
 
     QVBoxLayout *hdrListCkLayout = new QVBoxLayout;
@@ -470,10 +495,16 @@ MainWindow::MainWindow(QWidget *parent)
     hdrElstCkGrid.setColLabel(1, "Bytes");
     hdrElstCkGrid.setColLabel(2, "Name");
     hdrElstCkGrid.setColLabel(3, "Description");
-    hdrElstCkGrid.setColWidth(0, GfxStyle::HeaderCheckColumnWidth);
-    hdrElstCkGrid.setColWidth(1, GfxStyle::TraceHeaderBytesColumnWidth);
-    hdrElstCkGrid.setColWidth(2, GfxStyle::TraceHeaderNameColumnWidth);
-    hdrElstCkGrid.setColWidth(3, GfxStyle::HiddenTableColumnWidth);
+    hdrElstCkGrid.setColWidthToCheckIndicator(
+        0, GfxStyle::TableColumnHorizontalPadding);
+    hdrElstCkGrid.setColWidthInCharacters(
+        1, GfxStyle::HeaderBytesCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    hdrElstCkGrid.setColWidthInCharacters(
+        2, GfxStyle::HeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    hdrElstCkGrid.setColWidthToContents(
+        3, GfxStyle::TableColumnHorizontalPadding);
     hdrElstCkGrid.setColChkbx(0, true);
 
     QVBoxLayout *hdrElstCkLayout = new QVBoxLayout;
@@ -487,7 +518,8 @@ MainWindow::MainWindow(QWidget *parent)
     hdrListDtGrid.setRowCount(0);
     hdrListDtGrid.setColCount(1);
     hdrListDtGrid.setColLabel(0, "Trace");
-    hdrListDtGrid.setColWidth(0, GfxStyle::TraceNumberColumnWidth);
+    hdrListDtGrid.setColWidthInCharacters(
+        0, GfxStyle::TraceHeaderValueCharacterCount);
 
     QVBoxLayout *hdrListDtLayout = new QVBoxLayout;
     hdrListDtLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -498,7 +530,8 @@ MainWindow::MainWindow(QWidget *parent)
     hdrElstDtGrid.setRowCount(0);
     hdrElstDtGrid.setColCount(1);
     hdrElstDtGrid.setColLabel(0, "Trace");
-    hdrElstDtGrid.setColWidth(0, GfxStyle::TraceNumberColumnWidth);
+    hdrElstDtGrid.setColWidthInCharacters(
+        0, GfxStyle::TraceHeaderValueCharacterCount);
 
     QVBoxLayout *hdrElstDtLayout = new QVBoxLayout;
     hdrElstDtLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -858,11 +891,6 @@ void MainWindow::applyInterfaceDpi(int dpi)
         widget->setMaximumSize(scaleSize(metrics.maximumSize));
         widget->setMinimumSize(scaleSize(metrics.minimumSize));
 
-        if (MyHugeTable *table = qobject_cast<MyHugeTable *>(widget))
-            table->setInterfaceScale(scale);
-        if (MyStringTable *table = qobject_cast<MyStringTable *>(widget))
-            table->setInterfaceScale(scale);
-
         if (widget == this || widget == &AboutDlg || widget == &AxisDlg ||
             widget == &EdHdrDlg || widget == &ProcParmDlg ||
             widget == &SaveAsDlg) {
@@ -902,6 +930,13 @@ void MainWindow::applyInterfaceDpi(int dpi)
     for (QWidget *widget : widgets) {
         if (widget->layout())
             scaleLayout(widget->layout());
+    }
+
+    for (QWidget *widget : widgets) {
+        if (MyHugeTable *table = qobject_cast<MyHugeTable *>(widget))
+            table->setInterfaceScale(scale);
+        if (MyStringTable *table = qobject_cast<MyStringTable *>(widget))
+            table->setInterfaceScale(scale);
     }
 
     if (timeLabel)
@@ -1439,7 +1474,8 @@ void MainWindow::SetHdrDatList()
             QString name = h->name;
 
             hdrListDtGrid.setColLabel(j, name);
-            hdrListDtGrid.setColWidth(j, GfxStyle::TraceNumberColumnWidth);
+            hdrListDtGrid.setColWidthInCharacters(
+                j, GfxStyle::TraceHeaderValueCharacterCount);
             hdrListDtGrid.setColTag(j, i + 1);
             hdrListCk.set(name);
             ui->cbSidx->addItem(name);
@@ -1490,7 +1526,8 @@ void MainWindow::SetHdrDatElst()
             QString name = h->name;
 
             hdrElstDtGrid.setColLabel(j, name);
-            hdrElstDtGrid.setColWidth(j, GfxStyle::TraceNumberColumnWidth);
+            hdrElstDtGrid.setColWidthInCharacters(
+                j, GfxStyle::TraceHeaderValueCharacterCount);
             hdrElstDtGrid.setColTag(j, i + 1);
             hdrElstCk.set(name);
             //          ui->cbSidx->addItem(name);
@@ -1504,7 +1541,8 @@ void MainWindow::SetHdrDatElst()
                 e = exprList[name].ExprString();
 
             hdrElstDtGrid.setColLabel(j, e);
-            hdrElstDtGrid.setColWidth(j, GfxStyle::TraceNumberColumnWidth);
+            hdrElstDtGrid.setColWidthInCharacters(
+                j, GfxStyle::TraceHeaderValueCharacterCount);
             hdrElstDtGrid.setColTag(j, i + 1);
             j++;
         }

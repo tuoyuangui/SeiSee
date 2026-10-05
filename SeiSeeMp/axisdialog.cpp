@@ -17,6 +17,9 @@ AxisDialog::AxisDialog(QWidget *parent)
     selHdrGrid.setColCount(1);
     selHdrGrid.verticalHeader()->setVisible(false);
     selHdrGrid.horizontalHeader()->setVisible(false);
+    selHdrGrid.setColWidthInCharacters(
+        0, GfxStyle::SelectedHeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *selGridLayout = new QVBoxLayout;
     selGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -29,7 +32,11 @@ AxisDialog::AxisDialog(QWidget *parent)
     aviHdrGrid.verticalHeader()->setVisible(false);
     aviHdrGrid.horizontalHeader()->setVisible(false);
 
-    aviHdrGrid.setColWidth(0, GfxStyle::AvailableHeaderColumnWidth);
+    aviHdrGrid.setColWidthInCharacters(
+        0, GfxStyle::AvailableHeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    aviHdrGrid.setColWidthToStretch(
+        1, GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *aviGridLayout = new QVBoxLayout;
     aviGridLayout->setMargin(GfxStyle::CompactLayoutMargin);

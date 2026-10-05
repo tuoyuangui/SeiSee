@@ -159,12 +159,15 @@ public:
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_9;
     QFrame *frame_8;
+    QVBoxLayout *verticalLayout_28;
     QPushButton *zoomAllBtn;
     QPushButton *zoomWinBtn;
     QPushButton *zoomOutBtn;
     QPushButton *zoomInBtn;
     QPushButton *zoomPreBtn;
+    QSpacerItem *verticalSpacer_2;
     QPushButton *axisBtn;
+    QSpacerItem *verticalSpacer_3;
     QFrame *seisFrame1;
     QVBoxLayout *verticalLayout;
     QFrame *seisFrame;
@@ -638,7 +641,6 @@ public:
         frame->setObjectName(QString::fromUtf8("frame"));
         sizePolicy.setHeightForWidth(frame->sizePolicy().hasHeightForWidth());
         frame->setSizePolicy(sizePolicy);
-        frame->setMaximumSize(QSize(16777215, 100));
         frame->setAutoFillBackground(true);
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Plain);
@@ -937,9 +939,13 @@ public:
         frame_8->setAutoFillBackground(true);
         frame_8->setFrameShape(QFrame::Box);
         frame_8->setFrameShadow(QFrame::Raised);
+        verticalLayout_28 = new QVBoxLayout(frame_8);
+        verticalLayout_28->setSpacing(6);
+        verticalLayout_28->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_28->setObjectName(QString::fromUtf8("verticalLayout_28"));
+        verticalLayout_28->setContentsMargins(3, 4, 3, 4);
         zoomAllBtn = new QPushButton(frame_8);
         zoomAllBtn->setObjectName(QString::fromUtf8("zoomAllBtn"));
-        zoomAllBtn->setGeometry(QRect(4, 4, 25, 25));
         sizePolicy1.setHeightForWidth(zoomAllBtn->sizePolicy().hasHeightForWidth());
         zoomAllBtn->setSizePolicy(sizePolicy1);
         zoomAllBtn->setMinimumSize(QSize(25, 25));
@@ -947,9 +953,11 @@ public:
         QIcon icon11;
         icon11.addFile(QString::fromUtf8(":/images/ZoomA.png"), QSize(), QIcon::Normal, QIcon::Off);
         zoomAllBtn->setIcon(icon11);
+
+        verticalLayout_28->addWidget(zoomAllBtn);
+
         zoomWinBtn = new QPushButton(frame_8);
         zoomWinBtn->setObjectName(QString::fromUtf8("zoomWinBtn"));
-        zoomWinBtn->setGeometry(QRect(4, 35, 25, 25));
         sizePolicy1.setHeightForWidth(zoomWinBtn->sizePolicy().hasHeightForWidth());
         zoomWinBtn->setSizePolicy(sizePolicy1);
         zoomWinBtn->setMinimumSize(QSize(25, 25));
@@ -957,9 +965,11 @@ public:
         QIcon icon12;
         icon12.addFile(QString::fromUtf8(":/images/ZoomW.png"), QSize(), QIcon::Normal, QIcon::Off);
         zoomWinBtn->setIcon(icon12);
+
+        verticalLayout_28->addWidget(zoomWinBtn);
+
         zoomOutBtn = new QPushButton(frame_8);
         zoomOutBtn->setObjectName(QString::fromUtf8("zoomOutBtn"));
-        zoomOutBtn->setGeometry(QRect(4, 66, 25, 25));
         sizePolicy1.setHeightForWidth(zoomOutBtn->sizePolicy().hasHeightForWidth());
         zoomOutBtn->setSizePolicy(sizePolicy1);
         zoomOutBtn->setMinimumSize(QSize(25, 25));
@@ -967,9 +977,11 @@ public:
         QIcon icon13;
         icon13.addFile(QString::fromUtf8(":/images/ZoomO.png"), QSize(), QIcon::Normal, QIcon::Off);
         zoomOutBtn->setIcon(icon13);
+
+        verticalLayout_28->addWidget(zoomOutBtn);
+
         zoomInBtn = new QPushButton(frame_8);
         zoomInBtn->setObjectName(QString::fromUtf8("zoomInBtn"));
-        zoomInBtn->setGeometry(QRect(4, 97, 25, 25));
         sizePolicy1.setHeightForWidth(zoomInBtn->sizePolicy().hasHeightForWidth());
         zoomInBtn->setSizePolicy(sizePolicy1);
         zoomInBtn->setMinimumSize(QSize(25, 25));
@@ -977,9 +989,11 @@ public:
         QIcon icon14;
         icon14.addFile(QString::fromUtf8(":/images/ZoomI.png"), QSize(), QIcon::Normal, QIcon::Off);
         zoomInBtn->setIcon(icon14);
+
+        verticalLayout_28->addWidget(zoomInBtn);
+
         zoomPreBtn = new QPushButton(frame_8);
         zoomPreBtn->setObjectName(QString::fromUtf8("zoomPreBtn"));
-        zoomPreBtn->setGeometry(QRect(4, 128, 25, 25));
         sizePolicy1.setHeightForWidth(zoomPreBtn->sizePolicy().hasHeightForWidth());
         zoomPreBtn->setSizePolicy(sizePolicy1);
         zoomPreBtn->setMinimumSize(QSize(25, 25));
@@ -987,9 +1001,15 @@ public:
         QIcon icon15;
         icon15.addFile(QString::fromUtf8(":/images/ZoomP.png"), QSize(), QIcon::Normal, QIcon::Off);
         zoomPreBtn->setIcon(icon15);
+
+        verticalLayout_28->addWidget(zoomPreBtn);
+
+        verticalSpacer_2 = new QSpacerItem(20, 21, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        verticalLayout_28->addItem(verticalSpacer_2);
+
         axisBtn = new QPushButton(frame_8);
         axisBtn->setObjectName(QString::fromUtf8("axisBtn"));
-        axisBtn->setGeometry(QRect(4, 180, 25, 25));
         sizePolicy1.setHeightForWidth(axisBtn->sizePolicy().hasHeightForWidth());
         axisBtn->setSizePolicy(sizePolicy1);
         axisBtn->setMinimumSize(QSize(25, 25));
@@ -997,6 +1017,13 @@ public:
         QIcon icon16;
         icon16.addFile(QString::fromUtf8(":/images/Axes.png"), QSize(), QIcon::Normal, QIcon::Off);
         axisBtn->setIcon(icon16);
+
+        verticalLayout_28->addWidget(axisBtn);
+
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_28->addItem(verticalSpacer_3);
+
 
         horizontalLayout_9->addWidget(frame_8);
 

@@ -85,10 +85,23 @@ namespace GfxStyle {
     constexpr int TraceHeaderNameColumnWidth = 65;
     constexpr int TraceDataColumnWidth = 80;
     constexpr int HeaderCheckColumnWidth = 20;
-    constexpr int TraceNumberColumnWidth = 60;
     constexpr int AvailableHeaderColumnWidth = 80;
     constexpr int EditHeaderValueColumnWidth = 65;
     constexpr int SaveHeaderNameColumnWidth = 60;
+
+    // MyStringTable 列宽，按当前字体中的字符宽度或内容自适应。
+    constexpr int TableColumnHorizontalPadding = 8;
+    constexpr int DirectoryTypeCharacterCount = 5;
+    constexpr int BinaryHeaderValueCharacterCount = 6;
+    constexpr int HeaderBytesCharacterCount = 7;
+    constexpr int HeaderNameCharacterCount = 7;
+    constexpr int TraceDataIndexCharacterCount = 7;
+    constexpr int TraceDataTimeCharacterCount = 7;
+    constexpr int AvailableHeaderNameCharacterCount = 7;
+    constexpr int SelectedHeaderNameCharacterCount = 15;
+
+    // SeiSeeMp 道头表格myhugetable表格列宽，单位为字符所占的个数。
+    constexpr int TraceHeaderValueCharacterCount = 11;
 
     // SeiSeeMp 紧凑型布局间距，单位为 96 DPI 下的逻辑像素。
     constexpr int CompactLayoutMargin = 1;

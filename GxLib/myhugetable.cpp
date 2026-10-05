@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QFontMetrics>
 #include <QKeyEvent>
 
 MyHugeTable::MyHugeTable(QWidget *parent)
@@ -31,8 +32,7 @@ MyHugeTable::MyHugeTable(QWidget *parent)
     cxWidget->setAutoFillBackground(true);
     //  cxWidget->setPalette(Pal1);
 
-    QWidget *colhFrame = new QWidget(this);
-    colhFrame->setFixedHeight(18);
+    colHeaderFrame = new QWidget(this);
     //  colhFrame->setAutoFillBackground(true);
     //  colhFrame->setPalette(Pal1);
 
@@ -42,10 +42,10 @@ MyHugeTable::MyHugeTable(QWidget *parent)
 
     QFrame *gridFrame = new QFrame(this);
 
-    topLayout->addWidget(colhFrame);
+    topLayout->addWidget(colHeaderFrame);
     topLayout->addWidget(gridFrame);
 
-    QGridLayout *colhLayout = new QGridLayout(colhFrame);
+    QGridLayout *colhLayout = new QGridLayout(colHeaderFrame);
     colhLayout->setContentsMargins(0, 0, 0, 0);
     colhLayout->setSpacing(0);
 
@@ -67,6 +67,8 @@ MyHugeTable::MyHugeTable(QWidget *parent)
 
     connect(cWidget, SIGNAL(colEvent(int)), this, SLOT(hcCol(int)));
 
+    updateHeaderHeight();
+
     setRowCount(0);
 
     //  tWidget->setFocusPolicy(Qt::TabFocus);
@@ -79,6 +81,8 @@ MyHugeTable::MyHugeTable(QWidget *parent)
 void MyHugeTable::setInterfaceScale(qreal scale)
 {
     m_interfaceScale = qMax<qreal>(0.1, scale);
+    updateCharacterColumnWidths();
+    updateHeaderHeight();
     resizeEvent(nullptr);
     updateGeometry();
     update();
@@ -93,7 +97,56 @@ int MyHugeTable::columnWidth(int n) const
 
 int MyHugeTable::rowHeight() const
 {
-    return qMax(1, qRound(18 * m_interfaceScale));
+    return qMax(1, QFontMetrics(tWidget->font()).height() +
+                       qRound(4 * m_interfaceScale));
+}
+
+int MyHugeTable::headerHeight() const
+{
+    return qMax(1, QFontMetrics(cWidget->font()).height() +
+                       qRound(4 * m_interfaceScale));
+}
+
+void MyHugeTable::updateHeaderHeight()
+{
+    const int height = headerHeight();
+    colHeaderFrame->setFixedHeight(height);
+    cWidget->setFixedHeight(height);
+    updateGeometry();
+}
+
+void MyHugeTable::updateCharacterColumnWidths()
+{
+    const QFontMetrics metrics(tWidget->font());
+    const int padding = qRound(4 * m_interfaceScale);
+
+    for (int column = 0; column < colCount(); ++column) {
+        const int characterCount = m_cols[column].characterCount;
+        if (characterCount < 1)
+            continue;
+
+        const int pixelWidth =
+            metrics.horizontalAdvance(
+                QString(characterCount, QLatin1Char('0'))) +
+            padding;
+        m_cols[column].width =
+            qMax(1, qRound(pixelWidth / m_interfaceScale));
+    }
+
+    cWidget->update();
+    resizeEvent(nullptr);
+}
+
+void MyHugeTable::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() != QEvent::FontChange)
+        return;
+
+    updateCharacterColumnWidths();
+    updateHeaderHeight();
+    tWidget->update();
+    cWidget->update();
 }
 
 QString MyHugeTable::getCellData(int nrow, int ncol)
@@ -278,8 +331,18 @@ void MyHugeTable::setColWidth(int n, int v)
         return;
 
     m_cols[n].width = v;
+    m_cols[n].characterCount = 0;
     cWidget->update();
     resizeEvent(NULL);
+}
+
+void MyHugeTable::setColWidthInCharacters(int n, int characterCount)
+{
+    if (n < 0 || n >= colCount() || characterCount < 1)
+        return;
+
+    m_cols[n].characterCount = characterCount;
+    updateCharacterColumnWidths();
 }
 
 void MyHugeTable::setColTag(int n, int v)
@@ -384,6 +447,9 @@ void MyHtWidget::paintEvent(QPaintEvent *event)
     int h = this->height();
 
     QPainter painter(this);
+    const QFontMetrics fontMetrics(painter.font());
+    const int textBaselineOffset =
+        (p->rowHeight() - fontMetrics.height()) / 2 + fontMetrics.ascent();
 
     qint64 nr;
     int ro = p->vScrollBar->value();
@@ -436,8 +502,7 @@ void MyHtWidget::paintEvent(QPaintEvent *event)
             QString data = p->getCellData(nr, nc);
 
             painter.drawText(x - xo + qRound(2 * p->m_interfaceScale),
-                             (nr + 1 - ro) * p->rowHeight() -
-                                 qRound(4 * p->m_interfaceScale),
+                             (nr - ro) * p->rowHeight() + textBaselineOffset,
                              data);
             painter.drawRect(QRect(x - xo, (nr - ro) * p->rowHeight(), wc,
                                    p->rowHeight()));
@@ -541,7 +606,7 @@ void MyHtWidget::mouseDoubleClickEvent(QMouseEvent *event)
         p->setCurRow(r);
 
         lEdit->setFocus();
-        lEdit->move(ww, (r-ro)*18);
+        lEdit->move(ww, (r - ro) * p->rowHeight());
         lEdit->resize(wc, p->rowHeight());
         lEdit->setText(data);
         lEdit->show();
@@ -651,9 +716,15 @@ MyHcWidget::MyHcWidget(MyHugeTable *parent)
 {
     p = parent;
 
-    setFixedHeight(20);
     //  setFocusPolicy(Qt::ClickFocus);
     //  setFocusPolicy(Qt::StrongFocus);
+}
+
+void MyHcWidget::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::FontChange && p->cWidget == this)
+        p->updateHeaderHeight();
 }
 
 void MyHcWidget::paintEvent(QPaintEvent *event)
@@ -664,6 +735,10 @@ void MyHcWidget::paintEvent(QPaintEvent *event)
     //  int h = this->height();
 
     QPainter painter(this);
+    const QFontMetrics fontMetrics(painter.font());
+    const int textBaselineOffset =
+        (p->headerHeight() - fontMetrics.height()) / 2 +
+        fontMetrics.ascent();
 
     int ro = p->vScrollBar->value();
     int xo = p->hScrollBar->value();
@@ -705,12 +780,11 @@ void MyHcWidget::paintEvent(QPaintEvent *event)
         QString data = p->colLabel(nc);
 
         QBrush b = QBrush(hc);
-        painter.fillRect(QRect(x - xo, 0, wc, p->rowHeight()), b);
+        painter.fillRect(QRect(x - xo, 0, wc, p->headerHeight()), b);
 
         painter.drawText(x - xo + qRound(2 * p->m_interfaceScale),
-                         p->rowHeight() - qRound(4 * p->m_interfaceScale),
-                         data);
-        painter.drawRect(QRect(x - xo, 0, wc, p->rowHeight()));
+                         textBaselineOffset, data);
+        painter.drawRect(QRect(x - xo, 0, wc, p->headerHeight()));
         x += wc;
     }
 }

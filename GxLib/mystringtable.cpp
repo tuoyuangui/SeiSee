@@ -1,7 +1,10 @@
 #include <QApplication>
 #include <QDebug>
+#include <QFontMetrics>
 #include <QHeaderView>
 #include <QPushButton>
+#include <QStyle>
+#include <QTimer>
 
 #include "mystringtable.h"
 
@@ -289,6 +292,7 @@ int MyStringTableModel::columnCount(const QModelIndex &) const
 MyStringTable::MyStringTable(QWidget *parent)
     : QTableView(parent)
     , m_interfaceScale(1.0)
+    , m_columnWidthUpdatePending(false)
 {
     setStyleSheet("QHeaderView::section { background-color:lightgrey }");
 
@@ -306,6 +310,7 @@ MyStringTable::MyStringTable(QWidget *parent)
     horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
     horizontalHeader()->setHighlightSections(false);
     horizontalHeader()->setMinimumSectionSize(1);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 #if QT_VERSION >= 0x050000
     horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -322,17 +327,104 @@ MyStringTable::MyStringTable(QWidget *parent)
 
     connect(horizontalHeader(), SIGNAL(sectionPressed(int)), this,
             SLOT(hHeaderPressed(int)));
+    connect(_model, &QAbstractItemModel::dataChanged, this,
+            [this](const QModelIndex &, const QModelIndex &,
+                   const QVector<int> &) { scheduleColumnWidthUpdate(); });
+    connect(_model, &QAbstractItemModel::headerDataChanged, this,
+            [this](Qt::Orientation, int, int) {
+                scheduleColumnWidthUpdate();
+            });
+    connect(_model, &QAbstractItemModel::modelReset, this,
+            [this]() { scheduleColumnWidthUpdate(); });
 }
 
 void MyStringTable::setInterfaceScale(qreal scale)
 {
     m_interfaceScale = qMax<qreal>(0.1, scale);
     verticalHeader()->setDefaultSectionSize(qRound(18 * m_interfaceScale));
+    updateColumnWidths();
+}
+
+void MyStringTable::scheduleColumnWidthUpdate()
+{
+    if (m_columnWidthUpdatePending)
+        return;
+
+    m_columnWidthUpdatePending = true;
+    QTimer::singleShot(0, this, [this]() {
+        m_columnWidthUpdatePending = false;
+        updateColumnWidths();
+    });
+}
+
+int MyStringTable::contentColumnWidth(int column)
+{
+    const QFontMetrics metrics(font());
+    int width = metrics.horizontalAdvance(_cols[column].label);
+
+    for (int row = 0; row < RowCount(); ++row)
+        width = qMax(width, metrics.horizontalAdvance(Cell(row, column)));
+
+    return qMax(1, width + qRound(_cols[column].width * m_interfaceScale));
+}
+
+void MyStringTable::updateColumnWidths()
+{
+    if (ColCount() < 1)
+        return;
+
+    const QFontMetrics metrics(font());
+    const int availableWidth = qMax(0, viewport()->width());
+    QVector<int> widths(ColCount(), 1);
+    int stretchCount = 0;
+    int fixedWidth = 0;
+
     for (int column = 0; column < ColCount(); ++column) {
-        const int width = ColWidth(column);
-        if (width > 0)
-            horizontalHeader()->resizeSection(column, width);
+        const MyStringTableCol &col = _cols[column];
+        int width = 0;
+        switch (col.widthMode) {
+        case MyStringTableCol::FixedWidth:
+            width = qRound(col.width * m_interfaceScale);
+            break;
+        case MyStringTableCol::CharacterWidth:
+            width = metrics.horizontalAdvance(
+                        QString(col.characterCount, QLatin1Char('0'))) +
+                    qRound(col.width * m_interfaceScale);
+            break;
+        case MyStringTableCol::ContentsWidth:
+            width = contentColumnWidth(column);
+            break;
+        case MyStringTableCol::CheckIndicatorWidth: {
+            const int indicatorWidth =
+                style()->pixelMetric(QStyle::PM_IndicatorWidth, nullptr, this);
+            width = qMax(1, indicatorWidth) +
+                    qRound(col.width * m_interfaceScale);
+            break;
+        }
+        case MyStringTableCol::StretchWidth:
+            ++stretchCount;
+            continue;
+        }
+
+        widths[column] = qMax(1, width);
+        fixedWidth += widths[column];
     }
+
+    if (stretchCount > 0) {
+        const int stretchWidth =
+            qMax(stretchCount, availableWidth - fixedWidth) / stretchCount;
+        for (int column = 0; column < ColCount(); ++column) {
+            if (_cols[column].widthMode != MyStringTableCol::StretchWidth)
+                continue;
+
+            const int contentWidth =
+                _cols[column].width > 0 ? contentColumnWidth(column) : 1;
+            widths[column] = qMax(stretchWidth, contentWidth);
+        }
+    }
+
+    for (int column = 0; column < ColCount(); ++column)
+        horizontalHeader()->resizeSection(column, widths[column]);
 }
 
 void MyStringTable::setIndexWidget(int r, int c, QWidget *w)
@@ -353,6 +445,7 @@ void MyStringTable::setRowCount(int v, bool reset)
 
     if (reset)
         _model->endResetModel();
+    updateColumnWidths();
 }
 
 void MyStringTable::delRow(int row, bool reset)
@@ -393,6 +486,7 @@ void MyStringTable::setColCount(int v, bool reset)
 
     if (reset)
         _model->endResetModel();
+    updateColumnWidths();
 }
 
 QSize MyStringTable::sizeHint() const
@@ -675,7 +769,10 @@ void MyStringTable::setColWidth(int c, int v)
         return;
 
     _cols[c].width = v;
-    update();
+    _cols[c].widthMode = v > 0 ? MyStringTableCol::FixedWidth
+                               : MyStringTableCol::StretchWidth;
+    _cols[c].characterCount = 0;
+    updateColumnWidths();
 }
 
 int MyStringTable::ColWidth(int c)
@@ -683,7 +780,55 @@ int MyStringTable::ColWidth(int c)
     if (c < 0 || c >= ColCount())
         return false;
 
+    if (_cols[c].widthMode != MyStringTableCol::FixedWidth)
+        return horizontalHeader()->sectionSize(c);
+
     return qRound(_cols[c].width * m_interfaceScale);
+}
+
+void MyStringTable::setColWidthInCharacters(int c, int characterCount,
+                                            int horizontalPadding)
+{
+    if (c < 0 || c >= ColCount() || characterCount < 1)
+        return;
+
+    _cols[c].width = qMax(0, horizontalPadding);
+    _cols[c].widthMode = MyStringTableCol::CharacterWidth;
+    _cols[c].characterCount = characterCount;
+    updateColumnWidths();
+}
+
+void MyStringTable::setColWidthToContents(int c, int horizontalPadding)
+{
+    if (c < 0 || c >= ColCount())
+        return;
+
+    _cols[c].width = qMax(0, horizontalPadding);
+    _cols[c].widthMode = MyStringTableCol::ContentsWidth;
+    _cols[c].characterCount = 0;
+    updateColumnWidths();
+}
+
+void MyStringTable::setColWidthToStretch(int c, int horizontalPadding)
+{
+    if (c < 0 || c >= ColCount())
+        return;
+
+    _cols[c].width = qMax(0, horizontalPadding);
+    _cols[c].widthMode = MyStringTableCol::StretchWidth;
+    _cols[c].characterCount = 0;
+    updateColumnWidths();
+}
+
+void MyStringTable::setColWidthToCheckIndicator(int c, int horizontalPadding)
+{
+    if (c < 0 || c >= ColCount())
+        return;
+
+    _cols[c].width = qMax(0, horizontalPadding);
+    _cols[c].widthMode = MyStringTableCol::CheckIndicatorWidth;
+    _cols[c].characterCount = 0;
+    updateColumnWidths();
 }
 
 void MyStringTable::setColLabel(int c, QString v)
@@ -704,36 +849,8 @@ QString MyStringTable::ColLabel(int c)
 
 void MyStringTable::resizeEvent(QResizeEvent *event)
 {
-    int w = event->size().width();
-
-    if (ColCount() > 0) {
-        int ws = w / ColCount();
-        int ns;
-        int ww = 0;
-        int nn = 0;
-
-        for (ns = 0; ns < ColCount(); ns++) {
-            ws = ColWidth(ns);
-            if (ws > 0)
-                ww += ws;
-            else
-                nn++;
-        }
-
-        if (nn > 0) {
-            ww = (w - ww) / nn;
-            if (ww < 10)
-                ww = 10;
-        }
-
-        for (ns = 0; ns < ColCount(); ns++) {
-            ws = ColWidth(ns);
-            if (ws < 1)
-                ws = ww;
-            horizontalHeader()->resizeSection(ns, ws);
-        }
-    }
     QTableView::resizeEvent(event);
+    updateColumnWidths();
 }
 
 void MyStringTable::keyPressEvent(QKeyEvent *event)

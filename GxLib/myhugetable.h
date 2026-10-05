@@ -68,6 +68,9 @@ public:
 signals:
     void colEvent(int col);
 
+protected:
+    void changeEvent(QEvent *event);
+
 public slots:
 };
 
@@ -77,12 +80,14 @@ public:
     QString hdr;
     int width;
     int tag;
+    int characterCount;
     QColor hbgc;
 
     MyCol()
     {
         width = 0;
         tag = 0;
+        characterCount = 0;
         hbgc = Qt::white;
     }
 };
@@ -97,6 +102,7 @@ private:
     QScrollBar *vScrollBar;
     QScrollBar *hScrollBar;
     MyHcWidget *cWidget;
+    QWidget *colHeaderFrame;
     MyHtWidget *tWidget;
     QWidget *txWidget; // corner box for grid
     QWidget *cxWidget; // corner box for column header
@@ -109,8 +115,14 @@ private:
     int colsW(); //  total width of columns
     int columnWidth(int n) const;
     int rowHeight() const;
+    int headerHeight() const;
+    void updateHeaderHeight();
+    void updateCharacterColumnWidths();
 
     void resizeEvent(QResizeEvent *event);
+
+protected:
+    void changeEvent(QEvent *event);
 
 public:
     friend class MyHtWidget;
@@ -133,6 +145,7 @@ public:
     QString colLabel(int n);
 
     void setColWidth(int n, int v);
+    void setColWidthInCharacters(int n, int characterCount);
 
     void setColHdrBgc(int n, QColor v = Qt::white);
 
