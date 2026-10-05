@@ -6,8 +6,9 @@
 #include "gfxobjseis.h"
 #include "gfxsrcseis.h"
 
-class GfxObjSeisSect : public GfxObjSeis {
-  protected:
+class GfxObjSeisSect : public GfxObjSeis
+{
+protected:
     int m_SelTr; // Selected trace index
 
     int *_si;
@@ -18,7 +19,7 @@ class GfxObjSeisSect : public GfxObjSeis {
     double m_Ti; // Increment for time lines
     bool m_Tl;   // Show Time Lines
 
-  public:
+public:
     GfxObjSeisSect(QObject *parent = 0);
 
     virtual ~GfxObjSeisSect();

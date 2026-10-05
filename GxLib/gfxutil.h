@@ -8,8 +8,9 @@
 
 using namespace std;
 
-class zdata {
-  public:
+class zdata
+{
+public:
     int xo, yo;
     double xs, ys;
 

@@ -13,8 +13,9 @@ typedef unsigned char byte;
 using namespace ExprEval;
 using namespace std;
 
-class TrcHdrNode : public FunctionNode {
-  public:
+class TrcHdrNode : public FunctionNode
+{
+public:
     TrcHdrNode(Expression *expr)
         : FunctionNode(expr)
     {
@@ -24,8 +25,9 @@ class TrcHdrNode : public FunctionNode {
     double DoEvaluate();
 };
 
-class TrcHdrFactory : public FunctionFactory {
-  public:
+class TrcHdrFactory : public FunctionFactory
+{
+public:
     string GetName() const
     {
         return "H";
@@ -37,8 +39,9 @@ class TrcHdrFactory : public FunctionFactory {
     }
 };
 
-class SeisTrExpr : public Expression {
-  protected:
+class SeisTrExpr : public Expression
+{
+protected:
     byte *Hdr; // Address of Header buffer
     int Len;   // Header Len;
     int Swp;   //
@@ -54,7 +57,7 @@ class SeisTrExpr : public Expression {
 
     void Parse();
 
-  public:
+public:
     double V; // Prev value for undo
 
     SeisTrExpr(QString e = "");

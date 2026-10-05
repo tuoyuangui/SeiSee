@@ -11,13 +11,14 @@
 #include "workthread.h"
 
 namespace Ui {
-class SaveAsDialog;
+    class SaveAsDialog;
 }
 
-class SaveAsDialog : public QDialog {
+class SaveAsDialog : public QDialog
+{
     Q_OBJECT
 
-  public:
+public:
     SeisFile *sf;
     QString *savDir;
 
@@ -26,7 +27,7 @@ class SaveAsDialog : public QDialog {
 
     void show();
 
-  private slots:
+private slots:
 
     void hdrListEvent(int row, int mode);
 
@@ -51,7 +52,7 @@ class SaveAsDialog : public QDialog {
     void x_progr(int pers, QString mess);
     void x_fin(QString mess);
 
-  private:
+private:
     bool running;
 
     MyStringTable hdrListGrid;
@@ -65,7 +66,7 @@ class SaveAsDialog : public QDialog {
 
     int ReadTxt(QLineEdit *edt, bool &ok);
 
-  signals:
+signals:
     void stop();
 };
 

@@ -19,8 +19,9 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_AboutDialog {
-  public:
+class Ui_AboutDialog
+{
+public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QLabel *label_2;
@@ -129,7 +130,9 @@ class Ui_AboutDialog {
 };
 
 namespace Ui {
-class AboutDialog : public Ui_AboutDialog {};
+    class AboutDialog : public Ui_AboutDialog
+    {
+    };
 } // namespace Ui
 
 QT_END_NAMESPACE

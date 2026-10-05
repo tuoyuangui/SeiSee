@@ -18,8 +18,9 @@ using namespace std;
 
 string SegdTimeToStr(long long ts);
 
-class IdxNamMap {
-  private:
+class IdxNamMap
+{
+private:
     QMap<int, const char *> map;
 
     int unki;
@@ -27,7 +28,7 @@ class IdxNamMap {
     int idx1;
     int idx2;
 
-  public:
+public:
     IdxNamMap();
 
     IdxNamMap(const char *data[], int datacnt, int idxbase, int unk = 0,
@@ -36,13 +37,14 @@ class IdxNamMap {
     const char *operator[](int idx);
 };
 
-class ptrAry {
-  private:
+class ptrAry
+{
+private:
     void **_data;
     int _nitems;
     int _nalloc;
 
-  public:
+public:
     int getCount()
     {
         return _nitems;
@@ -66,12 +68,13 @@ class ptrAry {
 };
 //---------------------------------------------------------------------------
 
-class byteAry {
-  private:
+class byteAry
+{
+private:
     byte *_data;
     int _nitems;
 
-  public:
+public:
     int get_count()
     {
         return _nitems;
@@ -94,21 +97,23 @@ class byteAry {
 
 //---------------------------------------------------------------------------
 
-class TMyObj {
-  public:
+class TMyObj
+{
+public:
     virtual ~TMyObj()
     {
         // int x=1;
     }
 };
 
-class TMyObjList {
-  private:
+class TMyObjList
+{
+private:
     bool OwnsObjects;
 
     ptrAry _obj;
 
-  public:
+public:
     int getCount()
     {
         return _obj.getCount();
@@ -175,8 +180,9 @@ class TMyObjList {
 
 //---------------------------------------------------------------------------
 
-class TTrInf {
-  public:
+class TTrInf
+{
+public:
     int the;
     int csn;
     int stn;
@@ -192,11 +198,12 @@ class TSegDObj;
 class TSegD;
 class TGenHedAll;
 
-class TSegD {
-  protected:
+class TSegD
+{
+protected:
     string _err;
 
-  public:
+public:
     int ntrs;
 
     int hdr_len;
@@ -308,8 +315,9 @@ class TSegD {
     int Parse(byte *buf, int len, bool HeadersOnly, bool keep_buf = false);
 };
 
-class TSegDObj : public TMyObj {
-  protected:
+class TSegDObj : public TMyObj
+{
+protected:
     string _inf;
     string _err;
 
@@ -325,7 +333,7 @@ class TSegDObj : public TMyObj {
     byte *_dat;
     int _pos;
 
-  public:
+public:
     int len; // length in memory (for demux traces only headrs)
     int fln; // length in file for demux traces;
     byte *hdr;
@@ -391,64 +399,71 @@ class TSegDObj : public TMyObj {
     }
 };
 
-class TSegdInfo : public TSegDObj {
-  private:
+class TSegdInfo : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TSegdInfo(TSegD *segd);
 };
 
-class TSegdWarn : public TSegDObj {
-  private:
+class TSegdWarn : public TSegDObj
+{
+private:
     string _wrn;
     string get_inf();
 
-  public:
+public:
     TSegdWarn(TSegD *segd, string warn);
 };
 
-class TSegdEof : public TSegDObj {
-  private:
+class TSegdEof : public TSegDObj
+{
+private:
     string _wrn;
     string get_inf();
 
-  public:
+public:
     TSegdEof(TSegD *segd, string warn);
 };
 
-class TGenHedAll : public TSegDObj {
-  private:
+class TGenHedAll : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TGenHedAll(TSegD *segd);
 };
 
-class TGenHdrB : public TSegDObj {
-  private:
+class TGenHdrB : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     int NTRS;
     int NAUX;
 
     TGenHdrB(TSegD *segd);
 };
 
-class TGenHdr1 : public TSegDObj {
-  private:
+class TGenHdr1 : public TSegDObj
+{
+private:
     virtual string get_inf();
 
-  public:
+public:
     TGenHdr1(TSegD *segd);
 };
 
-class TGenHdr2 : public TSegDObj {
-  private:
+class TGenHdr2 : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TGenHdr2(TSegD *segd);
 
     int R;
@@ -459,97 +474,108 @@ class TGenHdr2 : public TSegDObj {
     double R_ms;
 };
 
-class TGenHdr3 : public TSegDObj {
-  private:
+class TGenHdr3 : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TGenHdr3(TSegD *segd);
 };
 
-class TGenHdrN : public TSegDObj {
+class TGenHdrN : public TSegDObj
+{
 
-  private:
+private:
     string get_inf();
 
     int ghn;
 
-  public:
+public:
     TGenHdrN(TSegD *segd, int num);
 };
 
-class TEcHdr : public TSegDObj {
-  private:
+class TEcHdr : public TSegDObj
+{
+private:
     int _mod;
 
     string get_inf();
 
-  public:
+public:
     TEcHdr(TSegD *segd);
 };
 
-class TExHdr : public TSegDObj {
-  private:
+class TExHdr : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TExHdr(TSegD *segd);
 };
 
-class TSsHdr : public TSegDObj {
-  private:
+class TSsHdr : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TSsHdr(TSegD *segd);
 };
 
-class TXxHdr : public TSegDObj {
-  private:
+class TXxHdr : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TXxHdr(TSegD *segd);
 };
 
-class TSkew : public TSegDObj {
-  private:
+class TSkew : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TSkew(TSegD *segd);
 };
 
-class TMux : public TSegDObj {
-  private:
+class TMux : public TSegDObj
+{
+private:
     TMyObjList *traces;
 
     string get_inf();
 
-  public:
+public:
     TMux(TSegD *segd);
     ~TMux();
 };
 
-class TJunk : public TSegDObj {
-  private:
+class TJunk : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TJunk(TSegD *segd, int len);
 };
 
-class TTapeHdr : public TSegDObj {
-  private:
+class TTapeHdr : public TSegDObj
+{
+private:
     string get_inf();
 
-  public:
+public:
     TTapeHdr(TSegD *segd);
 };
 
-class TTr : public TSegDObj {
-  private:
-  public:
+class TTr : public TSegDObj
+{
+private:
+public:
     int csi;
 
     int atn; // seguential trace number in file
@@ -577,9 +603,10 @@ class TTr : public TSegDObj {
     ~TTr();
 };
 
-class TTrList : public TMyObjList {
-  private:
-  public:
+class TTrList : public TMyObjList
+{
+private:
+public:
     TTrList()
         : TMyObjList(false)
     {
@@ -591,12 +618,13 @@ class TTrList : public TMyObjList {
     }
 };
 
-class TCs : public TSegDObj {
-  protected:
+class TCs : public TSegDObj
+{
+protected:
     TTrList *_trc;
     int _ntr;
 
-  public:
+public:
     const char *typnm;
     int typn;
     int stn;
@@ -635,24 +663,27 @@ class TCs : public TSegDObj {
     }
 };
 
-class TCsD : public TCs {
+class TCsD : public TCs
+{
 
-  public:
+public:
     TCsD(TSegD *segd);
 
     virtual string get_inf();
 };
 
-class TCsB : public TCs {
-  public:
+class TCsB : public TCs
+{
+public:
     TCsB(TSegD *segd, int no, int ntr); // no: 0 - aux, 1 - data
 
     virtual string get_inf();
 };
 
-class TCsList : public TMyObjList {
-  private:
-  public:
+class TCsList : public TMyObjList
+{
+private:
+public:
     TCsList()
         : TMyObjList(false)
     {
@@ -666,9 +697,10 @@ class TCsList : public TMyObjList {
 
 //---------------------------------------------------------------------------
 
-class TLtod : public TMyObjList {
-  private:
-  public:
+class TLtod : public TMyObjList
+{
+private:
+public:
     string fname;
 
     TLtod()
@@ -677,9 +709,10 @@ class TLtod : public TMyObjList {
     }
 };
 
-class TFileInLtod : public TMyObj {
-  private:
-  public:
+class TFileInLtod : public TMyObj
+{
+private:
+public:
     TLtod *ltod;
     int fno;
     long long pos;

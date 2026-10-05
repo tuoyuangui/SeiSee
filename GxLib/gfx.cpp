@@ -315,12 +315,10 @@ void Gfx::SetDpi(int dpiX, int dpiY)
 {
     m_dpiX = dpiX > 0 ? dpiX : GfxStyle::ReferenceDpi;
     m_dpiY = dpiY > 0 ? dpiY : GfxStyle::ReferenceDpi;
-    _img.setDotsPerMeterX(
-        Round(m_dpiX * GfxStyle::MillimetersPerMeter /
-              GfxStyle::MillimetersPerInch));
-    _img.setDotsPerMeterY(
-        Round(m_dpiY * GfxStyle::MillimetersPerMeter /
-              GfxStyle::MillimetersPerInch));
+    _img.setDotsPerMeterX(Round(m_dpiX * GfxStyle::MillimetersPerMeter /
+                                GfxStyle::MillimetersPerInch));
+    _img.setDotsPerMeterY(Round(m_dpiY * GfxStyle::MillimetersPerMeter /
+                                GfxStyle::MillimetersPerInch));
 }
 
 int Gfx::ScaleByDpiX(double logicalValue) const

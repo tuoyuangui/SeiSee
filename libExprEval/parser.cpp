@@ -19,67 +19,67 @@ using namespace ExprEval;
 // Private functions to solve locale problems
 // ------------------------------------------
 namespace {
-bool expreval_isalpha(char c)
-{
-    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-}
-
-bool expreval_isdigit(char c)
-{
-    return (c >= '0' && c <= '9');
-}
-
-bool expreval_isalnum(char c)
-{
-    return expreval_isalpha(c) || expreval_isdigit(c);
-}
-
-bool expreval_isspace(char c)
-{
-    return (c == ' ') || (c == '\t') || (c == '\r') || (c == '\n');
-}
-
-double expreval_atof(const char *str)
-{
-    bool negative = false;
-    long double value = 0.0;
-
-    // Skip space
-    while (expreval_isspace(*str))
-        str++;
-
-    // Check for sign
-    if (*str == '-') {
-        negative = true;
-        str++;
-    } else if (*str == '+') {
-        str++;
+    bool expreval_isalpha(char c)
+    {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
-    // The part before the decimal
-    while (*str >= '0' && *str <= '9') {
-        value = (value * 10.0) + (double)(*str - '0');
-        str++;
+    bool expreval_isdigit(char c)
+    {
+        return (c >= '0' && c <= '9');
     }
 
-    // Decimal, if any
-    if (*str == '.') {
-        long double divisor = 1.0;
-        str++;
+    bool expreval_isalnum(char c)
+    {
+        return expreval_isalpha(c) || expreval_isdigit(c);
+    }
 
-        // Part after the decimal, if any
-        while (*str >= '0' && *str <= '9') {
-            value = (value * 10.0) + (double)(*str - '0');
-            divisor *= 10.0;
+    bool expreval_isspace(char c)
+    {
+        return (c == ' ') || (c == '\t') || (c == '\r') || (c == '\n');
+    }
+
+    double expreval_atof(const char *str)
+    {
+        bool negative = false;
+        long double value = 0.0;
+
+        // Skip space
+        while (expreval_isspace(*str))
+            str++;
+
+        // Check for sign
+        if (*str == '-') {
+            negative = true;
+            str++;
+        } else if (*str == '+') {
             str++;
         }
 
-        value /= divisor;
-    }
+        // The part before the decimal
+        while (*str >= '0' && *str <= '9') {
+            value = (value * 10.0) + (double)(*str - '0');
+            str++;
+        }
 
-    // The result
-    return negative ? -value : value;
-}
+        // Decimal, if any
+        if (*str == '.') {
+            long double divisor = 1.0;
+            str++;
+
+            // Part after the decimal, if any
+            while (*str >= '0' && *str <= '9') {
+                value = (value * 10.0) + (double)(*str - '0');
+                divisor *= 10.0;
+                str++;
+            }
+
+            value /= divisor;
+        }
+
+        // The result
+        return negative ? -value : value;
+    }
 }; // namespace
 
 // Token

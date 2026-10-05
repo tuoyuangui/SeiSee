@@ -21,8 +21,9 @@
 
 //---------------------------------------------------------------------------------------------
 
-class DirItem {
-  public:
+class DirItem
+{
+public:
     QString fname;
     int ftype; // 0 - dir, 1 - Sgd, 2 - ltod, 3 - file in ltod
     int ffid;
@@ -33,13 +34,14 @@ class DirItem {
 
 //---------------------------------------------------------------------------------------------
 
-class Worker : public QObject {
+class Worker : public QObject
+{
     Q_OBJECT
 
-  public:
+public:
     explicit Worker(QObject *parent = 0);
 
-  protected:
+protected:
     bool m_stop;
 
     virtual void xprint(QString str)
@@ -60,7 +62,7 @@ class Worker : public QObject {
 
     virtual int xprintf(const char *fmt, ...);
 
-  public slots:
+public slots:
     virtual void process()
     {
         emit efin("");
@@ -69,7 +71,7 @@ class Worker : public QObject {
 
     void stop();
 
-  signals:
+signals:
     void finished();
     void eprint(QString str);
     void eprogr(int pers, QString str);
@@ -80,35 +82,37 @@ class Worker : public QObject {
 
 typedef QList<DirItem> DirList;
 
-class DirScanWorker : public Worker {
+class DirScanWorker : public Worker
+{
     Q_OBJECT
 
-  public:
+public:
     explicit DirScanWorker(QString dirName, QObject *parent = 0);
 
-  protected:
+protected:
     QString m_dirName;
     int m_type; // 1 - dir, 2 - ltod, 3 - tape
 
     DirList dlist;
 
-  public slots:
+public slots:
     virtual void process();
 
-  signals:
+signals:
     void edir(DirList dist);
 };
 //---------------------------------------------------------------------------------------------
 
-class TraceFindWorker : public Worker {
+class TraceFindWorker : public Worker
+{
     Q_OBJECT
 
-  public:
+public:
     explicit TraceFindWorker(SeisFile *sf, long long cidx, QString sidx,
                              double sval, QString dir, QString sign,
                              QObject *parent = 0);
 
-  protected:
+protected:
     SeisFile *m_sf;
     QString m_sidx;
     double m_sval;
@@ -116,41 +120,43 @@ class TraceFindWorker : public Worker {
     QString m_sign;
     long long m_cidx;
 
-  public slots:
+public slots:
     virtual void process();
 
-  signals:
+signals:
     void efind(int tridx);
 };
 //---------------------------------------------------------------------------------------------
 
-class DelayScanWorker : public Worker {
+class DelayScanWorker : public Worker
+{
     Q_OBJECT
 
-  public:
+public:
     explicit DelayScanWorker(SeisFile *sf, QObject *parent = 0);
 
-  protected:
+protected:
     SeisFile *m_sf;
 
-  public slots:
+public slots:
     virtual void process();
 
-  signals:
+signals:
     void edelay(int dlymin, int dlymax);
 };
 //---------------------------------------------------------------------------------------------
 
-class ChangeThExprWorker : public Worker {
+class ChangeThExprWorker : public Worker
+{
     Q_OBJECT
 
-  public:
+public:
     explicit ChangeThExprWorker(SeisFile *sf, QMap<QString, SeisTrExpr> elist,
                                 QString undofn, int mode, QObject *parent = 0);
 
     ~ChangeThExprWorker();
 
-  protected:
+protected:
     SeisFile *m_sf;
     QMap<QString, SeisTrExpr> m_elist;
 
@@ -160,20 +166,21 @@ class ChangeThExprWorker : public Worker {
     QString update();
     QString undo();
 
-  public slots:
+public slots:
     virtual void process();
 };
 //---------------------------------------------------------------------------------------------
 
-class SaveAsWorker : public Worker {
+class SaveAsWorker : public Worker
+{
     Q_OBJECT
 
-  public:
+public:
     explicit SaveAsWorker(SeisFile *sf, QString outfn, QString selh, int trmin,
                           int trmax, int trstp, int tmmin, int tmmax, int frmt,
                           bool rev, QObject *parent = 0);
 
-  protected:
+protected:
     SeisFile *m_sf;
     QString m_outfn;
 
@@ -192,7 +199,7 @@ class SaveAsWorker : public Worker {
     void CopyTrcByIdx(int outf);
     void CopyTrcByHdr(int outf);
 
-  public slots:
+public slots:
     virtual void process();
 };
 //---------------------------------------------------------------------------------------------

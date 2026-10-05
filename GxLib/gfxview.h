@@ -16,9 +16,10 @@
 #include "gfx.h"
 #include "gfxobj.h"
 
-class GfxView : public QWidget {
+class GfxView : public QWidget
+{
     Q_OBJECT
-  protected:
+protected:
     Gfx m_gfx;
 
     QList<GfxObj *> m_links;
@@ -52,7 +53,7 @@ class GfxView : public QWidget {
 
     //  GfxObj* ObjHit(int x, int y);
 
-  public:
+public:
     explicit GfxView(QWidget *parent = 0);
 
     ~GfxView();
@@ -112,7 +113,7 @@ class GfxView : public QWidget {
         return &m_gfx;
     }
 
-  signals:
+signals:
     void dpiChanged();
     void OnPrevDraw(GfxView *view);
     void OnPostDraw(GfxView *view);
@@ -120,7 +121,7 @@ class GfxView : public QWidget {
     void wheel_Event(QWheelEvent *event);
     void timeSetEvent(double time);
 
-  public slots:
+public slots:
 };
 
 #endif // Gm_XVIEW_H

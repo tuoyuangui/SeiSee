@@ -32,8 +32,9 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_SaveAsDialog {
-  public:
+class Ui_SaveAsDialog
+{
+public:
     QVBoxLayout *verticalLayout_7;
     QSplitter *splitter;
     QGroupBox *groupBox;
@@ -514,7 +515,9 @@ class Ui_SaveAsDialog {
 };
 
 namespace Ui {
-class SaveAsDialog : public Ui_SaveAsDialog {};
+    class SaveAsDialog : public Ui_SaveAsDialog
+    {
+    };
 } // namespace Ui
 
 QT_END_NAMESPACE

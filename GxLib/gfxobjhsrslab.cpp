@@ -34,8 +34,8 @@ void GfxObjHsrsLab::DoDraw()
     int ya = 0;
     int yb = m_view->height() - GfxStyle::AxisLineWidthPixels;
 
-    int rowHeight =
-        gfx->GetFontMetrics().height() + gfx->ScaleY(GfxStyle::HeaderLabelRowGap);
+    int rowHeight = gfx->GetFontMetrics().height() +
+                    gfx->ScaleY(GfxStyle::HeaderLabelRowGap);
     int labelDescent = gfx->GetFontMetrics().descent();
     int leftPadding = TextStartX();
     int bottomPadding = gfx->ScaleY(GfxStyle::HeaderLabelBottomPadding);
@@ -44,9 +44,8 @@ void GfxObjHsrsLab::DoDraw()
 
     for (nh = 0; nh < Nh; nh++) {
         QString hname = m_hdrs[Nh - nh - 1];
-        int baseline =
-            yb - GfxStyle::AxisLineWidthPixels - bottomPadding - labelDescent -
-            nh * rowHeight;
+        int baseline = yb - GfxStyle::AxisLineWidthPixels - bottomPadding -
+                       labelDescent - nh * rowHeight;
 
         gfx->DrawText(leftPadding, baseline, hname);
     }

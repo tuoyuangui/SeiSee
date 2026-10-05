@@ -26,8 +26,9 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_AxisDialog {
-  public:
+class Ui_AxisDialog
+{
+public:
     QVBoxLayout *verticalLayout;
     QTabWidget *tabWidget;
     QWidget *tab;
@@ -319,7 +320,9 @@ class Ui_AxisDialog {
 };
 
 namespace Ui {
-class AxisDialog : public Ui_AxisDialog {};
+    class AxisDialog : public Ui_AxisDialog
+    {
+    };
 } // namespace Ui
 
 QT_END_NAMESPACE

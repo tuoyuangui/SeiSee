@@ -3,14 +3,15 @@
 
 #include "gfxobj.h"
 
-class GfxObjTAxis : public GfxObj {
-  protected:
+class GfxObjTAxis : public GfxObj
+{
+protected:
     double m_Ti;
     bool m_rightSide;
 
     virtual void DoDraw();
 
-  public:
+public:
     GfxObjTAxis(QObject *parent = 0);
 
     void setRightSide(bool v)

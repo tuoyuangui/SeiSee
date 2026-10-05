@@ -12,8 +12,9 @@
 
 int Bresenham(int x0, int y0, int x1, int y1, int *x, int *y);
 
-class Ttr {
-  public:
+class Ttr
+{
+public:
     unsigned char *_buf;
     int _dly;
     float *_smp;
@@ -57,8 +58,9 @@ class Ttr {
     }
 };
 
-class Gfx {
-  protected:
+class Gfx
+{
+protected:
     int m_w, m_ww, m_wb;
     int m_h;
     int m_x;
@@ -94,7 +96,7 @@ class Gfx {
     int ScaleByDpi(double logicalValue) const;
     void ApplyFontPointSize(double pointSize);
 
-  public:
+public:
     explicit Gfx();
 
     void SetViewPort(QPainter *p, QRect *r, int dpiX = 0, int dpiY = 0);
@@ -198,9 +200,9 @@ class Gfx {
 
     void SetPalette(QList<QRgb> pal);
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
 #endif // GFX_H

@@ -3,10 +3,11 @@
 
 #include "gfxsrcseismem.h"
 
-class GfxSrcSeisMemSegd : public GfxSrcSeisMem {
+class GfxSrcSeisMemSegd : public GfxSrcSeisMem
+{
     Q_OBJECT
 
-  protected:
+protected:
     char *_ti; // trace is read
     int *_cs;
     int *_ch;
@@ -19,7 +20,7 @@ class GfxSrcSeisMemSegd : public GfxSrcSeisMem {
 
     virtual Ttr Tt(long long ntr);
 
-  public:
+public:
     void Reset(); // set all traces as unread
 
     virtual void setNt(int nt);
@@ -37,7 +38,7 @@ class GfxSrcSeisMemSegd : public GfxSrcSeisMem {
     GfxSrcSeisMemSegd(QObject *parent = 0);
     ~GfxSrcSeisMemSegd();
 
-  signals:
+signals:
     void smpRequest(int ncs, int nch, float *smp, char &rc);
 };
 

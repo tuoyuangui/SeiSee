@@ -9,10 +9,11 @@
 
 class SectList;
 
-class GfxObjSeis : public GfxObj {
+class GfxObjSeis : public GfxObj
+{
     friend class GfxSctList;
 
-  protected:
+protected:
     GfxSrcSeis *s_src;
 
     int m_Mode;
@@ -30,7 +31,7 @@ class GfxObjSeis : public GfxObj {
 
     QList<QRgb> m_Pal; // Color Palette
 
-  public:
+public:
     void setMode(int v)
     {
         m_Mode = v;

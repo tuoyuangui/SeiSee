@@ -15,24 +15,26 @@
 
 class MxStringTable;
 
-class XHeaderView : public QHeaderView {
-  private:
+class XHeaderView : public QHeaderView
+{
+private:
     virtual void paintSection(QPainter *painter, const QRect &rect,
                               int logicalIndex) const;
 
-  public:
+public:
     XHeaderView(QWidget *parent = 0);
     ~XHeaderView()
     {
     }
 };
 
-class MxStringTableDelegate : public QStyledItemDelegate {
+class MxStringTableDelegate : public QStyledItemDelegate
+{
     Q_OBJECT
-  private:
+private:
     MxStringTable *_parent;
 
-  public:
+public:
     explicit MxStringTableDelegate(MxStringTable *parent = 0)
         : QStyledItemDelegate((QObject *)parent)
     {
@@ -44,8 +46,9 @@ class MxStringTableDelegate : public QStyledItemDelegate {
                const QModelIndex &index) const;
 };
 
-class MxStringTableCell {
-  public:
+class MxStringTableCell
+{
+public:
     QString text;
     QString imgnm;
     QIcon icon;
@@ -64,8 +67,9 @@ class MxStringTableCell {
     }
 };
 
-class MxStringTableRow {
-  public:
+class MxStringTableRow
+{
+public:
     bool sel;
     QColor color;
     QColor textc; // text color
@@ -80,8 +84,9 @@ class MxStringTableRow {
     }
 };
 
-class MxStringTableCol {
-  public:
+class MxStringTableCol
+{
+public:
     bool chkbx; // show check
     QString label;
     QColor labbg;
@@ -100,15 +105,16 @@ class MxStringTableCol {
 class MxStringTable;
 class MxStringTableModel;
 
-class MxStringTableModel : public QAbstractTableModel {
+class MxStringTableModel : public QAbstractTableModel
+{
     Q_OBJECT
 
     friend class MxStringTable;
 
-  protected:
+protected:
     MxStringTable *_tab;
 
-  public:
+public:
     explicit MxStringTableModel(MxStringTable *parent);
 
     virtual int rowCount(const QModelIndex &) const;
@@ -125,17 +131,18 @@ class MxStringTableModel : public QAbstractTableModel {
     virtual QVariant headerData(int section, Qt::Orientation orientation,
                                 int role) const;
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
-class MxStringTable : public QTableView {
+class MxStringTable : public QTableView
+{
     Q_OBJECT
 
     friend class MxStringTableModel;
 
-  protected:
+protected:
     //  QVector<MxStringTableRow> _rows;
     //  QVector<MxStringTableCol> _cols;
 
@@ -178,7 +185,7 @@ class MxStringTable : public QTableView {
     }
     */
 
-  public:
+public:
     MxStringTableModel *_model;
 
     explicit MxStringTable(QWidget *parent = 0);
@@ -266,7 +273,7 @@ class MxStringTable : public QTableView {
 
     void setTextChanged(bool v);
 
-  signals:
+signals:
 
     void hHeaderEvent(int col);
 
@@ -276,7 +283,7 @@ class MxStringTable : public QTableView {
 
     void textChanged();
 
-  public slots:
+public slots:
 
     void hHeaderPressed(int logicalIndex)
     {

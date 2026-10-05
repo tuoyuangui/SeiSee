@@ -5,15 +5,16 @@
 
 #include "gfxsrcseis.h"
 
-class GfxSrcSeisMem : public GfxSrcSeis {
-  protected:
+class GfxSrcSeisMem : public GfxSrcSeis
+{
+protected:
     float *_tr;  // Trace samples
     double *_th; // Trace headers
 
     QList<QString> m_hdrs;
     QMap<QString, int> m_hidx;
 
-  public:
+public:
     GfxSrcSeisMem(QObject *parent = 0);
 
     void SetSmp(int nt, float *v)

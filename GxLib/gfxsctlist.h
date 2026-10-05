@@ -3,11 +3,12 @@
 
 #include "gfxobjseissect.h"
 
-class GfxSctList : public GfxObjSeisSect {
-  protected:
+class GfxSctList : public GfxObjSeisSect
+{
+protected:
     QVector<GfxObjSeisSect *> items;
 
-  public:
+public:
     GfxSctList(QObject *parent = 0);
 
     ~GfxSctList();

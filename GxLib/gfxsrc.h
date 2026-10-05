@@ -6,13 +6,14 @@
 
 #include "gfxobj.h"
 
-class GfxSrc : public QObject {
+class GfxSrc : public QObject
+{
     Q_OBJECT
 
-  protected:
+protected:
     QList<GfxObj *> m_links;
 
-  public:
+public:
     explicit GfxSrc(QObject *parent = 0);
 
     virtual ~GfxSrc();
@@ -23,9 +24,9 @@ class GfxSrc : public QObject {
 
     virtual void Clear();
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
 #endif // GFXSRC_H

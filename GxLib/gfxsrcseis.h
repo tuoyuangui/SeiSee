@@ -3,8 +3,9 @@
 
 #include "gfxsrc.h"
 
-class GfxSrcSeis : public GfxSrc {
-  protected:
+class GfxSrcSeis : public GfxSrc
+{
+protected:
     int m_Nh; // Number of trace headers
     int m_Nt; // Number of traces
     int m_Ns; // Number of trace samples
@@ -24,7 +25,7 @@ class GfxSrcSeis : public GfxSrc {
             m_Nh=nh; Invalidate();
         }
     */
-  public:
+public:
     GfxSrcSeis(QObject *parent = 0);
 
     ~GfxSrcSeis();

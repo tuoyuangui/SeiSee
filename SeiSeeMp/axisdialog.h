@@ -6,13 +6,14 @@
 #include <QDialog>
 
 namespace Ui {
-class AxisDialog;
+    class AxisDialog;
 }
 
-class AxisDialog : public QDialog {
+class AxisDialog : public QDialog
+{
     Q_OBJECT
 
-  private:
+private:
     MyStringTable selHdrGrid;
     MyStringTable aviHdrGrid;
 
@@ -20,7 +21,7 @@ class AxisDialog : public QDialog {
 
     bool changed;
 
-  public:
+public:
     explicit AxisDialog(QWidget *parent = 0);
     ~AxisDialog();
 
@@ -31,7 +32,7 @@ class AxisDialog : public QDialog {
 
     void show();
 
-  private slots:
+private slots:
     void on_closeButton_pressed();
 
     void on_addBtn_pressed();
@@ -52,13 +53,13 @@ class AxisDialog : public QDialog {
 
     void on_ckTimLines_toggled(bool checked);
 
-  private:
+private:
     Ui::AxisDialog *ui;
 
     void FillAviGrid();
     void FillForm();
 
-  signals:
+signals:
     void changedEvent();
 };
 

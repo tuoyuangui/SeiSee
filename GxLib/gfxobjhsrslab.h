@@ -6,13 +6,14 @@
 #include <QList>
 #include <QObject>
 
-class GfxObjHsrsLab : public GfxObj {
-  protected:
+class GfxObjHsrsLab : public GfxObj
+{
+protected:
     QList<QString> m_hdrs;
 
     virtual void DoDraw();
 
-  public:
+public:
     GfxObjHsrsLab(QObject *parent = 0);
     ~GfxObjHsrsLab();
 

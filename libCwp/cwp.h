@@ -65,8 +65,9 @@ void maketz2(int nt, float dt, float ft, float v[], int nz, float dz, float fz,
 #define PFA_MAX 720720
 #define SU_NFLTS 65535
 
-class CwpFilter {
-  public:
+class CwpFilter
+{
+public:
     float *f;      // array of filter frequencies
     int npoly;     // .... sizes of f and intfr
     float *filter; // filter array
@@ -132,8 +133,9 @@ class CwpFilter {
     int Apply(float *Inp, float *Out = NULL);
 };
 
-class CwpTimeToDepth {
-  public:
+class CwpTimeToDepth
+{
+public:
     int nt; // number of time samples
     int it; // counter
     int nz; // numer of depth samples

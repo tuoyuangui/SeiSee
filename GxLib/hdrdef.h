@@ -25,11 +25,12 @@ public:
 };
 */
 
-class CkList {
-  private:
+class CkList
+{
+private:
     QStringList Items;
 
-  public:
+public:
     int operator[](QString i)
     {
         if (Items.contains(i))
@@ -65,12 +66,13 @@ class CkList {
     }
 };
 
-class CkListSet {
-  private:
+class CkListSet
+{
+private:
     int cidx;
     QMap<int, CkList> Items;
 
-  public:
+public:
     CkListSet()
     {
         cidx = 0;
@@ -132,9 +134,10 @@ static int _fcode[] = {
     24  // IBM  Float 4
 };
 
-class FormatList {
+class FormatList
+{
 
-  public:
+public:
     static int codei(int idx)
     {
         if (idx < 0 || idx >= count())
@@ -197,8 +200,9 @@ class FormatList {
     }
 };
 
-class TrHdrDef {
-  public:
+class TrHdrDef
+{
+public:
     int frmt;     // format array
     int pos;      // position
     QString desc; // description
@@ -207,7 +211,7 @@ class TrHdrDef {
 
     SeisTrExpr expr;
 
-  public:
+public:
     QString bytesStr();
 
     explicit TrHdrDef();
@@ -215,9 +219,10 @@ class TrHdrDef {
     explicit TrHdrDef(QString n, QString d, QString expr);
 };
 
-class TrHdrDefList {
+class TrHdrDefList
+{
 
-  private:
+private:
     QList<TrHdrDef> Hdrs;
     QMap<QString, int> Hidx;
     int Type;
@@ -233,7 +238,7 @@ class TrHdrDefList {
         }
     }
 
-  public:
+public:
     QStringList NameList()
     {
         return Hidx.keys();
@@ -345,12 +350,13 @@ class TrHdrDefList {
     }
 };
 
-class TrHdrsMap : public QObject {
+class TrHdrsMap : public QObject
+{
     Q_OBJECT
-  private:
+private:
     int cidx;
 
-  public:
+public:
     QMap<int, TrHdrDefList> HdrsList;
 
     explicit TrHdrsMap(QObject *parent = 0);

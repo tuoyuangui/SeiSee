@@ -4,12 +4,13 @@
 #include <QObject>
 #include <QVector>
 
-class MyObjPtrList : public QObject {
+class MyObjPtrList : public QObject
+{
     Q_OBJECT
-  protected:
+protected:
     QVector<QObject *> items;
 
-  public:
+public:
     explicit MyObjPtrList(QObject *parent = 0);
 
     ~MyObjPtrList();
@@ -41,9 +42,9 @@ class MyObjPtrList : public QObject {
         items.clear();
     }
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
 #endif // MYPTRLIST_H

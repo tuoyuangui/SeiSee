@@ -56,8 +56,7 @@ bool GfxView::event(QEvent *event)
 {
     bool result = QWidget::event(event);
 
-    if (event->type() == QEvent::Show ||
-        event->type() == QEvent::WinIdChange ||
+    if (event->type() == QEvent::Show || event->type() == QEvent::WinIdChange ||
         event->type() == QEvent::ScreenChangeInternal) {
         QTimer::singleShot(0, this, &GfxView::TrackWindowScreen);
     }
@@ -201,12 +200,10 @@ void GfxView::paintEvent(QPaintEvent *pe)
     int screenDpiY = m_trackedScreen
                          ? qRound(m_trackedScreen->logicalDotsPerInchY())
                          : deviceDpiY;
-    int dpix = m_dpiOverride > GfxStyle::UseScreenDpi
-                   ? m_dpiOverride
-                   : screenDpiX;
-    int dpiy = m_dpiOverride > GfxStyle::UseScreenDpi
-                   ? m_dpiOverride
-                   : screenDpiY;
+    int dpix =
+        m_dpiOverride > GfxStyle::UseScreenDpi ? m_dpiOverride : screenDpiX;
+    int dpiy =
+        m_dpiOverride > GfxStyle::UseScreenDpi ? m_dpiOverride : screenDpiY;
 
     bool dpiWasChanged = dpix != m_dpiX || dpiy != m_dpiY;
     if (dpiWasChanged)

@@ -7,13 +7,14 @@
 #include "hdrdef.h"
 #include "seisfile.h"
 
-class GfxSrcFile : public GfxSrcSeis {
+class GfxSrcFile : public GfxSrcSeis
+{
     Q_OBJECT
 
-  protected:
+protected:
     SeisFile *m_Sfile;
 
-  public:
+public:
     explicit GfxSrcFile(QObject *parent = 0);
 
     virtual ~GfxSrcFile()
@@ -117,9 +118,9 @@ class GfxSrcFile : public GfxSrcSeis {
         ////
     }
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
 #endif // GFXSRCFILE_H

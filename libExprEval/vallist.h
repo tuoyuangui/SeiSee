@@ -12,70 +12,73 @@
 
 // Part of expreval namespace
 namespace ExprEval {
-// Value list item
-//--------------------------------------------------------------------------
-class ValueListItem {
-  public:
-    ValueListItem(const ::std::string &name, double def = 0.0,
-                  bool constant = false);
-    ValueListItem(const ::std::string &name, double *ptr, double def = 0.0,
-                  bool constant = false);
+    // Value list item
+    //--------------------------------------------------------------------------
+    class ValueListItem
+    {
+    public:
+        ValueListItem(const ::std::string &name, double def = 0.0,
+                      bool constant = false);
+        ValueListItem(const ::std::string &name, double *ptr, double def = 0.0,
+                      bool constant = false);
 
-    const ::std::string &GetName() const;
-    bool IsConstant() const;
+        const ::std::string &GetName() const;
+        bool IsConstant() const;
 
-    double *GetAddress();
-    void Reset();
+        double *GetAddress();
+        void Reset();
 
-  private:
-    ::std::string m_name; // Name of value
-    bool m_constant;      // Value is constant
+    private:
+        ::std::string m_name; // Name of value
+        bool m_constant;      // Value is constant
 
-    double m_value; // Internal value (if ptr == 0)
-    double *m_ptr;  // Pointer to extern value if not 0
+        double m_value; // Internal value (if ptr == 0)
+        double *m_ptr;  // Pointer to extern value if not 0
 
-    double m_def; // Default value when reset
-};
+        double m_def; // Default value when reset
+    };
 
-// Value list
-//--------------------------------------------------------------------------
-class ValueList {
-  public:
-    typedef ::std::vector<ValueListItem *>::size_type size_type;
+    // Value list
+    //--------------------------------------------------------------------------
+    class ValueList
+    {
+    public:
+        typedef ::std::vector<ValueListItem *>::size_type size_type;
 
-    ValueList();
-    ~ValueList();
+        ValueList();
+        ~ValueList();
 
-    // Add variable or constant to the list
-    void Add(const ::std::string &name, double def = 0.0,
-             bool constant = false);
+        // Add variable or constant to the list
+        void Add(const ::std::string &name, double def = 0.0,
+                 bool constant = false);
 
-    // Add an external variable or constant to the list
-    void AddAddress(const ::std::string &name, double *ptr, double def = 0.0,
-                    bool constant = false);
+        // Add an external variable or constant to the list
+        void AddAddress(const ::std::string &name, double *ptr,
+                        double def = 0.0, bool constant = false);
 
-    // Get the address of a variable or constant, internal or external
-    double *GetAddress(const ::std::string &name) const;
+        // Get the address of a variable or constant, internal or external
+        double *GetAddress(const ::std::string &name) const;
 
-    // Is the value constant
-    bool IsConstant(const ::std::string &name) const;
+        // Is the value constant
+        bool IsConstant(const ::std::string &name) const;
 
-    // Enumerate values
-    size_type Count() const;
-    void Item(size_type pos, ::std::string *name = 0, double *value = 0) const;
+        // Enumerate values
+        size_type Count() const;
+        void Item(size_type pos, ::std::string *name = 0,
+                  double *value = 0) const;
 
-    // Initialize some default values (math constants)
-    void AddDefaultValues();
+        // Initialize some default values (math constants)
+        void AddDefaultValues();
 
-    // Reset items to default values (constants are not changed)
-    void Reset();
+        // Reset items to default values (constants are not changed)
+        void Reset();
 
-    // Free items and clear memory
-    void Clear();
+        // Free items and clear memory
+        void Clear();
 
-  private:
-    ::std::vector<ValueListItem *> m_values;
-};
+    private:
+        ::std::vector<ValueListItem *> m_values;
+    };
 }; // namespace ExprEval
 
 #endif // __EXPREVAL_VALLIST_H

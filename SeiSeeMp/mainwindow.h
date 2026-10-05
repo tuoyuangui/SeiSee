@@ -57,15 +57,16 @@ public:
 */
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
-class myEventCatcher : public QObject {
+class myEventCatcher : public QObject
+{
     Q_OBJECT
-  protected:
+protected:
     int _tag;
 
-  public:
+public:
     myEventCatcher(int tag, QObject *parent)
         : QObject(parent)
     {
@@ -87,18 +88,19 @@ class myEventCatcher : public QObject {
         return QObject::eventFilter(object, event);
     }
 
-  signals:
+signals:
     void whellEvent(int tag, QWheelEvent *event);
 
-  public slots:
+public slots:
 };
 
-class myTextEditEventCatcher : public QObject {
+class myTextEditEventCatcher : public QObject
+{
     Q_OBJECT
-  protected:
+protected:
     int _tag;
 
-  public:
+public:
     myTextEditEventCatcher(int tag, QObject *parent)
         : QObject(parent)
     {
@@ -119,25 +121,26 @@ class myTextEditEventCatcher : public QObject {
         return QObject::eventFilter(object, event);
     }
 
-  signals:
+signals:
     void keyEvent(int tag, QKeyEvent *event);
 
-  public slots:
+public slots:
 };
 
 class VerticalTimeLabel;
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
-  protected:
+protected:
     void resizeEvent(QResizeEvent *event);
 
-  public:
+public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-  public slots:
+public slots:
     void execProc(SeisFile *sf, int ns, double si, float *smp);
 
     void sclZoom(double zx, double zy, int xc, int yc);
@@ -146,7 +149,7 @@ class MainWindow : public QMainWindow {
 
     void winZoom(QRect r);
 
-  private slots:
+private slots:
 
     void binHdrGridChangedEvent();
     void syncHorizontalAxisScrollBar(int minimum, int maximum);
@@ -348,7 +351,7 @@ class MainWindow : public QMainWindow {
 
     void on_ckDly_toggled(bool checked);
 
-  private:
+private:
     Ui::MainWindow *ui;
 
     //  ReadThread*    WorkThread;
@@ -505,7 +508,7 @@ class MainWindow : public QMainWindow {
 
     void FindTrace(QString dir);
 
-  signals:
+signals:
     void stop_dirs();
     void stop_find();
     void stop_expu();

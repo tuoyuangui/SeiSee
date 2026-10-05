@@ -36,8 +36,9 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_MainWindow {
-  public:
+class Ui_MainWindow
+{
+public:
     QAction *actionOpen_Directory;
     QAction *actionE_xit;
     QAction *actionAbout;
@@ -991,7 +992,9 @@ class Ui_MainWindow {
 };
 
 namespace Ui {
-class MainWindow : public Ui_MainWindow {};
+    class MainWindow : public Ui_MainWindow
+    {
+    };
 } // namespace Ui
 
 QT_END_NAMESPACE

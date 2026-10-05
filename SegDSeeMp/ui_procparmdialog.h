@@ -23,8 +23,9 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_ProcParmDialog {
-  public:
+class Ui_ProcParmDialog
+{
+public:
     QVBoxLayout *verticalLayout_4;
     QGroupBox *groupBox;
     QHBoxLayout *horizontalLayout_14;
@@ -307,7 +308,9 @@ class Ui_ProcParmDialog {
 };
 
 namespace Ui {
-class ProcParmDialog : public Ui_ProcParmDialog {};
+    class ProcParmDialog : public Ui_ProcParmDialog
+    {
+    };
 } // namespace Ui
 
 QT_END_NAMESPACE

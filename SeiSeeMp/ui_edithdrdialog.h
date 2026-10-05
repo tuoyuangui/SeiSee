@@ -28,8 +28,9 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_EditHdrDialog {
-  public:
+class Ui_EditHdrDialog
+{
+public:
     QVBoxLayout *verticalLayout_4;
     QGroupBox *groupBox_5;
     QHBoxLayout *horizontalLayout;
@@ -466,7 +467,9 @@ class Ui_EditHdrDialog {
 };
 
 namespace Ui {
-class EditHdrDialog : public Ui_EditHdrDialog {};
+    class EditHdrDialog : public Ui_EditHdrDialog
+    {
+    };
 } // namespace Ui
 
 QT_END_NAMESPACE

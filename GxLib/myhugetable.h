@@ -10,12 +10,13 @@
 
 class MyHugeTable;
 
-class MyHtWidget : public QWidget {
+class MyHtWidget : public QWidget
+{
     Q_OBJECT
 
     friend class MyHugeTable;
 
-  private:
+private:
     MyHugeTable *p;
 
     void paintEvent(QPaintEvent *event);
@@ -26,17 +27,17 @@ class MyHtWidget : public QWidget {
 
     QLineEdit *lEdit;
 
-  protected:
+protected:
     void scrollToCurRow();
 
     int xy2cr(int x, int y, int &c, qint64 &r);
 
-  public:
+public:
     explicit MyHtWidget(MyHugeTable *parent);
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 
     void on_lEdit_editingFinished()
     {
@@ -50,7 +51,7 @@ class MyHcWidget : public QWidget // Column header
 
     friend class MyHugeTable;
 
-  private:
+private:
     MyHugeTable *p;
 
     void paintEvent(QPaintEvent *event);
@@ -58,20 +59,21 @@ class MyHcWidget : public QWidget // Column header
     void mousePressEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
 
-  protected:
+protected:
     int x2c(int x);
 
-  public:
+public:
     explicit MyHcWidget(MyHugeTable *parent);
 
-  signals:
+signals:
     void colEvent(int col);
 
-  public slots:
+public slots:
 };
 
-class MyCol {
-  public:
+class MyCol
+{
+public:
     QString hdr;
     int width;
     int tag;
@@ -85,10 +87,11 @@ class MyCol {
     }
 };
 
-class MyHugeTable : public QWidget {
+class MyHugeTable : public QWidget
+{
     Q_OBJECT
 
-  private:
+private:
     QVector<MyCol> m_cols;
 
     QScrollBar *vScrollBar;
@@ -106,7 +109,7 @@ class MyHugeTable : public QWidget {
 
     void resizeEvent(QResizeEvent *event);
 
-  public:
+public:
     friend class MyHtWidget;
     friend class MyHcWidget;
 
@@ -147,14 +150,14 @@ class MyHugeTable : public QWidget {
     QString getCellData(int nrow, int ncol);
     void sendRowEvent(qint64 nrow, int mode);
 
-  public slots:
+public slots:
 
     void vChanged(int val);
     void hChanged(int val);
 
     void hcCol(int col);
 
-  signals:
+signals:
     void cellDataRequest(int nrow, int ncol, QString &val);
     void headerEvent(int col);
     void rowEvent(qint64 row, int mode);

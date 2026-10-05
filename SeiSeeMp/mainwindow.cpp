@@ -36,13 +36,14 @@
 #include "util2.h"
 #include "util2qt.h"
 
-class VerticalTimeLabel : public QWidget {
-  public:
+class VerticalTimeLabel : public QWidget
+{
+public:
     explicit VerticalTimeLabel(QWidget *parent = nullptr)
         : QWidget(parent)
     {
-        int font_Id = QFontDatabase::addApplicationFont(
-            GfxStyle::LabelFontResource);
+        int font_Id =
+            QFontDatabase::addApplicationFont(GfxStyle::LabelFontResource);
         QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
 
         // 初始化默认字体（与原 paintEvent 中的设置一致）
@@ -96,7 +97,7 @@ class VerticalTimeLabel : public QWidget {
         return QFontMetrics(m_font, this).height();
     }
 
-  protected:
+protected:
     void paintEvent(QPaintEvent *) override
     {
         QPainter painter(this);
@@ -116,14 +117,13 @@ class VerticalTimeLabel : public QWidget {
                          QString::fromLatin1(GfxStyle::TimeLabelText));
     }
 
-  private:
+private:
     void refreshFontSize()
     {
         QScreen *currentScreen = screen();
         const int screenDpiY =
-            qMax(1, currentScreen
-                        ? qRound(currentScreen->logicalDotsPerInchY())
-                        : QApplication::desktop()->logicalDpiY());
+            qMax(1, currentScreen ? qRound(currentScreen->logicalDotsPerInchY())
+                                  : QApplication::desktop()->logicalDpiY());
         m_font.setPointSizeF(GfxStyle::LabelFontPointSize * m_displayDpiY /
                              screenDpiY);
     }
@@ -179,9 +179,9 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *dpiAction = appearanceMenu->addAction(tr("Display DPI..."));
     connect(dpiAction, &QAction::triggered, this, [this]() {
         QScreen *currentScreen = timeView.screen();
-        const int screenDpi =
-            currentScreen ? qRound(currentScreen->logicalDotsPerInchX())
-                          : QApplication::desktop()->logicalDpiX();
+        const int screenDpi = currentScreen
+                                  ? qRound(currentScreen->logicalDotsPerInchX())
+                                  : QApplication::desktop()->logicalDpiX();
         QStringList options;
         QList<int> dpiValues;
         options.append(tr("Screen default (%1 DPI)").arg(screenDpi));
@@ -1763,9 +1763,8 @@ void MainWindow::ArrangeSections()
         timeGfx->ScaleX(GfxStyle::TimeLabelToAxisGap); // Time 与刻度值的间隔
     int labelAndTicksWidth =
         qMax(timeAxis.RequiredWidth(), timeRightAxis.RequiredWidth());
-    int timeAxisWidth =
-        headerTextStart + timeLabel->rotatedTextWidth() + timeLabelGap +
-        labelAndTicksWidth;
+    int timeAxisWidth = headerTextStart + timeLabel->rotatedTextWidth() +
+                        timeLabelGap + labelAndTicksWidth;
     timeScrl->setFixedWidth(timeAxisWidth);
     timeRightScrl->setFixedWidth(timeAxisWidth);
     hlabView.setFixedWidth(timeAxisWidth);

@@ -31,8 +31,9 @@ extern TrHdrsMap TraceHdrsSet;
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-class DataStorageTrace {
-  public:
+class DataStorageTrace
+{
+public:
     byte *_buf;
     int _dly;
     float *_smp;
@@ -48,8 +49,9 @@ class DataStorageTrace {
     }
 };
 
-class DataStorage {
-  private:
+class DataStorage
+{
+private:
     int _nobj; // number of objects;
     int _strl; // number of real items in storage;
     int _olen; // object length
@@ -63,7 +65,7 @@ class DataStorage {
 
     int _next;
 
-  public:
+public:
     DataStorage &Assign(const DataStorage &src);
 
     DataStorage();
@@ -97,12 +99,13 @@ class DataStorage {
     //  DataStorageTrace getTrace(int n);
 };
 
-class BinHed {
-  protected:
+class BinHed
+{
+protected:
     byte _buf[400];
     int _swap;
 
-  public:
+public:
     int val(int idx);
     void setVal(int idx, int val);
     QString name(int idx);
@@ -129,10 +132,11 @@ class BinHed {
 
 class SeisFile;
 
-class SeisFile : public QObject {
+class SeisFile : public QObject
+{
     Q_OBJECT
 
-  protected:
+protected:
     QMutex _mutex;
     DataStorage _data;
 
@@ -189,7 +193,7 @@ class SeisFile : public QObject {
 
     void Invalidate();
 
-  public:
+public:
     explicit SeisFile(QObject *parent = 0);
 
     virtual QString typeName()
@@ -550,10 +554,10 @@ class SeisFile : public QObject {
 
     Ttr Tt(long long ntr); // Get trace with header
 
-  signals:
+signals:
     void execProc(SeisFile *sf, int ns, double si, float *smp);
 
-  public slots:
+public slots:
 };
 
 //---------------------------------------------------------------------------

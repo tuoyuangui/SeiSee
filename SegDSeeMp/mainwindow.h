@@ -33,15 +33,16 @@
 #define VERSION "4.0.2"
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
-class myEventCatcher : public QObject {
+class myEventCatcher : public QObject
+{
     Q_OBJECT
-  protected:
+protected:
     int _tag;
 
-  public:
+public:
     myEventCatcher(int tag, QObject *parent)
         : QObject(parent)
     {
@@ -63,20 +64,21 @@ class myEventCatcher : public QObject {
         return QObject::eventFilter(object, event);
     }
 
-  signals:
+signals:
     void whellEvent(int tag, QWheelEvent *event);
 
-  public slots:
+public slots:
 };
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
-  public:
+public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-  public slots:
+public slots:
 
     void sendSmp(int ncs, int nch, float *smp, char &rc);
 
@@ -90,7 +92,7 @@ class MainWindow : public QMainWindow {
 
     virtual void closeEvent(QCloseEvent *event);
 
-  private slots:
+private slots:
 
     void dirGridEvent(int row, int mode);
     void hdrGridEvent(int row, int mode);
@@ -192,7 +194,7 @@ class MainWindow : public QMainWindow {
 
     void on_actionUser_s_Manual_Russian_triggered();
 
-  private:
+private:
     Ui::MainWindow *ui;
 
     ReadThread *WorkThread;

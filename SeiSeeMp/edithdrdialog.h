@@ -8,13 +8,14 @@
 #include "sgyfile.h"
 
 namespace Ui {
-class EditHdrDialog;
+    class EditHdrDialog;
 }
 
-class EditHdrDialog : public QDialog {
+class EditHdrDialog : public QDialog
+{
     Q_OBJECT
 
-  public:
+public:
     explicit EditHdrDialog(QWidget *parent = 0);
     ~EditHdrDialog();
 
@@ -26,7 +27,7 @@ class EditHdrDialog : public QDialog {
 
     void show();
 
-  private:
+private:
     Ui::EditHdrDialog *ui;
 
     void setChanged(bool v);
@@ -39,7 +40,7 @@ class EditHdrDialog : public QDialog {
 
     void onUserInput();
 
-  private slots:
+private slots:
 
     void hdrTabEvent(int row, int mode);
 
@@ -62,7 +63,7 @@ class EditHdrDialog : public QDialog {
 
     void on_insBtn_clicked();
 
-  signals:
+signals:
     void changedEvent();
 };
 

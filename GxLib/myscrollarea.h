@@ -7,10 +7,11 @@
 #include <QScrollBar>
 #include <QWidget>
 
-class MyScrollArea : public QScrollArea {
+class MyScrollArea : public QScrollArea
+{
     Q_OBJECT
 
-  private:
+private:
     QWidget *plot;
     int mv;
 
@@ -37,7 +38,7 @@ class MyScrollArea : public QScrollArea {
 
     virtual void scrollContentsBy(int dx, int dy);
 
-  public:
+public:
     MyScrollArea(QWidget *plt, int mrb = 0);
 
     void setZoomW(int on);
@@ -54,13 +55,13 @@ class MyScrollArea : public QScrollArea {
         return horizontalScrollBar()->value();
     }
 
-  signals:
+signals:
     void zoomChanged(double zx, double zy, int x, int y);
     void zoomW(QRect r);
     void mouseEvent(QMouseEvent *event);
     void keyEvent(QKeyEvent *event);
 
-  private slots:
+private slots:
 
     void on_vScroll(int value);
     void on_hScroll(int value);

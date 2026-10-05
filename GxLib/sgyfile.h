@@ -3,10 +3,11 @@
 
 #include "seisfile.h"
 
-class SgyFile : public SeisFile {
+class SgyFile : public SeisFile
+{
     Q_OBJECT
 
-  protected:
+protected:
     virtual void Open(string fn);
     virtual void Close();
 
@@ -18,7 +19,7 @@ class SgyFile : public SeisFile {
 
     virtual float GetSample(int idx, byte *inptrc);
 
-  public:
+public:
     explicit SgyFile(QObject *parent = 0);
     virtual ~SgyFile();
 
@@ -50,15 +51,16 @@ class SgyFile : public SeisFile {
             return true;
     }
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
-class SuFile : public SgyFile {
+class SuFile : public SgyFile
+{
     Q_OBJECT
 
-  protected:
+protected:
     virtual void Open(string fn);
     virtual void Close();
 
@@ -68,7 +70,7 @@ class SuFile : public SgyFile {
 
     virtual void ReadTrace(long long ntr);
 
-  public:
+public:
     explicit SuFile(QObject *parent = 0);
     virtual ~SuFile();
 
@@ -84,15 +86,16 @@ class SuFile : public SgyFile {
         return 2;
     }
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
-class CstFile : public SgyFile {
+class CstFile : public SgyFile
+{
     Q_OBJECT
 
-  protected:
+protected:
     virtual void Open(string fn);
     virtual void Close();
 
@@ -102,7 +105,7 @@ class CstFile : public SgyFile {
 
     virtual void ReadTrace(long long ntr);
 
-  public:
+public:
     explicit CstFile(QObject *parent = 0);
     virtual ~CstFile();
 
@@ -120,9 +123,9 @@ class CstFile : public SgyFile {
 
     virtual float GetSample(int idx, byte *inptrc);
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
 #endif // SGYFILE_H

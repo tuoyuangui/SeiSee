@@ -6,14 +6,15 @@
 
 #include "gfxobjseis.h"
 
-class GfxObjSeisHdrs : public GfxObjSeis {
-  protected:
+class GfxObjSeisHdrs : public GfxObjSeis
+{
+protected:
     QList<QString> m_hdrs;
     bool m_bottomSide;
 
     virtual void DoDraw();
 
-  public:
+public:
     virtual double Y1()
     {
         return 0;

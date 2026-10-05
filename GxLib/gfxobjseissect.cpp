@@ -330,8 +330,7 @@ void GfxObjSeisSect::DoDraw()
     xp = x2fpix(s_src->Tp(n1));
     xc = x2fpix(s_src->Tp(n1 + 1));
 
-    int desiredTraceSpacing =
-        gfx->ScaleX(GfxStyle::HeaderAxisMinTickSpacing);
+    int desiredTraceSpacing = gfx->ScaleX(GfxStyle::HeaderAxisMinTickSpacing);
     int step = desiredTraceSpacing / fabs(xp - xc);
     if (step < 1)
         step = 1;

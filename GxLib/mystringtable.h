@@ -15,24 +15,26 @@
 
 class MyStringTable;
 
-class MyHeaderView : public QHeaderView {
-  private:
+class MyHeaderView : public QHeaderView
+{
+private:
     virtual void paintSection(QPainter *painter, const QRect &rect,
                               int logicalIndex) const;
 
-  public:
+public:
     MyHeaderView(QWidget *parent = 0);
     ~MyHeaderView()
     {
     }
 };
 
-class MyStringTableDelegate : public QStyledItemDelegate {
+class MyStringTableDelegate : public QStyledItemDelegate
+{
     Q_OBJECT
-  private:
+private:
     MyStringTable *_parent;
 
-  public:
+public:
     explicit MyStringTableDelegate(MyStringTable *parent = 0)
         : QStyledItemDelegate((QObject *)parent)
     {
@@ -44,8 +46,9 @@ class MyStringTableDelegate : public QStyledItemDelegate {
                const QModelIndex &index) const;
 };
 
-class MyStringTableCell {
-  public:
+class MyStringTableCell
+{
+public:
     QString text;
     QString imgnm;
     QIcon icon;
@@ -64,8 +67,9 @@ class MyStringTableCell {
     }
 };
 
-class MyStringTableRow {
-  public:
+class MyStringTableRow
+{
+public:
     bool sel;
     QColor color;
     QColor textc; // text color
@@ -80,8 +84,9 @@ class MyStringTableRow {
     }
 };
 
-class MyStringTableCol {
-  public:
+class MyStringTableCol
+{
+public:
     bool chkbx; // show check
     QString label;
     QColor labbg;
@@ -100,15 +105,16 @@ class MyStringTableCol {
 class MyStringTable;
 class MyStringTableModel;
 
-class MyStringTableModel : public QAbstractTableModel {
+class MyStringTableModel : public QAbstractTableModel
+{
     Q_OBJECT
 
     friend class MyStringTable;
 
-  protected:
+protected:
     MyStringTable *_tab;
 
-  public:
+public:
     explicit MyStringTableModel(MyStringTable *parent);
 
     virtual int rowCount(const QModelIndex &) const;
@@ -125,17 +131,18 @@ class MyStringTableModel : public QAbstractTableModel {
     virtual QVariant headerData(int section, Qt::Orientation orientation,
                                 int role) const;
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
-class MyStringTable : public QTableView {
+class MyStringTable : public QTableView
+{
     Q_OBJECT
 
     friend class MyStringTableModel;
 
-  protected:
+protected:
     QVector<MyStringTableRow> _rows;
     QVector<MyStringTableCol> _cols;
 
@@ -165,7 +172,7 @@ class MyStringTable : public QTableView {
         QTableView::setColumnWidth(c, w);
     }
 
-  public:
+public:
     MyStringTableModel *_model;
 
     explicit MyStringTable(QWidget *parent = 0);
@@ -253,7 +260,7 @@ class MyStringTable : public QTableView {
 
     void setTextChanged(bool v);
 
-  signals:
+signals:
 
     void hHeaderEvent(int col);
 
@@ -263,7 +270,7 @@ class MyStringTable : public QTableView {
 
     void textChanged();
 
-  public slots:
+public slots:
 
     void hHeaderPressed(int logicalIndex)
     {

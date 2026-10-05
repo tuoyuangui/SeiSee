@@ -11,9 +11,10 @@
 class GfxView;
 class GfxSrc;
 
-class GfxObj : public QObject {
+class GfxObj : public QObject
+{
     Q_OBJECT
-  protected:
+protected:
     int L;
     int R;
     int W;
@@ -46,7 +47,7 @@ class GfxObj : public QObject {
     GfxView *m_view;
     GfxSrc *m_src;
 
-  public:
+public:
     explicit GfxObj(QObject *parent = 0);
 
     virtual ~GfxObj();
@@ -199,9 +200,9 @@ class GfxObj : public QObject {
     }
     virtual void DoDraw();
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 };
 
 #endif // GFXOBJ_H

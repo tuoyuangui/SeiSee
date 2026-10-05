@@ -51,8 +51,8 @@ void GfxObjSeisHdrs::DoDraw()
     //  gfx->DrawRect(x1,y1,x2-1,y2-1,0);
     int axisY = m_bottomSide ? y1 : y2 - GfxStyle::AxisLineWidthPixels;
 
-    gfx->DrawLine(x1, axisY,
-                  m_view->width() - GfxStyle::AxisLineWidthPixels, axisY, 0);
+    gfx->DrawLine(x1, axisY, m_view->width() - GfxStyle::AxisLineWidthPixels,
+                  axisY, 0);
 
     if (!s_src || s_src->Nt() < 1)
         return;
@@ -152,8 +152,9 @@ void GfxObjSeisHdrs::DoDraw()
             int textWidth = gfx->GetTextWidth(lab);
             int textX = xc - textWidth / 2;
             int baseline =
-                m_bottomSide ? axisY + labelGap + labelAscent + nh * (ht + lineGap)
-                             : axisY - labelGap - labelDescent - nh * (ht + lineGap);
+                m_bottomSide
+                    ? axisY + labelGap + labelAscent + nh * (ht + lineGap)
+                    : axisY - labelGap - labelDescent - nh * (ht + lineGap);
 
             if (textX > x1 && textX + textWidth < x2)
                 gfx->DrawText(textX, baseline, lab);

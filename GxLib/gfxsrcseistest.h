@@ -3,11 +3,12 @@
 
 #include "gfxsrcseis.h"
 
-class GfxSrcSeisTest : public GfxSrcSeis {
-  protected:
+class GfxSrcSeisTest : public GfxSrcSeis
+{
+protected:
     float *_tr;
 
-  public:
+public:
     GfxSrcSeisTest(QObject *parent = 0);
 
     virtual ~GfxSrcSeisTest();

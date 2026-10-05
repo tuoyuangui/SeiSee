@@ -20,8 +20,8 @@ int GfxObjTAxis::RequiredWidth() const
         return 0;
 
     Gfx *axisGfx = m_view->getGfx();
-    int labelWidth =
-        axisGfx->GetTextWidth(QString::fromLatin1(GfxStyle::TimeAxisWidthSample));
+    int labelWidth = axisGfx->GetTextWidth(
+        QString::fromLatin1(GfxStyle::TimeAxisWidthSample));
     int labelGap = axisGfx->ScaleX(GfxStyle::TimeAxisLabelGap);
 
     // 刻度线位于 labelGap 预留的区间内；轴线本身占一个物理像素。
