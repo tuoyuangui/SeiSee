@@ -85,7 +85,6 @@ public:
     {
         if (EditHdrDialog->objectName().isEmpty())
             EditHdrDialog->setObjectName(QString::fromUtf8("EditHdrDialog"));
-        EditHdrDialog->resize(726, 618);
         verticalLayout_4 = new QVBoxLayout(EditHdrDialog);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         groupBox_5 = new QGroupBox(EditHdrDialog);

@@ -63,7 +63,6 @@ public:
         if (AxisDialog->objectName().isEmpty())
             AxisDialog->setObjectName(QString::fromUtf8("AxisDialog"));
         AxisDialog->setWindowModality(Qt::ApplicationModal);
-        AxisDialog->resize(698, 478);
         verticalLayout = new QVBoxLayout(AxisDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         tabWidget = new QTabWidget(AxisDialog);

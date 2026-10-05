@@ -7,17 +7,21 @@
 #include <QFileDialog>
 #include <QFontMetrics>
 #include <QDesktopWidget>
+#include <QHBoxLayout>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QMenu>
 #include <QPainter>
+#include <QPalette>
 #include <QScrollBar>
+#include <QScreen>
 #include <QSettings>
 #include <QSignalBlocker>
 #include <QStandardItemModel>
 #include <QTextCodec>
 #include <QTimer>
 #include <QUuid>
+#include <QVBoxLayout>
 #include <QWidget>
 
 #include <fcntl.h>
@@ -36,25 +40,28 @@
 #include "util2.h"
 #include "util2qt.h"
 
+namespace {
+
+int currentScreenLogicalDpiY(const QWidget *widget)
+{
+    QScreen *currentScreen = widget->screen();
+    if (!currentScreen)
+        currentScreen = QApplication::primaryScreen();
+    return currentScreen ? GfxStyle::ScreenDpiY(currentScreen)
+                         : qMax(1, QApplication::desktop()->logicalDpiY());
+}
+
+} // namespace
+
 class VerticalTimeLabel : public QWidget
 {
 public:
     explicit VerticalTimeLabel(QWidget *parent = nullptr)
         : QWidget(parent)
     {
-        int font_Id =
-            QFontDatabase::addApplicationFont(GfxStyle::LabelFontResource);
-        QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
-
-        // 初始化默认字体（与原 paintEvent 中的设置一致）
-        m_font.setFamily(QString::fromLatin1(GfxStyle::LabelFontFamily));
-
-        if (!font_list.isEmpty()) {
-            m_font.setFamily(font_list[0]);
-        }
-
-        m_font.setPointSizeF(GfxStyle::LabelFontPointSize);
+        m_font.setFamily(GfxStyle::LabelFontFamily);
         m_font.setStyleHint(GfxStyle::LabelFontStyleHint);
+        m_font.setPointSizeF(GfxStyle::LabelFontPointSize);
         refreshSize();
     }
 
@@ -120,10 +127,7 @@ protected:
 private:
     void refreshFontSize()
     {
-        QScreen *currentScreen = screen();
-        const int screenDpiY =
-            qMax(1, currentScreen ? qRound(currentScreen->logicalDotsPerInchY())
-                                  : QApplication::desktop()->logicalDpiY());
+        const int screenDpiY = currentScreenLogicalDpiY(this);
         m_font.setPointSizeF(GfxStyle::LabelFontPointSize * m_displayDpiY /
                              screenDpiY);
     }
@@ -164,9 +168,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
 
+    resize(GfxStyle::MainWindowWidth, GfxStyle::MainWindowHeight);
+    QFont directoryGridFont = QApplication::font();
+    directoryGridFont.setPointSizeF(GfxStyle::DirectoryGridFontPointSize);
+    ui->dirFrame->setFont(directoryGridFont);
+
     QSettings appearanceSettings("PSI", "SeiSeeMp");
     int appearanceDpi =
         appearanceSettings.value("appearance/dpi", GfxStyle::UseScreenDpi)
+            .toInt();
+    m_interfaceDpi =
+        appearanceSettings.value("appearance/interfaceDpi",
+                                 GfxStyle::UseScreenDpi)
             .toInt();
     timeView.setDpiOverride(appearanceDpi);
     timeRightView.setDpiOverride(appearanceDpi);
@@ -178,10 +191,7 @@ MainWindow::MainWindow(QWidget *parent)
     QMenu *appearanceMenu = ui->menuView->addMenu(tr("Appearance"));
     QAction *dpiAction = appearanceMenu->addAction(tr("Display DPI..."));
     connect(dpiAction, &QAction::triggered, this, [this]() {
-        QScreen *currentScreen = timeView.screen();
-        const int screenDpi = currentScreen
-                                  ? qRound(currentScreen->logicalDotsPerInchX())
-                                  : QApplication::desktop()->logicalDpiX();
+        const int screenDpi = currentScreenLogicalDpiY(this);
         QStringList options;
         QList<int> dpiValues;
         options.append(tr("Screen default (%1 DPI)").arg(screenDpi));
@@ -213,12 +223,46 @@ MainWindow::MainWindow(QWidget *parent)
         hdrsBottomView.setDpiOverride(dpi);
         seisView.setDpiOverride(dpi);
         hlabView.setDpiOverride(dpi);
-        timeLabel->setDisplayDpi(timeView.dpiY());
 
         QSettings settings("PSI", "SeiSeeMp");
         settings.setValue("appearance/dpi", dpi);
         if (ui->seisFrame->isVisible())
             ArrangeSections();
+    });
+
+    QAction *interfaceDpiAction =
+        appearanceMenu->addAction(tr("Interface DPI..."));
+    connect(interfaceDpiAction, &QAction::triggered, this, [this]() {
+        const int screenDpi = currentScreenLogicalDpiY(this);
+        QStringList options;
+        QList<int> dpiValues;
+        options.append(tr("Screen default (%1 DPI)").arg(screenDpi));
+        dpiValues.append(GfxStyle::UseScreenDpi);
+        for (int i = 0; i < GfxStyle::CommonDisplayDpiCount; ++i) {
+            const int dpi = GfxStyle::CommonDisplayDpis[i];
+            options.append(tr("%1 DPI").arg(dpi));
+            dpiValues.append(dpi);
+        }
+
+        int currentIndex = dpiValues.indexOf(m_interfaceDpi);
+        if (currentIndex < 0)
+            currentIndex = 0;
+        bool accepted = false;
+        const QString selected = QInputDialog::getItem(
+            this, tr("Interface DPI"), tr("Select interface DPI:"), options,
+            currentIndex, false, &accepted);
+        if (!accepted)
+            return;
+
+        const int selectedIndex = options.indexOf(selected);
+        if (selectedIndex < 0 || selectedIndex >= dpiValues.size())
+            return;
+
+        const int dpi = dpiValues.at(selectedIndex);
+        applyInterfaceDpi(dpi);
+
+        QSettings settings("PSI", "SeiSeeMp");
+        settings.setValue("appearance/interfaceDpi", dpi);
     });
 
     eExpIdx = 0;
@@ -285,11 +329,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     dirGrid.setColLabel(0, "Name");
     dirGrid.setColLabel(1, "Type");
-    dirGrid.setColWidth(1, 50);
+    dirGrid.setColWidth(1, GfxStyle::DirectoryTypeColumnWidth);
 
     QVBoxLayout *dirGridLayout = new QVBoxLayout;
-    dirGridLayout->setMargin(1);
-    dirGridLayout->setSpacing(1);
+    dirGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    dirGridLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     dirGridLayout->addWidget(&dirGrid);
     ui->dirFrame->setLayout(dirGridLayout);
 
@@ -300,13 +344,13 @@ MainWindow::MainWindow(QWidget *parent)
     binHdrGrid.setColLabel(0, "Value");
     binHdrGrid.setColLabel(1, "Description");
     binHdrGrid.setColLabel(2, "Bytes");
-    binHdrGrid.setColWidth(0, 70);
-    binHdrGrid.setColWidth(1, 0);
-    binHdrGrid.setColWidth(2, 65);
+    binHdrGrid.setColWidth(0, GfxStyle::HeaderValueColumnWidth);
+    binHdrGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
+    binHdrGrid.setColWidth(2, GfxStyle::BinaryHeaderBytesColumnWidth);
 
     QVBoxLayout *binHdrLayout = new QVBoxLayout;
-    binHdrLayout->setMargin(1);
-    binHdrLayout->setSpacing(1);
+    binHdrLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    binHdrLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     binHdrLayout->addWidget(&binHdrGrid);
     ui->binHdrFrame->setLayout(binHdrLayout);
 
@@ -317,13 +361,13 @@ MainWindow::MainWindow(QWidget *parent)
     trcHdrGrid.setColLabel(0, "Value");
     trcHdrGrid.setColLabel(1, "Description");
     trcHdrGrid.setColLabel(2, "Bytes");
-    trcHdrGrid.setColWidth(0, 70);
-    trcHdrGrid.setColWidth(1, 0);
-    trcHdrGrid.setColWidth(2, 60);
+    trcHdrGrid.setColWidth(0, GfxStyle::HeaderValueColumnWidth);
+    trcHdrGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
+    trcHdrGrid.setColWidth(2, GfxStyle::TraceHeaderBytesColumnWidth);
 
     QVBoxLayout *trcHdrLayout = new QVBoxLayout;
-    trcHdrLayout->setMargin(1);
-    trcHdrLayout->setSpacing(1);
+    trcHdrLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    trcHdrLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     trcHdrLayout->addWidget(&trcHdrGrid);
     ui->trcHdrFrame->setLayout(trcHdrLayout);
 
@@ -334,13 +378,13 @@ MainWindow::MainWindow(QWidget *parent)
     trcDatGrid.setColLabel(0, "Index");
     trcDatGrid.setColLabel(1, "Time");
     trcDatGrid.setColLabel(2, "Sample");
-    trcDatGrid.setColWidth(0, 80);
-    trcDatGrid.setColWidth(1, 80);
-    trcDatGrid.setColWidth(2, 0);
+    trcDatGrid.setColWidth(0, GfxStyle::TraceDataColumnWidth);
+    trcDatGrid.setColWidth(1, GfxStyle::TraceDataColumnWidth);
+    trcDatGrid.setColWidth(2, GfxStyle::HiddenTableColumnWidth);
 
     QVBoxLayout *trcDatLayout = new QVBoxLayout;
-    trcDatLayout->setMargin(1);
-    trcDatLayout->setSpacing(1);
+    trcDatLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    trcDatLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     trcDatLayout->addWidget(&trcDatGrid);
     ui->trcDatFrame->setLayout(trcDatLayout);
 
@@ -351,14 +395,14 @@ MainWindow::MainWindow(QWidget *parent)
     hdrListCkGrid.setColLabel(0, "");
     hdrListCkGrid.setColLabel(1, "Bytes");
     hdrListCkGrid.setColLabel(2, "Description");
-    hdrListCkGrid.setColWidth(0, 20);
-    hdrListCkGrid.setColWidth(1, 60);
-    hdrListCkGrid.setColWidth(2, 0);
+    hdrListCkGrid.setColWidth(0, GfxStyle::HeaderCheckColumnWidth);
+    hdrListCkGrid.setColWidth(1, GfxStyle::TraceHeaderBytesColumnWidth);
+    hdrListCkGrid.setColWidth(2, GfxStyle::HiddenTableColumnWidth);
     hdrListCkGrid.setColChkbx(0, true);
 
     QVBoxLayout *hdrListCkLayout = new QVBoxLayout;
-    hdrListCkLayout->setMargin(1);
-    hdrListCkLayout->setSpacing(1);
+    hdrListCkLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    hdrListCkLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     hdrListCkLayout->addWidget(&hdrListCkGrid);
     ui->hdrListCkFrame->setLayout(hdrListCkLayout);
 
@@ -368,14 +412,14 @@ MainWindow::MainWindow(QWidget *parent)
     hdrElstCkGrid.setColLabel(0, "");
     hdrElstCkGrid.setColLabel(1, "Bytes");
     hdrElstCkGrid.setColLabel(2, "Description");
-    hdrElstCkGrid.setColWidth(0, 20);
-    hdrElstCkGrid.setColWidth(1, 60);
-    hdrElstCkGrid.setColWidth(2, 0);
+    hdrElstCkGrid.setColWidth(0, GfxStyle::HeaderCheckColumnWidth);
+    hdrElstCkGrid.setColWidth(1, GfxStyle::TraceHeaderBytesColumnWidth);
+    hdrElstCkGrid.setColWidth(2, GfxStyle::HiddenTableColumnWidth);
     hdrElstCkGrid.setColChkbx(0, true);
 
     QVBoxLayout *hdrElstCkLayout = new QVBoxLayout;
-    hdrElstCkLayout->setMargin(1);
-    hdrElstCkLayout->setSpacing(1);
+    hdrElstCkLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    hdrElstCkLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     hdrElstCkLayout->addWidget(&hdrElstCkGrid);
     ui->hdrElstCkFrame->setLayout(hdrElstCkLayout);
 
@@ -384,22 +428,22 @@ MainWindow::MainWindow(QWidget *parent)
     hdrListDtGrid.setRowCount(0);
     hdrListDtGrid.setColCount(1);
     hdrListDtGrid.setColLabel(0, "Trace#");
-    hdrListDtGrid.setColWidth(0, 60);
+    hdrListDtGrid.setColWidth(0, GfxStyle::TraceNumberColumnWidth);
 
     QVBoxLayout *hdrListDtLayout = new QVBoxLayout;
-    hdrListDtLayout->setMargin(1);
-    hdrListDtLayout->setSpacing(1);
+    hdrListDtLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    hdrListDtLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     hdrListDtLayout->addWidget(&hdrListDtGrid);
     ui->hdrListDtFrame->setLayout(hdrListDtLayout);
 
     hdrElstDtGrid.setRowCount(0);
     hdrElstDtGrid.setColCount(1);
     hdrElstDtGrid.setColLabel(0, "Trace#");
-    hdrElstDtGrid.setColWidth(0, 60);
+    hdrElstDtGrid.setColWidth(0, GfxStyle::TraceNumberColumnWidth);
 
     QVBoxLayout *hdrElstDtLayout = new QVBoxLayout;
-    hdrElstDtLayout->setMargin(1);
-    hdrElstDtLayout->setSpacing(1);
+    hdrElstDtLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    hdrElstDtLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     hdrElstDtLayout->addWidget(&hdrElstDtGrid);
     ui->hdrElstDtFrame->setLayout(hdrElstDtLayout);
 
@@ -457,7 +501,45 @@ MainWindow::MainWindow(QWidget *parent)
     horizontalAxisScrollBar = new QScrollBar(Qt::Horizontal, this);
     verticalAxisScrollBar = new QScrollBar(Qt::Vertical, this);
 
-    // 设置滚动条策略，使其在隐藏时仍保留空间，目的是避免zoomALLBtn、zoomHallBtn、zoomVallBtn三个按钮执行时发生bug,在底部和右侧产生白条
+    // 给滚动条区域和角落区域设置背景色，用在其隐藏时保留占位区域，确保视觉上保持一致
+    const QColor axisScrollBarTrackColor =
+        horizontalAxisScrollBar->palette().color(QPalette::Window);
+
+    auto applySystemPaletteBackground = [](QWidget *widget,
+                                           const QColor &color) {
+        widget->setAutoFillBackground(true);
+        QPalette palette = widget->palette();
+        palette.setColor(QPalette::Window, color);
+        widget->setPalette(palette);
+    };
+
+    QWidget *horizontalAxisScrollBarArea = new QWidget(ui->seisFrame);
+    applySystemPaletteBackground(horizontalAxisScrollBarArea,
+                                 axisScrollBarTrackColor);
+    QHBoxLayout *horizontalAxisScrollBarAreaLayout =
+        new QHBoxLayout(horizontalAxisScrollBarArea);
+    horizontalAxisScrollBarAreaLayout->setContentsMargins(
+        GfxStyle::ScrollBarAreaMargin, GfxStyle::ScrollBarAreaMargin,
+        GfxStyle::ScrollBarAreaMargin, GfxStyle::ScrollBarAreaMargin);
+    horizontalAxisScrollBarAreaLayout->setSpacing(GfxStyle::ZeroLayoutSpacing);
+    horizontalAxisScrollBarAreaLayout->addWidget(horizontalAxisScrollBar);
+
+    QWidget *verticalAxisScrollBarArea = new QWidget(ui->seisFrame);
+    applySystemPaletteBackground(verticalAxisScrollBarArea,
+                                 axisScrollBarTrackColor);
+    QVBoxLayout *verticalAxisScrollBarAreaLayout =
+        new QVBoxLayout(verticalAxisScrollBarArea);
+    verticalAxisScrollBarAreaLayout->setContentsMargins(
+        GfxStyle::ScrollBarAreaMargin, GfxStyle::ScrollBarAreaMargin,
+        GfxStyle::ScrollBarAreaMargin, GfxStyle::ScrollBarAreaMargin);
+    verticalAxisScrollBarAreaLayout->setSpacing(GfxStyle::ZeroLayoutSpacing);
+    verticalAxisScrollBarAreaLayout->addWidget(verticalAxisScrollBar);
+
+    QWidget *axisScrollBarCorner = new QWidget(ui->seisFrame);
+    applySystemPaletteBackground(axisScrollBarCorner, axisScrollBarTrackColor);
+
+    // 隐藏滚动条时保留其布局空间，由外层容器继续绘制灰色背景。
+    // 目的是避免zoomALLBtn、zoomHallBtn、zoomVallBtn三个按钮执行时发生bug,在底部和右侧产生白条
     QSizePolicy horizontalScrollBarPolicy =
         horizontalAxisScrollBar->sizePolicy();
     horizontalScrollBarPolicy.setRetainSizeWhenHidden(true);
@@ -481,9 +563,10 @@ MainWindow::MainWindow(QWidget *parent)
             seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
     timeLabel = new VerticalTimeLabel(timeScrl->viewport());
-    timeLabel->setDisplayDpi(timeView.dpiY());
+    timeLabel->setDisplayDpi(m_interfaceDpi > GfxStyle::UseScreenDpi
+                                  ? m_interfaceDpi
+                                  : currentScreenLogicalDpiY(this));
     auto arrangeOnDpiChange = [this]() {
-        timeLabel->setDisplayDpi(timeView.dpiY());
         QTimer::singleShot(0, this, [this]() {
             if (ui && ui->seisFrame->isVisible())
                 ArrangeSections();
@@ -494,12 +577,11 @@ MainWindow::MainWindow(QWidget *parent)
     timeLabel->show();
 
     // 创建 QFont 对象
-    QFont monoFont(GfxStyle::LabelFontFamily);
+    QFont monoFont(GfxStyle::TextEditorFontFamily);
     // 使用样式提示让系统自动选择等宽字体
     // monoFont.setStyleHint(QFont::Monospace);
-    monoFont.setStyleHint(GfxStyle::LabelFontStyleHint);
-    // 设置字体大小（可选）
-    monoFont.setPixelSize(GfxStyle::TextEditorFontPixelSize);
+    monoFont.setStyleHint(GfxStyle::TextEditorFontStyleHint);
+    monoFont.setPointSizeF(GfxStyle::TextEditorFontPointSize);
 
     // 应用到 QPlainTextEdit
     ui->InfoTxt->setFont(monoFont);
@@ -613,8 +695,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     seisLayout = new QGridLayout;
 
-    seisLayout->setMargin(0);
-    seisLayout->setSpacing(0);
+    seisLayout->setMargin(GfxStyle::ZeroLayoutMargin);
+    seisLayout->setSpacing(GfxStyle::ZeroLayoutSpacing);
 
     seisLayout->addWidget(&hlabView, 0, 0);
     seisLayout->addWidget(timeScrl, 1, 0);
@@ -622,8 +704,9 @@ MainWindow::MainWindow(QWidget *parent)
     seisLayout->addWidget(seisScrl, 1, 1);
     seisLayout->addWidget(hdrsBottomScrl, 2, 1);
     seisLayout->addWidget(timeRightScrl, 1, 2);
-    seisLayout->addWidget(horizontalAxisScrollBar, 3, 0, 1, 3);
-    seisLayout->addWidget(verticalAxisScrollBar, 0, 3, 3, 1);
+    seisLayout->addWidget(horizontalAxisScrollBarArea, 3, 0, 1, 3);
+    seisLayout->addWidget(verticalAxisScrollBarArea, 0, 3, 3, 1);
+    seisLayout->addWidget(axisScrollBarCorner, 3, 3);
     seisLayout->setColumnStretch(1, 1);
     seisLayout->setRowStretch(1, 1);
 
@@ -647,11 +730,59 @@ MainWindow::MainWindow(QWidget *parent)
     SetSearchControls(true);
 
     ui->seisFrame->setVisible(false);
+    applyInterfaceDpi(m_interfaceDpi);
 
     //    exprList["CDP"] = SeisTrExpr("H(21,4)");
     //    exprList["SP" ] = SeisTrExpr("L-N+1");
 
     // CreatePalette24(c,v,-1,1,rgb,3); !!!
+}
+
+bool MainWindow::event(QEvent *event)
+{
+    const bool result = QMainWindow::event(event);
+    if (event->type() == QEvent::ScreenChangeInternal) {
+        QTimer::singleShot(0, this,
+                           [this]() { applyInterfaceDpi(m_interfaceDpi); });
+    }
+    return result;
+}
+
+void MainWindow::applyInterfaceDpi(int dpi)
+{
+    m_interfaceDpi = qMax(GfxStyle::UseScreenDpi, dpi);
+    const int screenDpi = currentScreenLogicalDpiY(this);
+    const int targetDpi =
+        m_interfaceDpi > GfxStyle::UseScreenDpi ? m_interfaceDpi : screenDpi;
+    const qreal scale = static_cast<qreal>(targetDpi) / screenDpi;
+
+    const QList<QWidget *> widgets = QApplication::allWidgets();
+    for (QWidget *widget : widgets) {
+        if (!m_baseInterfaceFonts.contains(widget)) {
+            m_baseInterfaceFonts.insert(widget, widget->font());
+            connect(widget, &QObject::destroyed, this,
+                    [this, widget]() { m_baseInterfaceFonts.remove(widget); });
+        }
+
+        const QFont baseFont = m_baseInterfaceFonts.value(widget);
+        if (qobject_cast<GfxView *>(widget)) {
+            widget->setFont(baseFont);
+            continue;
+        }
+
+        QFont scaledFont = baseFont;
+        if (baseFont.pointSizeF() > 0)
+            scaledFont.setPointSizeF(baseFont.pointSizeF() * scale);
+        else if (baseFont.pixelSize() > 0)
+            scaledFont.setPixelSize(
+                qMax(1, qRound(baseFont.pixelSize() * scale)));
+        widget->setFont(scaledFont);
+    }
+
+    if (timeLabel)
+        timeLabel->setDisplayDpi(targetDpi);
+    if (ui->seisFrame->isVisible())
+        ArrangeSections();
 }
 
 void MainWindow::hdrListDtGridDataEvent(int r, int c, QString &v)
@@ -1182,7 +1313,7 @@ void MainWindow::SetHdrDatList()
             QString name = h->name;
 
             hdrListDtGrid.setColLabel(j, name);
-            hdrListDtGrid.setColWidth(j, 60);
+            hdrListDtGrid.setColWidth(j, GfxStyle::TraceNumberColumnWidth);
             hdrListDtGrid.setColTag(j, i + 1);
             hdrListCk.set(name);
             ui->cbSidx->addItem(name);
@@ -1233,7 +1364,7 @@ void MainWindow::SetHdrDatElst()
             QString name = h->name;
 
             hdrElstDtGrid.setColLabel(j, name);
-            hdrElstDtGrid.setColWidth(j, 60);
+            hdrElstDtGrid.setColWidth(j, GfxStyle::TraceNumberColumnWidth);
             hdrElstDtGrid.setColTag(j, i + 1);
             hdrElstCk.set(name);
             //          ui->cbSidx->addItem(name);
@@ -1247,7 +1378,7 @@ void MainWindow::SetHdrDatElst()
                 e = exprList[name].ExprString();
 
             hdrElstDtGrid.setColLabel(j, e);
-            hdrElstDtGrid.setColWidth(j, 60);
+            hdrElstDtGrid.setColWidth(j, GfxStyle::TraceNumberColumnWidth);
             hdrElstDtGrid.setColTag(j, i + 1);
             j++;
         }

@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>EditHdrDialog</class>
  <widget class="QDialog" name="EditHdrDialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>726</width>
-    <height>618</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Header Editor</string>
   </property>

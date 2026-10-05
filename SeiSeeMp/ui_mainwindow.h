@@ -252,7 +252,6 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1282, 702);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/images/SeiSeeMp.png"), QSize(),
                      QIcon::Normal, QIcon::Off);
@@ -375,10 +374,6 @@ public:
 
         dirFrame = new QFrame(dirGroup);
         dirFrame->setObjectName(QString::fromUtf8("dirFrame"));
-        QFont font;
-        font.setFamily(QString::fromUtf8("MS Shell Dlg 2"));
-        font.setPointSize(8);
-        dirFrame->setFont(font);
         dirFrame->setFrameShape(QFrame::StyledPanel);
         dirFrame->setFrameShadow(QFrame::Raised);
 

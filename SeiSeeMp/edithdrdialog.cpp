@@ -1,4 +1,5 @@
 #include "edithdrdialog.h"
+#include "gfxstyle.h"
 #include "ui_edithdrdialog.h"
 
 EditHdrDialog::EditHdrDialog(QWidget *parent)
@@ -6,6 +7,7 @@ EditHdrDialog::EditHdrDialog(QWidget *parent)
     , ui(new Ui::EditHdrDialog)
 {
     ui->setupUi(this);
+    resize(GfxStyle::EditHeaderDialogWidth, GfxStyle::EditHeaderDialogHeight);
 
     int n;
 
@@ -34,12 +36,12 @@ EditHdrDialog::EditHdrDialog(QWidget *parent)
     hdrGrid.verticalHeader()->setVisible(false);
     hdrGrid.setColLabel(0, "Name");
     hdrGrid.setColLabel(1, "Description");
-    hdrGrid.setColWidth(0, 65);
-    hdrGrid.setColWidth(1, 0);
+    hdrGrid.setColWidth(0, GfxStyle::EditHeaderValueColumnWidth);
+    hdrGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
 
     QVBoxLayout *hdrGridLayout = new QVBoxLayout;
-    hdrGridLayout->setMargin(1);
-    hdrGridLayout->setSpacing(1);
+    hdrGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    hdrGridLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     hdrGridLayout->addWidget(&hdrGrid);
     ui->hdrsBox->setLayout(hdrGridLayout);
 
@@ -52,12 +54,12 @@ EditHdrDialog::EditHdrDialog(QWidget *parent)
     insGrid.verticalHeader()->setVisible(false);
     insGrid.setColLabel(0, "Name");
     insGrid.setColLabel(1, "Description");
-    insGrid.setColWidth(0, 65);
-    insGrid.setColWidth(1, 0);
+    insGrid.setColWidth(0, GfxStyle::EditHeaderValueColumnWidth);
+    insGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
 
     QVBoxLayout *insGridLayout = new QVBoxLayout;
-    insGridLayout->setMargin(1);
-    insGridLayout->setSpacing(1);
+    insGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    insGridLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     insGridLayout->addWidget(&insGrid);
     ui->frmHdrs->setLayout(insGridLayout);
 

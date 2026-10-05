@@ -1,6 +1,7 @@
 #include <QFileDialog>
 #include <QThread>
 
+#include "gfxstyle.h"
 #include "saveasdialog.h"
 #include "ui_saveasdialog.h"
 
@@ -9,18 +10,29 @@ SaveAsDialog::SaveAsDialog(QWidget *parent)
     , ui(new Ui::SaveAsDialog)
 {
     ui->setupUi(this);
+    resize(GfxStyle::SaveAsDialogWidth, GfxStyle::SaveAsDialogHeight);
+
+    QFont labelFont = QApplication::font();
+    labelFont.setPointSizeF(GfxStyle::SaveAsLabelFontPointSize);
+    ui->label_2->setFont(labelFont);
+    ui->label_3->setFont(labelFont);
+    ui->label_4->setFont(labelFont);
+    ui->label_5->setFont(labelFont);
+    ui->label_6->setFont(labelFont);
+    ui->label_7->setFont(labelFont);
+    ui->label_8->setFont(labelFont);
 
     hdrListGrid.setRowCount(0);
     hdrListGrid.setColCount(2);
     hdrListGrid.verticalHeader()->setVisible(false);
     hdrListGrid.setColLabel(0, "Name");
     hdrListGrid.setColLabel(1, "Description");
-    hdrListGrid.setColWidth(0, 60);
-    hdrListGrid.setColWidth(1, 0);
+    hdrListGrid.setColWidth(0, GfxStyle::SaveHeaderNameColumnWidth);
+    hdrListGrid.setColWidth(1, GfxStyle::HiddenTableColumnWidth);
 
     QVBoxLayout *hdrListCkLayout = new QVBoxLayout;
-    hdrListCkLayout->setMargin(1);
-    hdrListCkLayout->setSpacing(1);
+    hdrListCkLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    hdrListCkLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     hdrListCkLayout->addWidget(&hdrListGrid);
     ui->hdrBox->setLayout(hdrListCkLayout);
 

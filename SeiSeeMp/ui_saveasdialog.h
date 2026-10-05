@@ -98,7 +98,6 @@ public:
     {
         if (SaveAsDialog->objectName().isEmpty())
             SaveAsDialog->setObjectName(QString::fromUtf8("SaveAsDialog"));
-        SaveAsDialog->resize(661, 550);
         SaveAsDialog->setModal(true);
         verticalLayout_7 = new QVBoxLayout(SaveAsDialog);
         verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
@@ -138,9 +137,6 @@ public:
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         label_2 = new QLabel(tab);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        QFont font;
-        font.setPointSize(8);
-        label_2->setFont(font);
 
         gridLayout->addWidget(label_2, 0, 0, 1, 1);
 
@@ -152,7 +148,6 @@ public:
 
         label_3 = new QLabel(tab);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setFont(font);
 
         gridLayout->addWidget(label_3, 1, 0, 1, 1);
 
@@ -170,7 +165,6 @@ public:
 
         label_4 = new QLabel(tab);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setFont(font);
 
         gridLayout->addWidget(label_4, 2, 0, 1, 1);
 
@@ -188,7 +182,6 @@ public:
 
         label_5 = new QLabel(tab);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setFont(font);
 
         gridLayout->addWidget(label_5, 3, 0, 1, 1);
 
@@ -317,7 +310,6 @@ public:
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         label_6 = new QLabel(groupBox_4);
         label_6->setObjectName(QString::fromUtf8("label_6"));
-        label_6->setFont(font);
 
         gridLayout_2->addWidget(label_6, 0, 0, 1, 1);
 
@@ -335,7 +327,6 @@ public:
 
         label_7 = new QLabel(groupBox_4);
         label_7->setObjectName(QString::fromUtf8("label_7"));
-        label_7->setFont(font);
 
         gridLayout_2->addWidget(label_7, 1, 0, 1, 1);
 
@@ -363,7 +354,6 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         label_8 = new QLabel(groupBox_5);
         label_8->setObjectName(QString::fromUtf8("label_8"));
-        label_8->setFont(font);
 
         horizontalLayout->addWidget(label_8);
 

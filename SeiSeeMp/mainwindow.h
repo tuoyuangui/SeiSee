@@ -3,6 +3,8 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QFont>
+#include <QHash>
 #include <QLabel>
 #include <QMainWindow>
 #include <QPlainTextEdit>
@@ -134,6 +136,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 protected:
+    bool event(QEvent *event) override;
     void resizeEvent(QResizeEvent *event);
 
 public:
@@ -352,7 +355,11 @@ private slots:
     void on_ckDly_toggled(bool checked);
 
 private:
+    void applyInterfaceDpi(int dpi);
+
     Ui::MainWindow *ui;
+    int m_interfaceDpi = 0;
+    QHash<QWidget *, QFont> m_baseInterfaceFonts;
 
     //  ReadThread*    WorkThread;
 

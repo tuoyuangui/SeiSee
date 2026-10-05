@@ -76,8 +76,6 @@ public:
     {
         if (ProcParmDialog->objectName().isEmpty())
             ProcParmDialog->setObjectName(QString::fromUtf8("ProcParmDialog"));
-        ProcParmDialog->resize(340, 414);
-        ProcParmDialog->setMaximumSize(QSize(360, 414));
         ProcParmDialog->setModal(true);
         verticalLayout_6 = new QVBoxLayout(ProcParmDialog);
         verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));

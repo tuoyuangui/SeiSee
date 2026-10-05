@@ -2,6 +2,7 @@
 #define GFXSTYLE_H
 
 #include <QFont>
+#include <QScreen>
 
 namespace GfxStyle {
 
@@ -11,23 +12,89 @@ namespace GfxStyle {
     constexpr double MillimetersPerMeter = 1000.0;
     // 0 表示使用当前屏幕 DPI，而不是固定 DPI。
     constexpr int UseScreenDpi = 0;
+    // Qt normalizes logical DPI to 96 when high-DPI scaling is enabled.
+    // Include the screen scale factor to recover the effective screen DPI.
+    inline int ScreenDpiX(const QScreen *screen)
+    {
+        return screen
+                   ? qMax(1, qRound(screen->logicalDotsPerInchX() *
+                                    screen->devicePixelRatio()))
+                   : ReferenceDpi;
+    }
+
+    inline int ScreenDpiY(const QScreen *screen)
+    {
+        return screen
+                   ? qMax(1, qRound(screen->logicalDotsPerInchY() *
+                                    screen->devicePixelRatio()))
+                   : ReferenceDpi;
+    }
+
     // Appearance 菜单提供给用户选择的常见固定 DPI。
     static const int CommonDisplayDpis[] = {ReferenceDpi, 120, 144, 168,
                                             192,          240, 288, 384};
     constexpr int CommonDisplayDpiCount =
         sizeof(CommonDisplayDpis) / sizeof(CommonDisplayDpis[0]);
 
-    // 地震图、坐标轴及 Time 标签共用的字体设置。
-    // LabelFontPointSize 使用 point size；不是 pixel size。
+    // 应用界面字体；Qt 资源路径对应 fonts/Roboto-Regular-14.ttf。
+    static const char UiFontResource[] = ":/fonts/Roboto-Regular-14.ttf";
+    static const char UiFontFamily[] = "Roboto";
+    constexpr double UiFontPointSize = 9.75;
+    constexpr double DirectoryGridFontPointSize = 8.0;
+    constexpr double AboutTitleFontPointSize = 22.0;
+    constexpr double AboutSubtitleFontPointSize = 10.0;
+    constexpr double AboutProductFontPointSize = 12.0;
+    constexpr double AboutDetailsFontPointSize = 10.0;
+    constexpr double SaveAsLabelFontPointSize = 8.0;
+
+    // InfoTxt 和 TxtHdrEdit 使用 Courier New 等宽字体。
+    static const char TextEditorFontFamily[] = "Courier New";
+    constexpr QFont::StyleHint TextEditorFontStyleHint = QFont::Courier;
+    constexpr double TextEditorFontPointSize = 8.25;
+
+    // 地震图、坐标轴及 Time 标签字体字号，单位为 point。
     constexpr double LabelFontPointSize = 8.25;
-    constexpr QFont::StyleHint LabelFontStyleHint = QFont::Courier;
-    static const char LabelFontFamily[] = "Courier New";
+    static const char LabelFontFamily[] = "Times New Roman";
+    // Qt 资源路径对应 SeiSeeMp/fonts/TIMES.TTF。
     static const char LabelFontResource[] = ":/fonts/TIMES.TTF";
+    constexpr QFont::StyleHint LabelFontStyleHint = QFont::Serif;
     static const char TimeLabelText[] = "Time";
     static const char TimeAxisWidthSample[] = "0000";
-    // 以下两项使用 pixel size；它们是 Qt UI 字体字号，不是 point size。
-    constexpr int MainWindowDefaultFontPixelSize = 13;
-    constexpr int TextEditorFontPixelSize = 11;
+
+    // SeiSeeMp 初始窗口尺寸，单位为 Qt 逻辑像素。
+    constexpr int MainWindowWidth = 1282;
+    constexpr int MainWindowHeight = 702;
+    constexpr int AboutDialogWidth = 387;
+    constexpr int AboutDialogHeight = 228;
+    constexpr int AxisDialogWidth = 698;
+    constexpr int AxisDialogHeight = 478;
+    constexpr int EditHeaderDialogWidth = 726;
+    constexpr int EditHeaderDialogHeight = 618;
+    constexpr int ProcParmDialogWidth = 340;
+    constexpr int ProcParmDialogHeight = 414;
+    constexpr int ProcParmDialogMaxWidth = 360;
+    constexpr int SaveAsDialogWidth = 661;
+    constexpr int SaveAsDialogHeight = 550;
+
+    // SeiSeeMp 表格列宽，单位为 96 DPI 下的逻辑像素。
+    constexpr int HiddenTableColumnWidth = 0;
+    constexpr int DirectoryTypeColumnWidth = 50;
+    constexpr int HeaderValueColumnWidth = 70;
+    constexpr int BinaryHeaderBytesColumnWidth = 65;
+    constexpr int TraceHeaderBytesColumnWidth = 60;
+    constexpr int TraceDataColumnWidth = 80;
+    constexpr int HeaderCheckColumnWidth = 20;
+    constexpr int TraceNumberColumnWidth = 60;
+    constexpr int AvailableHeaderColumnWidth = 80;
+    constexpr int EditHeaderValueColumnWidth = 65;
+    constexpr int SaveHeaderNameColumnWidth = 60;
+
+    // SeiSeeMp 紧凑型布局间距，单位为 96 DPI 下的逻辑像素。
+    constexpr int CompactLayoutMargin = 1;
+    constexpr int CompactLayoutSpacing = 1;
+    constexpr int ZeroLayoutMargin = 0;
+    constexpr int ZeroLayoutSpacing = 0;
+    constexpr int ScrollBarAreaMargin = 0;
 
     // 以下距离以 ReferenceDpi (96 DPI) 下的像素为单位，
     // 绘制时经 ScaleX/ScaleY 换算为当前 DPI 下的像素；不是字体字号。

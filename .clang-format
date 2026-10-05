@@ -1,13 +1,22 @@
+# 基础样式及缩进
 BasedOnStyle: LLVM
 IndentWidth: 4
+# 访问修饰符（public、protected、private）相对类成员向外缩进 4 格
 AccessModifierOffset: -4
+# 命名空间内的代码也进行缩进
 NamespaceIndentation: All
+# 指针星号靠近变量名，并固定采用此规则，不根据原代码推断
 PointerAlignment: Right
 DerivePointerAlignment: false
+# 构造函数初始化列表换行时，逗号放在下一项的行首
 BreakConstructorInitializers: BeforeComma
+# 使用自定义的大括号换行规则
 BreakBeforeBraces: Custom
 BraceWrapping:
+  # 类和函数定义的左大括号另起一行
   AfterClass: true
   AfterFunction: true
+# 不将短函数压缩为单行
 AllowShortFunctionsOnASingleLine: None
+# 保留 #include 的现有顺序，不自动排序
 SortIncludes: false

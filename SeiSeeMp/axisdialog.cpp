@@ -1,4 +1,5 @@
 #include "axisdialog.h"
+#include "gfxstyle.h"
 #include "hdrdef.h"
 #include "sgyfile.h"
 #include "ui_axisdialog.h"
@@ -10,6 +11,7 @@ AxisDialog::AxisDialog(QWidget *parent)
     , ui(new Ui::AxisDialog)
 {
     ui->setupUi(this);
+    resize(GfxStyle::AxisDialogWidth, GfxStyle::AxisDialogHeight);
 
     selHdrGrid.setRowCount(0);
     selHdrGrid.setColCount(1);
@@ -17,8 +19,8 @@ AxisDialog::AxisDialog(QWidget *parent)
     selHdrGrid.horizontalHeader()->setVisible(false);
 
     QVBoxLayout *selGridLayout = new QVBoxLayout;
-    selGridLayout->setMargin(1);
-    selGridLayout->setSpacing(1);
+    selGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    selGridLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     selGridLayout->addWidget(&selHdrGrid);
     ui->selHdrsBox->setLayout(selGridLayout);
 
@@ -27,11 +29,11 @@ AxisDialog::AxisDialog(QWidget *parent)
     aviHdrGrid.verticalHeader()->setVisible(false);
     aviHdrGrid.horizontalHeader()->setVisible(false);
 
-    aviHdrGrid.setColWidth(0, 80);
+    aviHdrGrid.setColWidth(0, GfxStyle::AvailableHeaderColumnWidth);
 
     QVBoxLayout *aviGridLayout = new QVBoxLayout;
-    aviGridLayout->setMargin(1);
-    aviGridLayout->setSpacing(1);
+    aviGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
+    aviGridLayout->setSpacing(GfxStyle::CompactLayoutSpacing);
     aviGridLayout->addWidget(&aviHdrGrid);
     ui->aviHdrsBox->setLayout(aviGridLayout);
 }

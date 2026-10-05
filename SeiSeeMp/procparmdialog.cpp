@@ -1,4 +1,5 @@
 #include "procparmdialog.h"
+#include "gfxstyle.h"
 #include "ui_procparmdialog.h"
 
 #include "util2.h"
@@ -8,6 +9,9 @@ ProcParmDialog::ProcParmDialog(QWidget *parent)
     , ui(new Ui::ProcParmDialog)
 {
     ui->setupUi(this);
+    resize(GfxStyle::ProcParmDialogWidth, GfxStyle::ProcParmDialogHeight);
+    setMaximumSize(GfxStyle::ProcParmDialogMaxWidth,
+                   GfxStyle::ProcParmDialogHeight);
 }
 
 ProcParmDialog::~ProcParmDialog()

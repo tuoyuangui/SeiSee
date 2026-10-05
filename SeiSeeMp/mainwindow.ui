@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1282</width>
-    <height>702</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>SegDSeeMp</string>
   </property>
@@ -206,12 +198,6 @@
         </item>
         <item>
          <widget class="QFrame" name="dirFrame">
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>

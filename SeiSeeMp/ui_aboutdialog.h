@@ -35,7 +35,6 @@ public:
     {
         if (AboutDialog->objectName().isEmpty())
             AboutDialog->setObjectName(QString::fromUtf8("AboutDialog"));
-        AboutDialog->resize(387, 228);
         verticalLayout = new QVBoxLayout(AboutDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         horizontalLayout = new QHBoxLayout();
@@ -59,22 +58,17 @@ public:
 
         label_rev = new QLabel(AboutDialog);
         label_rev->setObjectName(QString::fromUtf8("label_rev"));
-        QFont font;
-        font.setPointSize(10);
-        label_rev->setFont(font);
         label_rev->setScaledContents(true);
 
         verticalLayout->addWidget(label_rev);
 
         label = new QLabel(AboutDialog);
         label->setObjectName(QString::fromUtf8("label"));
-        label->setFont(font);
 
         verticalLayout->addWidget(label);
 
         label_ww = new QLabel(AboutDialog);
         label_ww->setObjectName(QString::fromUtf8("label_ww"));
-        label_ww->setFont(font);
 
         verticalLayout->addWidget(label_ww);
 
@@ -102,12 +96,11 @@ public:
         label_3->setText(QCoreApplication::translate(
             "AboutDialog",
             "<html><head/><body><p align=\"center\"><span style=\" "
-            "font-size:22pt; "
             "font-weight:600; color:#00007f;\">SeiSee</span></p><p "
-            "align=\"center\"><span style=\" font-size:10pt; font-weight:600; "
+            "align=\"center\"><span style=\" font-weight:600; "
             "color:#00007f;\">MultiPlatform</span></p><p "
             "align=\"center\"><span "
-            "style=\" font-size:12pt; font-weight:600; color:#00007f;\">SEG-Y "
+            "style=\" font-weight:600; color:#00007f;\">SEG-Y "
             "Viewer</span></p></body></html>",
             nullptr));
         label_rev->setText(QCoreApplication::translate(

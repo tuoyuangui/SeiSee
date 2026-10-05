@@ -1,7 +1,6 @@
-#include <QApplication>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QEvent>
+#include <QApplication>
 #include <QTimer>
 
 #include "gfx.h"
@@ -16,10 +15,11 @@ GfxView::GfxView(QWidget *parent)
     m_trackedWindow = nullptr;
     m_trackedScreen = nullptr;
 
-    QDesktopWidget desk;
-
-    int dpix = desk.logicalDpiX();
-    int dpiy = desk.logicalDpiY();
+    QScreen *currentScreen = screen();
+    if (!currentScreen)
+        currentScreen = QApplication::primaryScreen();
+    int dpix = GfxStyle::ScreenDpiX(currentScreen);
+    int dpiy = GfxStyle::ScreenDpiY(currentScreen);
     m_dpiX = dpix;
     m_dpiY = dpiy;
     m_Xpmm = dpix / GfxStyle::MillimetersPerInch;
@@ -107,10 +107,12 @@ void GfxView::TrackScreen(QScreen *screen)
 
 void GfxView::RefreshScreenDpi()
 {
-    int dpiX = m_trackedScreen ? qRound(m_trackedScreen->logicalDotsPerInchX())
-                               : m_dpiX;
-    int dpiY = m_trackedScreen ? qRound(m_trackedScreen->logicalDotsPerInchY())
-                               : m_dpiY;
+    QScreen *currentScreen = m_trackedScreen ? m_trackedScreen.data() : screen();
+    if (!currentScreen)
+        currentScreen = QApplication::primaryScreen();
+
+    int dpiX = GfxStyle::ScreenDpiX(currentScreen);
+    int dpiY = GfxStyle::ScreenDpiY(currentScreen);
     if (m_dpiOverride > GfxStyle::UseScreenDpi) {
         dpiX = m_dpiOverride;
         dpiY = m_dpiOverride;
@@ -192,14 +194,15 @@ void GfxView::paintEvent(QPaintEvent *pe)
 
     engine = painter.paintEngine();
 
-    int deviceDpiX = engine->paintDevice()->logicalDpiX();
-    int deviceDpiY = engine->paintDevice()->logicalDpiY();
-    int screenDpiX = m_trackedScreen
-                         ? qRound(m_trackedScreen->logicalDotsPerInchX())
-                         : deviceDpiX;
-    int screenDpiY = m_trackedScreen
-                         ? qRound(m_trackedScreen->logicalDotsPerInchY())
-                         : deviceDpiY;
+    QScreen *currentScreen = m_trackedScreen ? m_trackedScreen.data() : screen();
+    if (!currentScreen)
+        currentScreen = QApplication::primaryScreen();
+    int screenDpiX = currentScreen
+                         ? GfxStyle::ScreenDpiX(currentScreen)
+                         : engine->paintDevice()->logicalDpiX();
+    int screenDpiY = currentScreen
+                         ? GfxStyle::ScreenDpiY(currentScreen)
+                         : engine->paintDevice()->logicalDpiY();
     int dpix =
         m_dpiOverride > GfxStyle::UseScreenDpi ? m_dpiOverride : screenDpiX;
     int dpiy =

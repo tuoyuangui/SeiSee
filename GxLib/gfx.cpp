@@ -3,11 +3,10 @@
 
 #include "gfx.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QFont>
-#include <QFontDatabase>
 #include <QFontMetrics>
-#include <QStringList>
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -253,17 +252,7 @@ Gfx::Gfx()
     _img = QImage(1, 1, QImage::Format_RGB32);
     SetDpi(m_dpiX, m_dpiY);
 
-    QFont font(GfxStyle::LabelFontFamily);
-    _font = font;
-    int font_Id =
-        QFontDatabase::addApplicationFont(GfxStyle::LabelFontResource);
-    QStringList font_list = QFontDatabase::applicationFontFamilies(font_Id);
-    if (!font_list.isEmpty()) {
-        QFont f;
-        f.setFamily(font_list[0]);
-        _font = f;
-    }
-
+    _font = QFont(GfxStyle::LabelFontFamily);
     _font.setStyleHint(GfxStyle::LabelFontStyleHint);
     ApplyFontPointSize(m_size);
 
