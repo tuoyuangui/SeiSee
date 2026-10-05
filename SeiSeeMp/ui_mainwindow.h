@@ -168,6 +168,7 @@ public:
     QPushButton *zoomPreBtn;
     QSpacerItem *verticalSpacer_2;
     QPushButton *axisBtn;
+    QPushButton *captureBtn;
     QSpacerItem *verticalSpacer_3;
     QFrame *seisFrame1;
     QVBoxLayout *verticalLayout;
@@ -1031,6 +1032,18 @@ public:
 
         verticalLayout_28->addWidget(axisBtn);
 
+        captureBtn = new QPushButton(frame_8);
+        captureBtn->setObjectName(QString::fromUtf8("captureBtn"));
+        sizePolicy1.setHeightForWidth(captureBtn->sizePolicy().hasHeightForWidth());
+        captureBtn->setSizePolicy(sizePolicy1);
+        captureBtn->setMinimumSize(QSize(25, 25));
+        captureBtn->setMaximumSize(QSize(25, 25));
+        QIcon icon17;
+        icon17.addFile(QString::fromUtf8(":/images/Capture.png"), QSize(), QIcon::Normal, QIcon::Off);
+        captureBtn->setIcon(icon17);
+
+        verticalLayout_28->addWidget(captureBtn);
+
         verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_28->addItem(verticalSpacer_3);
@@ -1130,9 +1143,9 @@ public:
         btnCkAll->setSizePolicy(sizePolicy1);
         btnCkAll->setMinimumSize(QSize(25, 25));
         btnCkAll->setMaximumSize(QSize(25, 25));
-        QIcon icon17;
-        icon17.addFile(QString::fromUtf8(":/images/ChkAll.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnCkAll->setIcon(icon17);
+        QIcon icon18;
+        icon18.addFile(QString::fromUtf8(":/images/ChkAll.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnCkAll->setIcon(icon18);
 
         horizontalLayout->addWidget(btnCkAll);
 
@@ -1142,9 +1155,9 @@ public:
         btnCkNon->setSizePolicy(sizePolicy1);
         btnCkNon->setMinimumSize(QSize(25, 25));
         btnCkNon->setMaximumSize(QSize(25, 25));
-        QIcon icon18;
-        icon18.addFile(QString::fromUtf8(":/images/ChkNon.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnCkNon->setIcon(icon18);
+        QIcon icon19;
+        icon19.addFile(QString::fromUtf8(":/images/ChkNon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnCkNon->setIcon(icon19);
 
         horizontalLayout->addWidget(btnCkNon);
 
@@ -1159,9 +1172,9 @@ public:
         btnEdHdr->setSizePolicy(sizePolicy1);
         btnEdHdr->setMinimumSize(QSize(25, 25));
         btnEdHdr->setMaximumSize(QSize(25, 25));
-        QIcon icon19;
-        icon19.addFile(QString::fromUtf8(":/images/edit_hdr.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnEdHdr->setIcon(icon19);
+        QIcon icon20;
+        icon20.addFile(QString::fromUtf8(":/images/edit_hdr.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnEdHdr->setIcon(icon20);
 
         horizontalLayout->addWidget(btnEdHdr);
 
@@ -1246,9 +1259,9 @@ public:
         btnSbin->setSizePolicy(sizePolicy1);
         btnSbin->setMinimumSize(QSize(25, 25));
         btnSbin->setMaximumSize(QSize(25, 25));
-        QIcon icon20;
-        icon20.addFile(QString::fromUtf8(":/images/Findb.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnSbin->setIcon(icon20);
+        QIcon icon21;
+        icon21.addFile(QString::fromUtf8(":/images/Findb.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnSbin->setIcon(icon21);
 
         horizontalLayout_10->addWidget(btnSbin);
 
@@ -1258,9 +1271,9 @@ public:
         btnSfwd->setSizePolicy(sizePolicy1);
         btnSfwd->setMinimumSize(QSize(25, 25));
         btnSfwd->setMaximumSize(QSize(25, 25));
-        QIcon icon21;
-        icon21.addFile(QString::fromUtf8(":/images/Ffwd.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnSfwd->setIcon(icon21);
+        QIcon icon22;
+        icon22.addFile(QString::fromUtf8(":/images/Ffwd.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnSfwd->setIcon(icon22);
 
         horizontalLayout_10->addWidget(btnSfwd);
 
@@ -1270,9 +1283,9 @@ public:
         btnSbkw->setSizePolicy(sizePolicy1);
         btnSbkw->setMinimumSize(QSize(25, 25));
         btnSbkw->setMaximumSize(QSize(25, 25));
-        QIcon icon22;
-        icon22.addFile(QString::fromUtf8(":/images/FindBkw.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnSbkw->setIcon(icon22);
+        QIcon icon23;
+        icon23.addFile(QString::fromUtf8(":/images/FindBkw.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnSbkw->setIcon(icon23);
 
         horizontalLayout_10->addWidget(btnSbkw);
 
@@ -1283,9 +1296,9 @@ public:
         btnSstop->setSizePolicy(sizePolicy1);
         btnSstop->setMinimumSize(QSize(25, 25));
         btnSstop->setMaximumSize(QSize(25, 25));
-        QIcon icon23;
-        icon23.addFile(QString::fromUtf8(":/images/SStp.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnSstop->setIcon(icon23);
+        QIcon icon24;
+        icon24.addFile(QString::fromUtf8(":/images/SStp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnSstop->setIcon(icon24);
 
         horizontalLayout_10->addWidget(btnSstop);
 
@@ -1299,9 +1312,9 @@ public:
         btnLastTr->setSizePolicy(sizePolicy1);
         btnLastTr->setMinimumSize(QSize(25, 25));
         btnLastTr->setMaximumSize(QSize(25, 25));
-        QIcon icon24;
-        icon24.addFile(QString::fromUtf8(":/images/GoBottom.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnLastTr->setIcon(icon24);
+        QIcon icon25;
+        icon25.addFile(QString::fromUtf8(":/images/GoBottom.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnLastTr->setIcon(icon25);
 
         horizontalLayout_10->addWidget(btnLastTr);
 
@@ -1311,9 +1324,9 @@ public:
         btnFirstTr->setSizePolicy(sizePolicy1);
         btnFirstTr->setMinimumSize(QSize(25, 25));
         btnFirstTr->setMaximumSize(QSize(25, 25));
-        QIcon icon25;
-        icon25.addFile(QString::fromUtf8(":/images/GoTop.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnFirstTr->setIcon(icon25);
+        QIcon icon26;
+        icon26.addFile(QString::fromUtf8(":/images/GoTop.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnFirstTr->setIcon(icon26);
 
         horizontalLayout_10->addWidget(btnFirstTr);
 
@@ -1433,7 +1446,7 @@ public:
         btnCkNonE->setSizePolicy(sizePolicy1);
         btnCkNonE->setMinimumSize(QSize(25, 25));
         btnCkNonE->setMaximumSize(QSize(25, 25));
-        btnCkNonE->setIcon(icon18);
+        btnCkNonE->setIcon(icon19);
 
         horizontalLayout_17->addWidget(btnCkNonE);
 
@@ -1483,9 +1496,9 @@ public:
         btnHexp->setSizePolicy(sizePolicy1);
         btnHexp->setMinimumSize(QSize(25, 25));
         btnHexp->setMaximumSize(QSize(25, 25));
-        QIcon icon26;
-        icon26.addFile(QString::fromUtf8(":/images/Hexp.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnHexp->setIcon(icon26);
+        QIcon icon27;
+        icon27.addFile(QString::fromUtf8(":/images/Hexp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnHexp->setIcon(icon27);
 
         horizontalLayout_15->addWidget(btnHexp);
 
@@ -1495,9 +1508,9 @@ public:
         btnNexp->setSizePolicy(sizePolicy1);
         btnNexp->setMinimumSize(QSize(25, 25));
         btnNexp->setMaximumSize(QSize(25, 25));
-        QIcon icon27;
-        icon27.addFile(QString::fromUtf8(":/images/Nexp.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnNexp->setIcon(icon27);
+        QIcon icon28;
+        icon28.addFile(QString::fromUtf8(":/images/Nexp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnNexp->setIcon(icon28);
 
         horizontalLayout_15->addWidget(btnNexp);
 
@@ -1507,9 +1520,9 @@ public:
         btnLexp->setSizePolicy(sizePolicy1);
         btnLexp->setMinimumSize(QSize(25, 25));
         btnLexp->setMaximumSize(QSize(25, 25));
-        QIcon icon28;
-        icon28.addFile(QString::fromUtf8(":/images/Lexp.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnLexp->setIcon(icon28);
+        QIcon icon29;
+        icon29.addFile(QString::fromUtf8(":/images/Lexp.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnLexp->setIcon(icon29);
 
         horizontalLayout_15->addWidget(btnLexp);
 
@@ -1523,9 +1536,9 @@ public:
         btnClrExp->setSizePolicy(sizePolicy1);
         btnClrExp->setMinimumSize(QSize(25, 25));
         btnClrExp->setMaximumSize(QSize(25, 25));
-        QIcon icon29;
-        icon29.addFile(QString::fromUtf8(":/images/delete_item.png"), QSize(), QIcon::Normal, QIcon::Off);
-        btnClrExp->setIcon(icon29);
+        QIcon icon30;
+        icon30.addFile(QString::fromUtf8(":/images/delete_item.png"), QSize(), QIcon::Normal, QIcon::Off);
+        btnClrExp->setIcon(icon30);
 
         horizontalLayout_15->addWidget(btnClrExp);
 
@@ -1565,7 +1578,7 @@ public:
         btnLastTr_2->setSizePolicy(sizePolicy1);
         btnLastTr_2->setMinimumSize(QSize(25, 25));
         btnLastTr_2->setMaximumSize(QSize(25, 25));
-        btnLastTr_2->setIcon(icon24);
+        btnLastTr_2->setIcon(icon25);
 
         horizontalLayout_15->addWidget(btnLastTr_2);
 
@@ -1575,7 +1588,7 @@ public:
         btnFirstTr_2->setSizePolicy(sizePolicy1);
         btnFirstTr_2->setMinimumSize(QSize(25, 25));
         btnFirstTr_2->setMaximumSize(QSize(25, 25));
-        btnFirstTr_2->setIcon(icon25);
+        btnFirstTr_2->setIcon(icon26);
 
         horizontalLayout_15->addWidget(btnFirstTr_2);
 
@@ -1743,6 +1756,7 @@ public:
         zoomInBtn->setText(QString());
         zoomPreBtn->setText(QString());
         axisBtn->setText(QString());
+        captureBtn->setText(QString());
         SeisTab->setTabText(SeisTab->indexOf(HdrsPg), QCoreApplication::translate("MainWindow", "Seismic", nullptr));
         groupBox_6->setTitle(QString());
         btnCkAll->setText(QString());

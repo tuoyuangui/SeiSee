@@ -11,11 +11,14 @@
 #include <QFontMetrics>
 #include <QDesktopWidget>
 #include <QHBoxLayout>
+#include <QImage>
 #include <QInputDialog>
+#include <QLabel>
 #include <QMessageBox>
 #include <QMenu>
 #include <QPainter>
 #include <QPalette>
+#include <QPixmap>
 #include <QScrollBar>
 #include <QScreen>
 #include <QSettings>
@@ -133,9 +136,9 @@ protected:
 private:
     void refreshFontSize()
     {
-        const int screenDpiY = currentScreenLogicalDpiY(this);
+        const int widgetLogicalDpiY = qMax(1, logicalDpiY());
         m_font.setPointSizeF(GfxStyle::LabelFontPointSize * m_displayDpiY /
-                             screenDpiY);
+                             widgetLogicalDpiY);
     }
 
     QFont m_font; // 存储当前使用的字体
@@ -224,7 +227,7 @@ MainWindow::MainWindow(QWidget *parent)
     hlabView.setDpiOverride(appearanceDpi);
 
     QMenu *appearanceMenu = ui->menuView->addMenu(tr("Appearance"));
-    QAction *dpiAction = appearanceMenu->addAction(tr("Display DPI..."));
+    QAction *dpiAction = appearanceMenu->addAction(tr("Seismic DPI..."));
     connect(dpiAction, &QAction::triggered, this, [this]() {
         const int screenDpi = currentScreenLogicalDpiY(this);
         QStringList options;
@@ -242,7 +245,7 @@ MainWindow::MainWindow(QWidget *parent)
             currentIndex = 0;
         bool accepted = false;
         QString selected = QInputDialog::getItem(
-            this, tr("Display DPI"), tr("Select display DPI:"), options,
+            this, tr("Seismic DPI"), tr("Select seismic DPI:"), options,
             currentIndex, false, &accepted);
         if (!accepted)
             return;
@@ -258,6 +261,8 @@ MainWindow::MainWindow(QWidget *parent)
         hdrsBottomView.setDpiOverride(dpi);
         seisView.setDpiOverride(dpi);
         hlabView.setDpiOverride(dpi);
+        if (timeLabel)
+            timeLabel->setDisplayDpi(timeView.dpiY());
 
         QSettings settings("PSI", "SeiSeeMp");
         settings.setValue("appearance/dpi", dpi);
@@ -688,9 +693,7 @@ MainWindow::MainWindow(QWidget *parent)
             seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
     timeLabel = new VerticalTimeLabel(timeScrl->viewport());
-    timeLabel->setDisplayDpi(m_interfaceDpi > GfxStyle::UseScreenDpi
-                                  ? m_interfaceDpi
-                                  : currentScreenLogicalDpiY(this));
+    timeLabel->setDisplayDpi(timeView.dpiY());
     auto arrangeOnDpiChange = [this]() {
         QTimer::singleShot(0, this, [this]() {
             if (ui && ui->seisFrame->isVisible())
@@ -985,7 +988,7 @@ void MainWindow::applyInterfaceDpi(int dpi)
     hlabView.refreshScreenDpi();
 
     if (timeLabel)
-        timeLabel->setDisplayDpi(targetDpi);
+        timeLabel->setDisplayDpi(timeView.dpiY());
     if (ui->seisFrame->isVisible())
         ArrangeSections();
 }
@@ -2994,6 +2997,131 @@ void MainWindow::on_axisBtn_pressed()
     AxisDlg.tL = seisSct.Tl();
 
     AxisDlg.show();
+}
+
+void MainWindow::on_captureBtn_pressed()
+{
+    SeisFile *file = seisSrc.Sfile();
+    if (!file || !file->Active()) {
+        QMessageBox::warning(this, tr("Screenshot unavailable"),
+                             tr("Open a seismic data file before capturing."));
+        return;
+    }
+
+    const int captureDpi = qMax(1, timeView.dpiY());
+    const qreal captureScaleX =
+        static_cast<qreal>(captureDpi) /
+        qMax(1, ui->seisFrame->logicalDpiX());
+    const qreal captureScaleY =
+        static_cast<qreal>(captureDpi) /
+        qMax(1, ui->seisFrame->logicalDpiY());
+    const QRect captureRect(
+        QPoint(0, 0),
+        QPoint(timeRightScrl->geometry().right() + 1,
+               hdrsBottomScrl->geometry().bottom() + 1));
+    const QSize captureSize(
+        qMax(1, qRound(captureRect.width() * captureScaleX)),
+        qMax(1, qRound(captureRect.height() * captureScaleY)));
+    QImage capturedImage(captureSize, QImage::Format_RGB32);
+    if (capturedImage.isNull()) {
+        QMessageBox::warning(this, tr("Screenshot failed"),
+                             tr("Could not capture the visible seismic area."));
+        return;
+    }
+    capturedImage.fill(ui->seisFrame->palette().color(QPalette::Window));
+    const int dotsPerMeter =
+        qRound(captureDpi * GfxStyle::MillimetersPerMeter /
+               GfxStyle::MillimetersPerInch);
+    capturedImage.setDotsPerMeterX(dotsPerMeter);
+    capturedImage.setDotsPerMeterY(dotsPerMeter);
+
+    QPainter capturePainter(&capturedImage);
+    capturePainter.scale(captureScaleX, captureScaleY);
+    ui->seisFrame->render(&capturePainter, -captureRect.topLeft(),
+                          QRegion(captureRect));
+    capturePainter.end();
+
+    const int horizontalOffset = seisScrl->horizontalScrollBar()->value();
+    const int verticalOffset = seisScrl->verticalScrollBar()->value();
+    const QSize visibleSize = seisScrl->viewport()->size();
+    const double firstTrace =
+        seisSrc.Tx(seisSct.pix2x(horizontalOffset));
+    const double lastTrace =
+        seisSrc.Tx(seisSct.pix2x(horizontalOffset + visibleSize.width()));
+    const double firstTime = seisSct.pix2y(verticalOffset);
+    const double lastTime =
+        seisSct.pix2y(verticalOffset + visibleSize.height());
+
+    const QFileInfo fileInfo(curFileName);
+    QString captureFileName =
+        QString("%1_%2_%3_%4_%5")
+            .arg(fileInfo.baseName())
+            .arg(qRound(qMin(firstTrace, lastTrace)) + 1)
+            .arg(qRound(qMax(firstTrace, lastTrace)) + 1)
+            .arg(QString::number(qMin(firstTime, lastTime), 'g', 8))
+            .arg(QString::number(qMax(firstTime, lastTime), 'g', 8));
+
+    if (ui->ckWiggle->isChecked()) {
+        captureFileName += "_wiggle";
+        if (ui->rbNon->isChecked())
+            captureFileName += "_non";
+        if (ui->rbNeg->isChecked())
+            captureFileName += "_neg";
+    }
+    if (ui->ckGray->isChecked())
+        captureFileName += "_gray";
+    if (ui->ckColor->isChecked())
+        captureFileName += "_color";
+    if (ui->ckTimLines->isChecked())
+        captureFileName += "_timeline";
+    if (ui->ckFilt->isChecked()) {
+        captureFileName +=
+            QString("_filt_%1_%2_%3_%4")
+                .arg(_f1)
+                .arg(_f2)
+                .arg(_f3)
+                .arg(_f4);
+    }
+    if (ui->ckAgc->isChecked())
+        captureFileName += "_agc";
+    if (ui->ckNorm->isChecked())
+        captureFileName += "_norm";
+    if (ui->ckDly->isChecked())
+        captureFileName += "_dly";
+    captureFileName += ".png";
+
+    const QDir outputDirectory(fileInfo.absolutePath());
+    QString outputPath = outputDirectory.filePath(captureFileName);
+    const QFileInfo captureFileInfo(outputPath);
+    const QString suffix = captureFileInfo.suffix();
+    const QString baseName = captureFileInfo.completeBaseName();
+    for (int number = 1; QFile::exists(outputPath); ++number) {
+        outputPath = outputDirectory.filePath(
+            QString("%1_%2.%3").arg(baseName).arg(number).arg(suffix));
+    }
+
+    if (!capturedImage.save(outputPath, "PNG")) {
+        QMessageBox::warning(
+            this, tr("Screenshot failed"),
+            tr("Could not save the screenshot to %1").arg(outputPath));
+        return;
+    }
+
+    QLabel *message = new QLabel(
+        tr("Screenshot saved to %1").arg(QDir::toNativeSeparators(outputPath)),
+        this);
+    message->setWordWrap(true);
+    message->setStyleSheet(
+        "QLabel { background: #323232; color: white; padding: 8px; "
+        "border-radius: 4px; }");
+    message->setMaximumWidth(qMax(250, width() / 2));
+    message->adjustSize();
+    const int statusBarHeight = statusBar()->height();
+    message->move(width() - message->width() - 12,
+                  height() - statusBarHeight - message->height() - 12);
+    message->show();
+    message->raise();
+    QTimer::singleShot(4000, message, &QObject::deleteLater);
 }
 
 void MainWindow::on_actionAxes_Setup_triggered()

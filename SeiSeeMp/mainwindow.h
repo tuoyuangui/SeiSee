@@ -260,6 +260,8 @@ private slots:
 
     void on_axisBtn_pressed();
 
+    void on_captureBtn_pressed();
+
     void on_actionAxes_Setup_triggered();
 
     void on_actionParameters_triggered();

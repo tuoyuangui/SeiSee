@@ -49,5 +49,6 @@
         <file>images/OpenFile.png</file>
         <file>fonts/Roboto-Regular-14.ttf</file>
         <file>fonts/TIMES.TTF</file>
+        <file>images/Capture.png</file>
     </qresource>
 </RCC>
