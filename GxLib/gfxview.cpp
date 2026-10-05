@@ -52,6 +52,11 @@ void GfxView::setDpiOverride(int dpi)
     update();
 }
 
+void GfxView::refreshScreenDpi()
+{
+    TrackWindowScreen();
+}
+
 bool GfxView::event(QEvent *event)
 {
     bool result = QWidget::event(event);

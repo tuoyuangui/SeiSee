@@ -60,6 +60,7 @@ public:
     QWidget *layoutWidget;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *selDirBtn;
+    QPushButton *opFileBtn;
     QPushButton *refreshBtn;
     QPushButton *goBackBtn;
     QFrame *dirFrame;
@@ -320,7 +321,7 @@ public:
         frame_3->setFrameShadow(QFrame::Raised);
         layoutWidget = new QWidget(frame_3);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(1, 1, 81, 28));
+        layoutWidget->setGeometry(QRect(1, 1, 107, 28));
         horizontalLayout_3 = new QHBoxLayout(layoutWidget);
         horizontalLayout_3->setSpacing(1);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
@@ -338,6 +339,16 @@ public:
         selDirBtn->setIcon(icon1);
 
         horizontalLayout_3->addWidget(selDirBtn);
+
+        opFileBtn = new QPushButton(layoutWidget);
+        opFileBtn->setObjectName(QString::fromUtf8("opFileBtn"));
+        sizePolicy1.setHeightForWidth(opFileBtn->sizePolicy().hasHeightForWidth());
+        opFileBtn->setSizePolicy(sizePolicy1);
+        opFileBtn->setMinimumSize(QSize(25, 25));
+        opFileBtn->setMaximumSize(QSize(25, 25));
+        opFileBtn->setIcon(icon2);
+
+        horizontalLayout_3->addWidget(opFileBtn);
 
         refreshBtn = new QPushButton(layoutWidget);
         refreshBtn->setObjectName(QString::fromUtf8("refreshBtn"));
@@ -1677,6 +1688,7 @@ public:
         actionDifference->setText(QCoreApplication::translate("MainWindow", "Difference", nullptr));
         dirGroup->setTitle(QCoreApplication::translate("MainWindow", "Directory List", nullptr));
         selDirBtn->setText(QString());
+        opFileBtn->setText(QString());
         refreshBtn->setText(QString());
         goBackBtn->setText(QString());
         HdrBox->setTitle(QCoreApplication::translate("MainWindow", "Headers", nullptr));

@@ -228,6 +228,8 @@ private slots:
 
     void on_refreshBtn_pressed();
 
+    void on_opFileBtn_pressed();
+
     void on_procParmBtn_pressed();
 
     void on_zoomWinBtn_pressed();

@@ -173,6 +173,35 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setLibraryPaths(paths);
 
     ui->setupUi(this);
+    connect(ui->SeisTab, &QTabWidget::currentChanged, this,
+            [this](int index) {
+                if (index != ui->SeisTab->indexOf(ui->HdrsPg))
+                    return;
+
+                QTimer::singleShot(0, this, [this]() {
+                    if (!ui || !ui->seisFrame->isVisible())
+                        return;
+
+                    seisView.refreshScreenDpi();
+                    hdrsView.refreshScreenDpi();
+                    hdrsBottomView.refreshScreenDpi();
+                    timeView.refreshScreenDpi();
+                    timeRightView.refreshScreenDpi();
+                    hlabView.refreshScreenDpi();
+                    seisSct.Preset();
+                    if (ui->HdrsPg->layout())
+                        ui->HdrsPg->layout()->activate();
+                    if (ui->seisFrame->layout())
+                        ui->seisFrame->layout()->activate();
+                    ArrangeSections();
+                    // seisView.update();
+                    // hdrsView.update();
+                    // hdrsBottomView.update();
+                    // timeView.update();
+                    // timeRightView.update();
+                    // hlabView.update();
+                });
+            });
 
     resize(GfxStyle::MainWindowWidth, GfxStyle::MainWindowHeight);
     QFont directoryGridFont = QApplication::font();
@@ -420,19 +449,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     //----------------------------------------------------------
     trcHdrGrid.setRowCount(0);
-    trcHdrGrid.setColCount(3);
+    trcHdrGrid.setColCount(4);
     trcHdrGrid.verticalHeader()->setVisible(false);
     trcHdrGrid.setColLabel(0, "Value");
-    trcHdrGrid.setColLabel(1, "Description");
-    trcHdrGrid.setColLabel(2, "Bytes");
+    trcHdrGrid.setColLabel(1, "Bytes");
+    trcHdrGrid.setColLabel(2, "Name");
+    trcHdrGrid.setColLabel(3, "Description");
     trcHdrGrid.setColWidthInCharacters(
         0, GfxStyle::TraceHeaderValueCharacterCount,
         GfxStyle::TableColumnHorizontalPadding);
-    trcHdrGrid.setColWidthToContents(
-        1, GfxStyle::TableColumnHorizontalPadding);
     trcHdrGrid.setColWidthInCharacters(
-        2, GfxStyle::HeaderBytesCharacterCount,
+        1, GfxStyle::HeaderBytesCharacterCount,
         GfxStyle::TableColumnHorizontalPadding);
+    trcHdrGrid.setColWidthInCharacters(
+        2, GfxStyle::HeaderNameCharacterCount,
+        GfxStyle::TableColumnHorizontalPadding);
+    trcHdrGrid.setColWidthToStretch(
+        3, GfxStyle::TableColumnHorizontalPadding);
 
     QVBoxLayout *trcHdrLayout = new QVBoxLayout;
     trcHdrLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -666,6 +699,11 @@ MainWindow::MainWindow(QWidget *parent)
     };
     connect(&timeView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
     connect(&timeRightView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
+    connect(&seisView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
+    connect(&hdrsView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
+    connect(&hdrsBottomView, &GfxView::dpiChanged, this,
+            arrangeOnDpiChange);
+    connect(&hlabView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
     timeLabel->show();
 
     // 创建 QFont 对象
@@ -938,6 +976,13 @@ void MainWindow::applyInterfaceDpi(int dpi)
         if (MyStringTable *table = qobject_cast<MyStringTable *>(widget))
             table->setInterfaceScale(scale);
     }
+
+    seisView.refreshScreenDpi();
+    hdrsView.refreshScreenDpi();
+    hdrsBottomView.refreshScreenDpi();
+    timeView.refreshScreenDpi();
+    timeRightView.refreshScreenDpi();
+    hlabView.refreshScreenDpi();
 
     if (timeLabel)
         timeLabel->setDisplayDpi(targetDpi);
@@ -2730,6 +2775,12 @@ void MainWindow::on_selDirBtn_pressed()
     ChangeDataDir(dir);
 }
 
+void MainWindow::on_opFileBtn_pressed()
+{
+    on_actionOpen_File_triggered();
+}
+
+
 void MainWindow::on_refreshBtn_pressed()
 {
     int row = dirGrid.curRow();
@@ -2990,8 +3041,9 @@ void MainWindow::FillHdrListGrids()
         hdrListCkGrid.setCell(n - 1, 3, h->desc);
         hdrListCkGrid.setCell(n - 1, 1, h->bytesStr());
         hdrListCkGrid.setCheck(n - 1, 0, hdrListCk[h->name]);
-        trcHdrGrid.setCell(n - 1, 1, h->desc);
-        trcHdrGrid.setCell(n - 1, 2, h->bytesStr());
+        trcHdrGrid.setCell(n - 1, 1, h->bytesStr());
+        trcHdrGrid.setCell(n - 1, 2, h->name);
+        trcHdrGrid.setCell(n - 1, 3, h->desc);
         trcHdrGrid.setCell(n - 1, 0, "");
     }
 
@@ -3020,11 +3072,10 @@ void MainWindow::FillHdrElstGrids()
         hdrElstCkGrid.setCell(n - 1, 3, h->desc);
         hdrElstCkGrid.setCell(n - 1, 1, h->bytesStr());
         hdrElstCkGrid.setCheck(n - 1, 0, hdrElstCk[h->name]);
-        /*
-                trcHdrGrid   .setCell(n-1,1,h->desc);
-                trcHdrGrid   .setCell(n-1,2,h->bytesStr());
-                trcHdrGrid   .setCell(n-1,0,"");
-        */
+        trcHdrGrid.setCell(n - 1, 1, h->bytesStr());
+        trcHdrGrid.setCell(n - 1, 2, h->name);
+        trcHdrGrid.setCell(n - 1, 3, h->desc);
+        trcHdrGrid.setCell(n - 1, 0, "");
     }
 
     SetHdrDatElst();

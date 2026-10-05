@@ -87,6 +87,7 @@ public:
     }
 
     void setDpiOverride(int dpi);
+    void refreshScreenDpi();
 
     void setXs(double v)
     {
