@@ -2,9 +2,12 @@
 #include "ui_mainwindow.h"
 
 #include <QComboBox>
+#include <QClipboard>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFontMetrics>
 #include <QDesktopWidget>
 #include <QHBoxLayout>
@@ -20,9 +23,12 @@
 #include <QStandardItemModel>
 #include <QTextCodec>
 #include <QTimer>
+#include <QUrl>
 #include <QUuid>
 #include <QVBoxLayout>
 #include <QWidget>
+
+#include <functional>
 
 #include <fcntl.h>
 #include <math.h>
@@ -270,7 +276,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_statMess = new QLabel("SeiSeeMp", this);
     m_statMess->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
-    m_statTrcn = new QLabel("Trace# ", this);
+    m_statTrcn = new QLabel("Trace ", this);
     m_statTrcn->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
     m_statTime = new QLabel("Time=", this);
@@ -330,6 +336,55 @@ MainWindow::MainWindow(QWidget *parent)
     dirGrid.setColLabel(0, "Name");
     dirGrid.setColLabel(1, "Type");
     dirGrid.setColWidth(1, GfxStyle::DirectoryTypeColumnWidth);
+    // 增加鼠标滑过文件名的tips
+    dirGrid.setMouseTracking(true);
+    dirGrid.viewport()->setMouseTracking(true);
+    dirGrid.setContextMenuPolicy(Qt::CustomContextMenu);
+    // 增加了文件目录右键三个菜单项
+    connect(&dirGrid, &QWidget::customContextMenuRequested, this,
+            [this](const QPoint &position) {
+                const QModelIndex index = dirGrid.indexAt(position);
+                if (!index.isValid())
+                    return;
+
+                const int row = index.row();
+                if (dirGrid.Tag(row, 0) != 1)
+                    return;
+
+                dirGrid.setCurrentIndex(index);
+
+                const QString fileName = dirGrid.Cell(row, 0);
+                const QString fullPath =
+                    QFileInfo(QDir(curDir).filePath(fileName)).absoluteFilePath();
+
+                QMenu menu(&dirGrid);
+                QAction *copyNameAction = menu.addAction(tr("Copy file name"));
+                QAction *copyPathAction = menu.addAction(tr("Copy full path"));
+                QAction *openFolderAction =
+                    menu.addAction(tr("Open containing folder"));
+                connect(copyNameAction, &QAction::triggered, this,
+                        [fileName]() {
+                            QApplication::clipboard()->setText(fileName);
+                        });
+                connect(copyPathAction, &QAction::triggered, this,
+                        [fullPath]() {
+                            QApplication::clipboard()->setText(fullPath);
+                        });
+                const QString containingFolder =
+                    QFileInfo(fullPath).absolutePath();
+                connect(openFolderAction, &QAction::triggered, this,
+                        [this, containingFolder]() {
+                            if (!QDesktopServices::openUrl(
+                                    QUrl::fromLocalFile(containingFolder))) {
+                                QMessageBox::warning(
+                                    this, tr("Unable to open folder"),
+                                    tr("Could not open the folder containing "
+                                       "this file."));
+                            }
+                        });
+
+                menu.exec(dirGrid.viewport()->mapToGlobal(position));
+            });
 
     QVBoxLayout *dirGridLayout = new QVBoxLayout;
     dirGridLayout->setMargin(GfxStyle::CompactLayoutMargin);
@@ -390,14 +445,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     //----------------------------------------------------------
     hdrListCkGrid.setRowCount(0);
-    hdrListCkGrid.setColCount(3);
+    hdrListCkGrid.setColCount(4);
     hdrListCkGrid.verticalHeader()->setVisible(false);
     hdrListCkGrid.setColLabel(0, "");
     hdrListCkGrid.setColLabel(1, "Bytes");
-    hdrListCkGrid.setColLabel(2, "Description");
+    hdrListCkGrid.setColLabel(2, "Name");
+    hdrListCkGrid.setColLabel(3, "Description");
     hdrListCkGrid.setColWidth(0, GfxStyle::HeaderCheckColumnWidth);
     hdrListCkGrid.setColWidth(1, GfxStyle::TraceHeaderBytesColumnWidth);
-    hdrListCkGrid.setColWidth(2, GfxStyle::HiddenTableColumnWidth);
+    hdrListCkGrid.setColWidth(2, GfxStyle::TraceHeaderNameColumnWidth);
+    hdrListCkGrid.setColWidth(3, GfxStyle::HiddenTableColumnWidth);
     hdrListCkGrid.setColChkbx(0, true);
 
     QVBoxLayout *hdrListCkLayout = new QVBoxLayout;
@@ -407,14 +464,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->hdrListCkFrame->setLayout(hdrListCkLayout);
 
     hdrElstCkGrid.setRowCount(0);
-    hdrElstCkGrid.setColCount(3);
+    hdrElstCkGrid.setColCount(4);
     hdrElstCkGrid.verticalHeader()->setVisible(false);
     hdrElstCkGrid.setColLabel(0, "");
     hdrElstCkGrid.setColLabel(1, "Bytes");
-    hdrElstCkGrid.setColLabel(2, "Description");
+    hdrElstCkGrid.setColLabel(2, "Name");
+    hdrElstCkGrid.setColLabel(3, "Description");
     hdrElstCkGrid.setColWidth(0, GfxStyle::HeaderCheckColumnWidth);
     hdrElstCkGrid.setColWidth(1, GfxStyle::TraceHeaderBytesColumnWidth);
-    hdrElstCkGrid.setColWidth(2, GfxStyle::HiddenTableColumnWidth);
+    hdrElstCkGrid.setColWidth(2, GfxStyle::TraceHeaderNameColumnWidth);
+    hdrElstCkGrid.setColWidth(3, GfxStyle::HiddenTableColumnWidth);
     hdrElstCkGrid.setColChkbx(0, true);
 
     QVBoxLayout *hdrElstCkLayout = new QVBoxLayout;
@@ -427,7 +486,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     hdrListDtGrid.setRowCount(0);
     hdrListDtGrid.setColCount(1);
-    hdrListDtGrid.setColLabel(0, "Trace#");
+    hdrListDtGrid.setColLabel(0, "Trace");
     hdrListDtGrid.setColWidth(0, GfxStyle::TraceNumberColumnWidth);
 
     QVBoxLayout *hdrListDtLayout = new QVBoxLayout;
@@ -438,7 +497,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     hdrElstDtGrid.setRowCount(0);
     hdrElstDtGrid.setColCount(1);
-    hdrElstDtGrid.setColLabel(0, "Trace#");
+    hdrElstDtGrid.setColLabel(0, "Trace");
     hdrElstDtGrid.setColWidth(0, GfxStyle::TraceNumberColumnWidth);
 
     QVBoxLayout *hdrElstDtLayout = new QVBoxLayout;
@@ -756,27 +815,93 @@ void MainWindow::applyInterfaceDpi(int dpi)
         m_interfaceDpi > GfxStyle::UseScreenDpi ? m_interfaceDpi : screenDpi;
     const qreal scale = static_cast<qreal>(targetDpi) / screenDpi;
 
+    auto scaleSize = [scale](const QSize &size) {
+        const int maxWidgetSize = QWIDGETSIZE_MAX;
+        const int width = size.width() >= maxWidgetSize
+                              ? maxWidgetSize
+                              : qMax(0, qRound(size.width() * scale));
+        const int height = size.height() >= maxWidgetSize
+                               ? maxWidgetSize
+                               : qMax(0, qRound(size.height() * scale));
+        return QSize(width, height);
+    };
+
     const QList<QWidget *> widgets = QApplication::allWidgets();
     for (QWidget *widget : widgets) {
-        if (!m_baseInterfaceFonts.contains(widget)) {
-            m_baseInterfaceFonts.insert(widget, widget->font());
+        if (!m_baseInterfaceMetrics.contains(widget)) {
+            InterfaceWidgetMetrics metrics;
+            metrics.font = widget->font();
+            metrics.minimumSize = widget->minimumSize();
+            metrics.maximumSize = widget->maximumSize();
+            metrics.windowSize = widget->size();
+            m_baseInterfaceMetrics.insert(widget, metrics);
             connect(widget, &QObject::destroyed, this,
-                    [this, widget]() { m_baseInterfaceFonts.remove(widget); });
+                    [this, widget]() {
+                        m_baseInterfaceMetrics.remove(widget);
+                    });
         }
 
-        const QFont baseFont = m_baseInterfaceFonts.value(widget);
-        if (qobject_cast<GfxView *>(widget)) {
-            widget->setFont(baseFont);
-            continue;
-        }
-
-        QFont scaledFont = baseFont;
-        if (baseFont.pointSizeF() > 0)
-            scaledFont.setPointSizeF(baseFont.pointSizeF() * scale);
-        else if (baseFont.pixelSize() > 0)
+        const InterfaceWidgetMetrics metrics =
+            m_baseInterfaceMetrics.value(widget);
+        const bool isPlot = qobject_cast<GfxView *>(widget) != nullptr;
+        QFont scaledFont = metrics.font;
+        if (metrics.font.pointSizeF() > 0)
+            scaledFont.setPointSizeF(metrics.font.pointSizeF() * scale);
+        else if (metrics.font.pixelSize() > 0)
             scaledFont.setPixelSize(
-                qMax(1, qRound(baseFont.pixelSize() * scale)));
-        widget->setFont(scaledFont);
+                qMax(1, qRound(metrics.font.pixelSize() * scale)));
+        widget->setFont(isPlot ? metrics.font : scaledFont);
+
+        if (isPlot)
+            continue;
+
+        widget->setMaximumSize(scaleSize(metrics.maximumSize));
+        widget->setMinimumSize(scaleSize(metrics.minimumSize));
+
+        if (MyHugeTable *table = qobject_cast<MyHugeTable *>(widget))
+            table->setInterfaceScale(scale);
+        if (MyStringTable *table = qobject_cast<MyStringTable *>(widget))
+            table->setInterfaceScale(scale);
+
+        if (widget == this || widget == &AboutDlg || widget == &AxisDlg ||
+            widget == &EdHdrDlg || widget == &ProcParmDlg ||
+            widget == &SaveAsDlg) {
+            widget->resize(scaleSize(metrics.windowSize));
+        }
+    }
+
+    std::function<void(QLayout *)> scaleLayout = [&](QLayout *layout) {
+        if (!layout)
+            return;
+
+        if (!m_baseInterfaceLayouts.contains(layout)) {
+            InterfaceLayoutMetrics metrics;
+            metrics.margins = layout->contentsMargins();
+            metrics.spacing = layout->spacing();
+            m_baseInterfaceLayouts.insert(layout, metrics);
+            connect(layout, &QObject::destroyed, this,
+                    [this, layout]() {
+                        m_baseInterfaceLayouts.remove(layout);
+                    });
+        }
+
+        const InterfaceLayoutMetrics metrics =
+            m_baseInterfaceLayouts.value(layout);
+        layout->setContentsMargins(
+            qRound(metrics.margins.left() * scale),
+            qRound(metrics.margins.top() * scale),
+            qRound(metrics.margins.right() * scale),
+            qRound(metrics.margins.bottom() * scale));
+        if (metrics.spacing >= 0)
+            layout->setSpacing(qMax(0, qRound(metrics.spacing * scale)));
+
+        for (int i = 0; i < layout->count(); ++i)
+            scaleLayout(layout->itemAt(i)->layout());
+    };
+
+    for (QWidget *widget : widgets) {
+        if (widget->layout())
+            scaleLayout(widget->layout());
     }
 
     if (timeLabel)
@@ -1137,6 +1262,7 @@ void MainWindow::FillDirGrid(QList<DirItem> list)
                 dirGrid.setTag(nr, 1, type);
 
                 dirGrid.setCell(nr, 0, fn);
+                dirGrid.setCellToolTip(nr, 0, fn);
                 // dirGrid.setCell(nr, 1, "");
 
                 if (type == 1) {
@@ -1182,7 +1308,7 @@ void MainWindow::SelectTrace(int it)
 
         char s[2048];
 
-        sprintf(s, "Trace# %d", trcn);
+        sprintf(s, "Trace %d", trcn);
 
         m_statTrcn->setText(s);
         ui->InfoTab->setTabText(2, s);
@@ -1246,9 +1372,9 @@ void MainWindow::viewMouseEvent(QMouseEvent *event)
 
         if (it >= 0 && it < seisSrc.Nt()) {
             int trcn = seisSrc.Th(it, 0);
-            m_statTrcn->setText(Tprintf("Trace# %d", trcn));
+            m_statTrcn->setText(Tprintf("Trace %d", trcn));
         } else {
-            m_statTrcn->setText(Tprintf("Trace# "));
+            m_statTrcn->setText(Tprintf("Trace "));
         }
     } else if (event->type() == QEvent::MouseButtonPress &&
                event->button() == Qt::LeftButton) {
@@ -1286,13 +1412,13 @@ void MainWindow::SetHdrDatList()
 
     sidx = ui->cbSidx->currentText();
 
-    if (sidx == "Trace#")
+    if (sidx == "Trace")
         sel = 0;
 
     hdrListCk.clear();
     ui->cbSidx->clear();
 
-    ui->cbSidx->addItem("Trace#");
+    ui->cbSidx->addItem("Trace");
 
     for (i = 0; i < hdrListCkGrid.RowCount(); i++) {
         if (hdrListCkGrid.Check(i, 0)) {
@@ -1339,12 +1465,12 @@ void MainWindow::SetHdrDatElst()
 
     //  sidx = ui->cbSidx->currentText();
 
-    //  if(sidx=="Trace#") sel=0;
+    //  if(sidx=="Trace") sel=0;
 
     hdrElstCk.clear();
     //  ui->cbSidx->clear();
 
-    //  ui->cbSidx->addItem("Trace#");
+    //  ui->cbSidx->addItem("Trace");
 
     for (i = 0; i < hdrElstCkGrid.RowCount(); i++) {
         if (hdrElstCkGrid.Check(i, 0)) {
@@ -2822,7 +2948,8 @@ void MainWindow::FillHdrListGrids()
         TrHdrDef *h = List->item(n);
 
         hdrListCkGrid.setTag(n - 1, 0, h->edit);
-        hdrListCkGrid.setCell(n - 1, 2, h->desc);
+        hdrListCkGrid.setCell(n - 1, 2, h->name);
+        hdrListCkGrid.setCell(n - 1, 3, h->desc);
         hdrListCkGrid.setCell(n - 1, 1, h->bytesStr());
         hdrListCkGrid.setCheck(n - 1, 0, hdrListCk[h->name]);
         trcHdrGrid.setCell(n - 1, 1, h->desc);
@@ -2851,7 +2978,8 @@ void MainWindow::FillHdrElstGrids()
         TrHdrDef *h = List->item(n);
 
         hdrElstCkGrid.setTag(n - 1, 0, h->edit);
-        hdrElstCkGrid.setCell(n - 1, 2, h->desc);
+        hdrElstCkGrid.setCell(n - 1, 2, h->name);
+        hdrElstCkGrid.setCell(n - 1, 3, h->desc);
         hdrElstCkGrid.setCell(n - 1, 1, h->bytesStr());
         hdrElstCkGrid.setCheck(n - 1, 0, hdrElstCk[h->name]);
         /*
@@ -3116,7 +3244,7 @@ void MainWindow::FindTrace(QString dir)
 
     SaveSval();
 
-    if (sidx == "Trace#" && val > 0) {
+    if (sidx == "Trace" && val > 0) {
         hdrListDtGrid.setCurCell(val - 1);
     } else {
         SeisFile *sf = seisSrc.Sfile();
@@ -3177,7 +3305,7 @@ void MainWindow::SetTrEdCurVal()
 
     SeisFile *sf = seisSrc.Sfile();
 
-    if (lab == "Trace#") {
+    if (lab == "Trace") {
         ui->cbEnval->setEnabled(false);
         ui->btnUpdTrh->setEnabled(false);
     } else {
@@ -3210,7 +3338,7 @@ void MainWindow::SetSearchControls(bool on)
     SetTrEdCurVal();
 
     if (on) {
-        if (lab == "Trace#") {
+        if (lab == "Trace") {
             ui->btnSfwd->setEnabled(false);
             ui->btnSbkw->setEnabled(false);
             ui->btnSbin->setEnabled(true);
@@ -3550,7 +3678,21 @@ void MainWindow::on_actionSave_As_triggered()
 
     SaveAsDlg.sf = sf;
     SaveAsDlg.savDir = &savDir;
+    SaveAsDlg.curDir = QDir(curDir).absolutePath();
     SaveAsDlg.show();
+}
+
+void MainWindow::on_actionDifference_triggered()
+{
+    SeisFile *sf = seisSrc.Sfile();
+
+    if (!sf || !sf->Active())
+        return;
+
+    DiffDlg.sf = sf;
+    DiffDlg.savDir = &savDir;
+    DiffDlg.curDir = QDir(curDir).absolutePath();
+    DiffDlg.show();
 }
 
 void MainWindow::on_btnLastTr_2_clicked()

@@ -684,13 +684,15 @@ int SeisFile::ThCount()
 }
 
 byte *SeisFile::MakeTrace(int &len, long long ntr, int swap, int frmt, int t1,
-                          int t2)
+                          int t2, bool isProc)
 {
     int cnt;
     int hfrm;
     int hpos;
 
-    len = TrcLen(240, frmt, _Ns);
+    int out_Ns = t2 - t1;
+
+    len = TrcLen(240, frmt, out_Ns);
     byte *obuf = new byte[len];
     /*
         if(_swap==swap && _Format==frmt)
@@ -740,16 +742,138 @@ byte *SeisFile::MakeTrace(int &len, long long ntr, int swap, int frmt, int t1,
     TrHdrDef *oh = OutHdrList->item("NSMP");
     hfrm = oh->frmt;
     hpos = oh->pos;
-    sFmt(hfrm, obuf, hpos, _Ns, swap);
+    sFmt(hfrm, obuf, hpos, out_Ns, swap);
 
     float *dat = (float *)(obuf + 240);
+    float *datin = (float *)(ibuf + 240);
+    for (i = 0; i < _Ns; i++)
+        datin[i] = GetSample(i, ibuf);
 
-    for (i = 0; i < Ns(); i++) {
-        v = GetSample(i, ibuf);
+    if (isProc)
+        execProc(this, _Ns, _Si, datin);
+
+    for (i = 0; i < out_Ns; i++) {
+        //        v = GetSample(i,ibuf);
+
         if (frmt == 5)
-            dat[i] = swapf4(v, swap);
+            dat[i] = swapf4(datin[i + t1], swap);
         else
-            dat[i] = ieee2ibm(v);
+            dat[i] = ieee2ibm(datin[i + t1]);
+    }
+
+    delete[] ibuf;
+
+    return obuf;
+}
+
+float *SeisFile::GetTraceSample(int &len, long long ntr, int swap, int frmt,
+                                int t1, int t2)
+{
+    int cnt;
+    //    int hfrm;
+    //    int hpos;
+
+    //    int out_Ns = t2 - t1;
+
+    //    len = TrcLen(240,frmt,out_Ns);
+    //    byte* obuf = new byte [len];
+    /*
+        if(_swap==swap && _Format==frmt)
+        {
+            cnt = ReadRawTrace(obuf, ntr, false);
+            return obuf;
+        }
+    */
+    byte *ibuf = new byte[_trl];
+
+    cnt = ReadRawTrace(ibuf, ntr, false);
+
+    int i;
+    float v;
+
+    //    memset(obuf,0,240);
+
+    float *datin = (float *)(ibuf + 240);
+    for (i = 0; i < _Ns; i++)
+        datin[i] = GetSample(i, ibuf);
+    return datin;
+}
+
+byte *SeisFile::MakeTraceDiff(int &len, long long ntr, int swap, int frmt,
+                              int t1, int t2, float *data2)
+{
+    int cnt;
+    int hfrm;
+    int hpos;
+
+    int out_Ns = t2 - t1;
+
+    len = TrcLen(240, frmt, out_Ns);
+    byte *obuf = new byte[len];
+    /*
+        if(_swap==swap && _Format==frmt)
+        {
+            cnt = ReadRawTrace(obuf, ntr, false);
+            return obuf;
+        }
+    */
+    byte *ibuf = new byte[_trl];
+
+    cnt = ReadRawTrace(ibuf, ntr, false);
+
+    int i;
+    float v;
+
+    TrHdrDefList *OutHdrList = &TraceHdrsSet[1];
+
+    memset(obuf, 0, 240);
+
+    for (i = 0; i < HdrDefList->count(); i++) {
+        QString name = HdrDefList->item(i)->name;
+
+        int oidx = OutHdrList->index(name);
+
+        if (oidx >= 0) {
+            TrHdrDef *ih = HdrDefList->item(name);
+
+            hfrm = ih->frmt;
+            hpos = ih->pos;
+
+            if (hfrm == 0)
+                v = ntr + 1;
+            else
+                v = iFmt(hfrm, ibuf, hpos, _swap);
+
+            TrHdrDef *oh = OutHdrList->item(oidx);
+            hfrm = oh->frmt;
+            hpos = oh->pos;
+
+            if (hfrm == 0)
+                continue;
+
+            sFmt(hfrm, obuf, hpos, v, swap);
+        }
+    }
+
+    TrHdrDef *oh = OutHdrList->item("NSMP");
+    hfrm = oh->frmt;
+    hpos = oh->pos;
+    sFmt(hfrm, obuf, hpos, out_Ns, swap);
+
+    float *dat = (float *)(obuf + 240);
+    float *datin = (float *)(ibuf + 240);
+    for (i = 0; i < _Ns; i++)
+        datin[i] = GetSample(i, ibuf) - data2[i]; // calculate difference
+
+    //    if (isProc) execProc(this,_Ns, _Si, datin);
+
+    for (i = 0; i < out_Ns; i++) {
+        //        v = GetSample(i,ibuf);
+
+        if (frmt == 5)
+            dat[i] = swapf4(datin[i + t1], swap);
+        else
+            dat[i] = ieee2ibm(datin[i + t1]);
     }
 
     delete[] ibuf;

@@ -482,19 +482,22 @@ void ChangeThExprWorker::process()
 
 SaveAsWorker::SaveAsWorker(SeisFile *sf, QString outfn, QString selh, int trmin,
                            int trmax, int trstp, int tmmin, int tmmax, int frmt,
-                           bool rev, QObject *parent)
+                           bool rev, bool isProc, QObject *parent)
     : Worker(parent)
 {
     m_sf = sf;
     m_outfn = outfn;
     m_selh = selh;
-    m_tmmin = tmmin;
-    m_tmmax = tmmax;
+    m_tmmin =
+        int((double)tmmin / (m_sf->Si() * 1000)); // unit: ms->sample index
+    m_tmmax =
+        int((double)tmmax / (m_sf->Si() * 1000)) + 1; // unit: ms->sample index
     m_trmin = trmin;
     m_trmax = trmax;
     m_trstp = trstp;
     m_frmt = frmt;
     m_rev = rev;
+    m_isProc = isProc;
 
     m_selhi = sf->ThIdx(m_selh);
 }
@@ -506,6 +509,7 @@ void SaveAsWorker::process()
     char ebuf[3200];
     int n, i, j;
     int cnt;
+    int out_Ns = m_tmmax - m_tmmin;
 
     QByteArray qtxt;
     QString txthed;
@@ -549,6 +553,7 @@ void SaveAsWorker::process()
     cnt = write(outf, ebuf, 3200);
 
     binhed.set(1, m_frmt, m_sf->binHed());
+    binhed.setVal(7, out_Ns);
 
     cnt = write(outf, binhed.buf(), 400);
 
@@ -577,6 +582,8 @@ void SaveAsWorker::CopyTrcByIdx(int outf)
     if (inc < 1)
         inc = 1;
 
+    long long trccount = (m_trmax - m_trmin);
+
     if (m_trstp < 1)
 
         for (tidx = m_trmin; tidx < m_trmax; tidx += inc) {
@@ -584,9 +591,10 @@ void SaveAsWorker::CopyTrcByIdx(int outf)
             if (m_rev)
                 ti = tcount - tidx - 1;
 
-            trbuf = m_sf->MakeTrace(cnt, ti, 1, m_frmt, m_tmmin, m_tmmax);
+            trbuf =
+                m_sf->MakeTrace(cnt, ti, 1, m_frmt, m_tmmin, m_tmmax, m_isProc);
             cnt = write(outf, trbuf, cnt);
-            pers = (100. * tidx) / tcount;
+            pers = (100. * (tidx - m_trmin)) / trccount;
             if (pp != pers) {
                 xpers(pers, "Saving...");
                 pp = pers;
@@ -619,7 +627,7 @@ void SaveAsWorker::CopyTrcByHdr(int outf)
         if (m_trstp > 1 && h % m_trstp)
             continue;
 
-        trbuf = m_sf->MakeTrace(cnt, ti, 1, m_frmt, m_tmmin, m_tmmax);
+        trbuf = m_sf->MakeTrace(cnt, ti, 1, m_frmt, m_tmmin, m_tmmax, m_isProc);
         cnt = write(outf, trbuf, cnt);
         pers = (100. * tidx) / tcount;
         if (pp != pers) {
@@ -629,4 +637,136 @@ void SaveAsWorker::CopyTrcByHdr(int outf)
 
         delete[] trbuf;
     }
+}
+
+//---------------------------------------------------------------------------------------------
+
+DiffWorker::DiffWorker(SeisFile *sf1, SeisFile *sf2, QString outfn,
+                       QString selh, int trmin, int trmax, int trstp, int tmmin,
+                       int tmmax, int frmt,
+                       //                      bool    rev,
+                       //                      bool    isProc,
+                       QObject *parent)
+    : Worker(parent)
+{
+    m_sf1 = sf1;
+    m_sf2 = sf2;
+    m_outfn = outfn;
+    m_selh = selh;
+    m_tmmin =
+        int((double)tmmin / (m_sf1->Si() * 1000)); // unit: ms->sample index
+    m_tmmax =
+        int((double)tmmax / (m_sf1->Si() * 1000)) + 1; // unit: ms->sample index
+    m_trmin = trmin;
+    m_trmax = trmax;
+    m_trstp = trstp;
+    m_frmt = frmt;
+    //    m_rev   = rev;
+    //    m_isProc = isProc;
+
+    m_selhi = sf1->ThIdx(m_selh);
+}
+
+void DiffWorker::process()
+{
+    QString mess;
+    char buf[3200];
+    char ebuf[3200];
+    int n, i, j;
+    int cnt;
+    int out_Ns = m_tmmax - m_tmmin;
+
+    QByteArray qtxt;
+    QString txthed;
+
+    BinHed binhed;
+
+    txthed = m_sf1->TxtHed();
+
+    qtxt = txthed.toLocal8Bit();
+    char *s = qtxt.data();
+
+    //   if(m_sf->Active())
+    //   {
+    //    }
+
+    int outf = open_q(m_outfn, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0664);
+
+    if (outf < 0) {
+        mess = "Cannot create output file: " + m_outfn;
+        goto END;
+    }
+
+    memset(buf, ' ', 3200);
+
+    for (i = j = n = 0; n < strlen(s); n++) {
+        char c = s[n];
+        if (c == '\n') {
+            i++;
+            j = 0;
+            continue;
+        } else {
+            if (j < 80 && i < 40) {
+                buf[i * 80 + j] = c;
+                j++;
+            }
+        }
+    }
+
+    asebdn(ebuf, buf, 3200);
+
+    cnt = write(outf, ebuf, 3200);
+
+    binhed.set(1, m_frmt, m_sf1->binHed());
+    binhed.setVal(7, out_Ns);
+
+    cnt = write(outf, binhed.buf(), 400);
+
+    DiffTrcByIdx(outf);
+
+    close(outf);
+
+END:
+    emit efin(mess);
+    emit finished(); //!!!!
+}
+
+void DiffWorker::DiffTrcByIdx(int outf)
+{
+    long long tidx;
+    long long tcount = m_sf1->Nt();
+    int cnt;
+    int cnt2;
+    byte *trbuf;
+    float *data2;
+    int pp = -1;
+    int pers;
+
+    int inc = m_trstp;
+    if (inc < 1)
+        inc = 1;
+
+    long long trccount = (m_trmax - m_trmin);
+
+    if (m_trstp < 1)
+
+        for (tidx = m_trmin; tidx < m_trmax; tidx += inc) {
+            long long ti = tidx;
+            //        if(m_rev)  ti = tcount-tidx-1;
+            data2 = m_sf2->GetTraceSample(cnt, ti, 1, m_frmt, m_tmmin,
+                                          m_tmmax); // get data2
+
+            trbuf = m_sf1->MakeTraceDiff(cnt, ti, 1, m_frmt, m_tmmin, m_tmmax,
+                                         data2); // data1 - data2
+
+            cnt = write(outf, trbuf, cnt);
+            pers = (100. * (tidx - m_trmin)) / trccount;
+            if (pp != pers) {
+                xpers(pers, "Saving...");
+                pp = pers;
+            }
+
+            delete[] trbuf;
+        }
+    //    xpers(1.,"Saving...");
 }

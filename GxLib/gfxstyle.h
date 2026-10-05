@@ -82,6 +82,7 @@ namespace GfxStyle {
     constexpr int HeaderValueColumnWidth = 70;
     constexpr int BinaryHeaderBytesColumnWidth = 65;
     constexpr int TraceHeaderBytesColumnWidth = 60;
+    constexpr int TraceHeaderNameColumnWidth = 65;
     constexpr int TraceDataColumnWidth = 80;
     constexpr int HeaderCheckColumnWidth = 20;
     constexpr int TraceNumberColumnWidth = 60;

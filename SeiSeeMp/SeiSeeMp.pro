@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     aboutdialog.cpp \
     axisdialog.cpp \
     workthread.cpp \
-    saveasdialog.cpp
+    saveasdialog.cpp \
+    diffdialog.cpp
 
 HEADERS  += mainwindow.h \
     edithdrdialog.h \
@@ -27,14 +28,16 @@ HEADERS  += mainwindow.h \
     aboutdialog.h \
     axisdialog.h \
     workthread.h \
-    saveasdialog.h
+    saveasdialog.h \
+    diffdialog.h
 
 FORMS    += mainwindow.ui \
     edithdrdialog.ui \
     procparmdialog.ui \
     aboutdialog.ui \
     axisdialog.ui \
-    saveasdialog.ui
+    saveasdialog.ui \
+    diffdialog.ui
 
 # ADD THIS LINE!
 RC_FILE += app.rc

@@ -113,6 +113,9 @@ QVariant MyStringTableModel::data(const QModelIndex &index, int role) const
     int r = index.row();
     int c = index.column();
 
+    if (role == Qt::ToolTipRole)
+        return _tab->_rows[r].cells[c].toolTip;
+
     // цвет фона ячейки
     if (role == Qt::BackgroundRole) {
         color = _tab->CellColor(r, c);
@@ -285,6 +288,7 @@ int MyStringTableModel::columnCount(const QModelIndex &) const
 
 MyStringTable::MyStringTable(QWidget *parent)
     : QTableView(parent)
+    , m_interfaceScale(1.0)
 {
     setStyleSheet("QHeaderView::section { background-color:lightgrey }");
 
@@ -297,7 +301,7 @@ MyStringTable::MyStringTable(QWidget *parent)
 
     setHorizontalHeader(new MyHeaderView(this));
 
-    verticalHeader()->setDefaultSectionSize(18);
+    verticalHeader()->setDefaultSectionSize(qRound(18 * m_interfaceScale));
 
     horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
     horizontalHeader()->setHighlightSections(false);
@@ -318,6 +322,17 @@ MyStringTable::MyStringTable(QWidget *parent)
 
     connect(horizontalHeader(), SIGNAL(sectionPressed(int)), this,
             SLOT(hHeaderPressed(int)));
+}
+
+void MyStringTable::setInterfaceScale(qreal scale)
+{
+    m_interfaceScale = qMax<qreal>(0.1, scale);
+    verticalHeader()->setDefaultSectionSize(qRound(18 * m_interfaceScale));
+    for (int column = 0; column < ColCount(); ++column) {
+        const int width = ColWidth(column);
+        if (width > 0)
+            horizontalHeader()->resizeSection(column, width);
+    }
 }
 
 void MyStringTable::setIndexWidget(int r, int c, QWidget *w)
@@ -668,7 +683,7 @@ int MyStringTable::ColWidth(int c)
     if (c < 0 || c >= ColCount())
         return false;
 
-    return _cols[c].width;
+    return qRound(_cols[c].width * m_interfaceScale);
 }
 
 void MyStringTable::setColLabel(int c, QString v)
@@ -868,6 +883,17 @@ void MyStringTable::setData(int r, int c, QString v)
         return;
 
     _rows[r].cells[c].data = v;
+}
+
+void MyStringTable::setCellToolTip(int r, int c, QString v)
+{
+    if (r < 0 || r >= RowCount())
+        return;
+    if (c < 0 || c >= ColCount())
+        return;
+
+    _rows[r].cells[c].toolTip = v;
+    emit _model->dataChanged(_model->index(r, c), _model->index(r, c));
 }
 
 QString MyStringTable::Data(int r, int c)

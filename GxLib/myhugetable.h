@@ -104,8 +104,11 @@ private:
     qint64 m_nrows;
     qint64 m_crow;
     int m_ccol;
+    qreal m_interfaceScale;
 
     int colsW(); //  total width of columns
+    int columnWidth(int n) const;
+    int rowHeight() const;
 
     void resizeEvent(QResizeEvent *event);
 
@@ -114,6 +117,8 @@ public:
     friend class MyHcWidget;
 
     explicit MyHugeTable(QWidget *parent = NULL);
+
+    void setInterfaceScale(qreal scale);
 
     qint64 rowCount()
     {

@@ -58,6 +58,7 @@ public:
     QColor textc; // text color
     bool edit;    // editable
     QString data;
+    QString toolTip;
 
     explicit MyStringTableCell()
     {
@@ -153,6 +154,7 @@ protected:
     bool _hidefoc;
 
     bool _changed;
+    qreal m_interfaceScale;
 
     virtual void resizeEvent(QResizeEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
@@ -176,6 +178,7 @@ public:
     MyStringTableModel *_model;
 
     explicit MyStringTable(QWidget *parent = 0);
+    void setInterfaceScale(qreal scale);
 
     void setIndexWidget(int r, int c, QWidget *w);
 
@@ -249,6 +252,7 @@ public:
 
     QString Data(int r, int c);
     void setData(int r, int c, QString v);
+    void setCellToolTip(int r, int c, QString v);
 
     QColor CellColor(int r, int c);
     void setCellColor(int r, int c, QColor v);

@@ -386,7 +386,7 @@ public:
 
     virtual double Tmax()
     {
-        return _Si * _Ns;
+        return _Si * (_Ns - 1);
     }
 
     virtual void ReadTrace(long long ntr)
@@ -403,8 +403,12 @@ public:
         return 0;
     }
 
-    byte *MakeTrace(int &len, long long ntr, int swap, int frmt, int t1,
+    byte *MakeTrace(int &len, long long ntr, int swap, int frmt, int t1, int t2,
+                    bool isProc);
+    float *GetTraceSample(int &len, long long ntr, int swap, int frmt, int t1,
                     int t2);
+    byte *MakeTraceDiff(int &len, long long ntr, int swap, int frmt, int t1,
+                        int t2, float *data2);
 
     virtual int WriteRawTrace(byte *, long long ntr, bool header_only = false)
     {

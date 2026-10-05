@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1193</width>
+    <height>874</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>SegDSeeMp</string>
   </property>
@@ -315,7 +323,7 @@
                <bool>false</bool>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="TxtHdrTab">
                <property name="autoFillBackground">
@@ -3057,7 +3065,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1282</width>
+     <width>1193</width>
      <height>22</height>
     </rect>
    </property>
@@ -3093,6 +3101,7 @@
     </property>
     <addaction name="actionParameters"/>
     <addaction name="actionHeader_Editor"/>
+    <addaction name="actionDifference"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuView"/>
@@ -3156,6 +3165,11 @@
    </property>
    <property name="text">
     <string>Open File</string>
+   </property>
+  </action>
+  <action name="actionDifference">
+   <property name="text">
+    <string>Difference</string>
    </property>
   </action>
  </widget>

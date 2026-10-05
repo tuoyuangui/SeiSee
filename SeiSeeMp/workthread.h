@@ -178,7 +178,7 @@ class SaveAsWorker : public Worker
 public:
     explicit SaveAsWorker(SeisFile *sf, QString outfn, QString selh, int trmin,
                           int trmax, int trstp, int tmmin, int tmmax, int frmt,
-                          bool rev, QObject *parent = 0);
+                          bool rev, bool isProc, QObject *parent = 0);
 
 protected:
     SeisFile *m_sf;
@@ -193,11 +193,47 @@ protected:
     int m_tmmax;
     int m_frmt;
     bool m_rev;
+    bool m_isProc;
 
     QString save();
 
     void CopyTrcByIdx(int outf);
     void CopyTrcByHdr(int outf);
+
+public slots:
+    virtual void process();
+};
+//---------------------------------------------------------------------------------------------
+
+class DiffWorker : public Worker
+{
+    Q_OBJECT
+
+public:
+    explicit DiffWorker(SeisFile *sf1, SeisFile *sf2, QString outfn,
+                        QString selh, int trmin, int trmax, int trstp,
+                        int tmmin, int tmmax, int frmt, QObject *parent = 0);
+
+protected:
+    SeisFile *m_sf1;
+    SeisFile *m_sf2;
+    QString m_outfn;
+
+    QString m_selh;
+    int m_selhi;
+    int m_trmin;
+    int m_trmax;
+    int m_trstp;
+    int m_tmmin;
+    int m_tmmax;
+    int m_frmt;
+    //    bool                      m_rev;
+    //    bool                      m_isProc;
+
+    QString save();
+
+    void DiffTrcByIdx(int outf);
+    //    void CopyTrcByHdr(int outf);
 
 public slots:
     virtual void process();

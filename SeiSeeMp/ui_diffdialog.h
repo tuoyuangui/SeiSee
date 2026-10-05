@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'saveasdialog.ui'
+** Form generated from reading UI file 'diffdialog.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.15.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef UI_SAVEASDIALOG_H
-#define UI_SAVEASDIALOG_H
+#ifndef UI_DIFFDIALOG_H
+#define UI_DIFFDIALOG_H
 
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
@@ -24,7 +24,6 @@
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QSplitter>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
@@ -32,13 +31,23 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_SaveAsDialog
+class Ui_DiffDialog
 {
 public:
     QVBoxLayout *verticalLayout_7;
-    QSplitter *splitter;
-    QGroupBox *groupBox;
+    QGroupBox *groupBox_2;
     QVBoxLayout *verticalLayout;
+    QGridLayout *gridLayout_3;
+    QLabel *label;
+    QLineEdit *pathFile;
+    QToolButton *btnOpenFileIn;
+    QLabel *label_9;
+    QLineEdit *pathFile2;
+    QToolButton *btnOpenFileIn2;
+    QLabel *label_10;
+    QLineEdit *pathFileOutput;
+    QToolButton *btnOpenFileOut;
+    QHBoxLayout *horizontalLayout_3;
     QGroupBox *groupBox_3;
     QVBoxLayout *verticalLayout_3;
     QTabWidget *tabNumExp;
@@ -79,42 +88,99 @@ public:
     QLabel *label_7;
     QLineEdit *edTmMax;
     QToolButton *btnTmMax;
+    QSpacerItem *verticalSpacer_2;
     QGroupBox *groupBox_5;
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout;
     QLabel *label_8;
     QComboBox *cbFormat;
-    QCheckBox *ckRev;
-    QCheckBox *ckProc;
+    QSpacerItem *horizontalSpacer;
     QGroupBox *groupBox_6;
     QHBoxLayout *horizontalLayout_2;
     QToolButton *btnSave;
     QToolButton *btnClose;
-    QGroupBox *hdrBox;
     QProgressBar *progressBar;
     QLineEdit *edMess;
 
-    void setupUi(QDialog *SaveAsDialog)
+    void setupUi(QDialog *DiffDialog)
     {
-        if (SaveAsDialog->objectName().isEmpty())
-            SaveAsDialog->setObjectName(QString::fromUtf8("SaveAsDialog"));
-        SaveAsDialog->setModal(true);
-        verticalLayout_7 = new QVBoxLayout(SaveAsDialog);
+        if (DiffDialog->objectName().isEmpty())
+            DiffDialog->setObjectName(QString::fromUtf8("DiffDialog"));
+        DiffDialog->resize(661, 720);
+        verticalLayout_7 = new QVBoxLayout(DiffDialog);
         verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
-        splitter = new QSplitter(SaveAsDialog);
-        splitter->setObjectName(QString::fromUtf8("splitter"));
-        splitter->setOrientation(Qt::Horizontal);
-        groupBox = new QGroupBox(splitter);
-        groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
-        groupBox->setSizePolicy(sizePolicy);
-        groupBox->setMaximumSize(QSize(350, 16777215));
-        verticalLayout = new QVBoxLayout(groupBox);
+        groupBox_2 = new QGroupBox(DiffDialog);
+        groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
+        verticalLayout = new QVBoxLayout(groupBox_2);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        groupBox_3 = new QGroupBox(groupBox);
+        gridLayout_3 = new QGridLayout();
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
+        label = new QLabel(groupBox_2);
+        label->setObjectName(QString::fromUtf8("label"));
+        QFont font;
+        font.setPointSize(8);
+        label->setFont(font);
+
+        gridLayout_3->addWidget(label, 0, 0, 1, 1);
+
+        pathFile = new QLineEdit(groupBox_2);
+        pathFile->setObjectName(QString::fromUtf8("pathFile"));
+        pathFile->setEnabled(false);
+
+        gridLayout_3->addWidget(pathFile, 0, 1, 1, 1);
+
+        btnOpenFileIn = new QToolButton(groupBox_2);
+        btnOpenFileIn->setObjectName(QString::fromUtf8("btnOpenFileIn"));
+        btnOpenFileIn->setEnabled(false);
+        btnOpenFileIn->setMinimumSize(QSize(30, 0));
+
+        gridLayout_3->addWidget(btnOpenFileIn, 0, 2, 1, 1);
+
+        label_9 = new QLabel(groupBox_2);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
+        label_9->setFont(font);
+
+        gridLayout_3->addWidget(label_9, 1, 0, 1, 1);
+
+        pathFile2 = new QLineEdit(groupBox_2);
+        pathFile2->setObjectName(QString::fromUtf8("pathFile2"));
+
+        gridLayout_3->addWidget(pathFile2, 1, 1, 1, 1);
+
+        btnOpenFileIn2 = new QToolButton(groupBox_2);
+        btnOpenFileIn2->setObjectName(QString::fromUtf8("btnOpenFileIn2"));
+        btnOpenFileIn2->setEnabled(true);
+        btnOpenFileIn2->setMinimumSize(QSize(30, 0));
+
+        gridLayout_3->addWidget(btnOpenFileIn2, 1, 2, 1, 1);
+
+        label_10 = new QLabel(groupBox_2);
+        label_10->setObjectName(QString::fromUtf8("label_10"));
+        label_10->setFont(font);
+
+        gridLayout_3->addWidget(label_10, 2, 0, 1, 1);
+
+        pathFileOutput = new QLineEdit(groupBox_2);
+        pathFileOutput->setObjectName(QString::fromUtf8("pathFileOutput"));
+
+        gridLayout_3->addWidget(pathFileOutput, 2, 1, 1, 1);
+
+        btnOpenFileOut = new QToolButton(groupBox_2);
+        btnOpenFileOut->setObjectName(QString::fromUtf8("btnOpenFileOut"));
+        btnOpenFileOut->setEnabled(true);
+        btnOpenFileOut->setMinimumSize(QSize(30, 0));
+
+        gridLayout_3->addWidget(btnOpenFileOut, 2, 2, 1, 1);
+
+
+        verticalLayout->addLayout(gridLayout_3);
+
+
+        verticalLayout_7->addWidget(groupBox_2);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        groupBox_3 = new QGroupBox(DiffDialog);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
         verticalLayout_3 = new QVBoxLayout(groupBox_3);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
@@ -136,6 +202,7 @@ public:
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         label_2 = new QLabel(tab);
         label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setFont(font);
 
         gridLayout->addWidget(label_2, 0, 0, 1, 1);
 
@@ -147,6 +214,7 @@ public:
 
         label_3 = new QLabel(tab);
         label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setFont(font);
 
         gridLayout->addWidget(label_3, 1, 0, 1, 1);
 
@@ -164,6 +232,7 @@ public:
 
         label_4 = new QLabel(tab);
         label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setFont(font);
 
         gridLayout->addWidget(label_4, 2, 0, 1, 1);
 
@@ -181,6 +250,7 @@ public:
 
         label_5 = new QLabel(tab);
         label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setFont(font);
 
         gridLayout->addWidget(label_5, 3, 0, 1, 1);
 
@@ -214,11 +284,11 @@ public:
         horizontalLayout_15->setObjectName(QString::fromUtf8("horizontalLayout_15"));
         btnHexp = new QPushButton(EcBox);
         btnHexp->setObjectName(QString::fromUtf8("btnHexp"));
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(btnHexp->sizePolicy().hasHeightForWidth());
-        btnHexp->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(btnHexp->sizePolicy().hasHeightForWidth());
+        btnHexp->setSizePolicy(sizePolicy);
         btnHexp->setMinimumSize(QSize(25, 25));
         btnHexp->setMaximumSize(QSize(25, 25));
         QIcon icon;
@@ -229,8 +299,8 @@ public:
 
         btnNexp = new QPushButton(EcBox);
         btnNexp->setObjectName(QString::fromUtf8("btnNexp"));
-        sizePolicy1.setHeightForWidth(btnNexp->sizePolicy().hasHeightForWidth());
-        btnNexp->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(btnNexp->sizePolicy().hasHeightForWidth());
+        btnNexp->setSizePolicy(sizePolicy);
         btnNexp->setMinimumSize(QSize(25, 25));
         btnNexp->setMaximumSize(QSize(25, 25));
         QIcon icon1;
@@ -241,8 +311,8 @@ public:
 
         btnLexp = new QPushButton(EcBox);
         btnLexp->setObjectName(QString::fromUtf8("btnLexp"));
-        sizePolicy1.setHeightForWidth(btnLexp->sizePolicy().hasHeightForWidth());
-        btnLexp->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(btnLexp->sizePolicy().hasHeightForWidth());
+        btnLexp->setSizePolicy(sizePolicy);
         btnLexp->setMinimumSize(QSize(25, 25));
         btnLexp->setMaximumSize(QSize(25, 25));
         QIcon icon2;
@@ -257,8 +327,8 @@ public:
 
         btnClrExp = new QPushButton(EcBox);
         btnClrExp->setObjectName(QString::fromUtf8("btnClrExp"));
-        sizePolicy1.setHeightForWidth(btnClrExp->sizePolicy().hasHeightForWidth());
-        btnClrExp->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(btnClrExp->sizePolicy().hasHeightForWidth());
+        btnClrExp->setSizePolicy(sizePolicy);
         btnClrExp->setMinimumSize(QSize(25, 25));
         btnClrExp->setMaximumSize(QSize(25, 25));
         QIcon icon3;
@@ -284,9 +354,9 @@ public:
         verticalLayout_3->addWidget(tabNumExp);
 
 
-        verticalLayout->addWidget(groupBox_3);
+        horizontalLayout_3->addWidget(groupBox_3);
 
-        groupBox_4 = new QGroupBox(groupBox);
+        groupBox_4 = new QGroupBox(DiffDialog);
         groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
         verticalLayout_2 = new QVBoxLayout(groupBox_4);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -300,6 +370,7 @@ public:
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         label_6 = new QLabel(groupBox_4);
         label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setFont(font);
 
         gridLayout_2->addWidget(label_6, 0, 0, 1, 1);
 
@@ -317,6 +388,7 @@ public:
 
         label_7 = new QLabel(groupBox_4);
         label_7->setObjectName(QString::fromUtf8("label_7"));
+        label_7->setFont(font);
 
         gridLayout_2->addWidget(label_7, 1, 0, 1, 1);
 
@@ -335,10 +407,17 @@ public:
 
         verticalLayout_2->addLayout(gridLayout_2);
 
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        verticalLayout->addWidget(groupBox_4);
+        verticalLayout_2->addItem(verticalSpacer_2);
 
-        groupBox_5 = new QGroupBox(groupBox);
+
+        horizontalLayout_3->addWidget(groupBox_4);
+
+
+        verticalLayout_7->addLayout(horizontalLayout_3);
+
+        groupBox_5 = new QGroupBox(DiffDialog);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
         verticalLayout_4 = new QVBoxLayout(groupBox_5);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
@@ -346,6 +425,7 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         label_8 = new QLabel(groupBox_5);
         label_8->setObjectName(QString::fromUtf8("label_8"));
+        label_8->setFont(font);
 
         horizontalLayout->addWidget(label_8);
 
@@ -356,25 +436,17 @@ public:
 
         horizontalLayout->addWidget(cbFormat);
 
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
+
 
         verticalLayout_4->addLayout(horizontalLayout);
 
-        ckRev = new QCheckBox(groupBox_5);
-        ckRev->setObjectName(QString::fromUtf8("ckRev"));
-        ckRev->setChecked(false);
 
-        verticalLayout_4->addWidget(ckRev);
+        verticalLayout_7->addWidget(groupBox_5);
 
-        ckProc = new QCheckBox(groupBox_5);
-        ckProc->setObjectName(QString::fromUtf8("ckProc"));
-        ckProc->setChecked(false);
-
-        verticalLayout_4->addWidget(ckProc);
-
-
-        verticalLayout->addWidget(groupBox_5);
-
-        groupBox_6 = new QGroupBox(groupBox);
+        groupBox_6 = new QGroupBox(DiffDialog);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
         horizontalLayout_2 = new QHBoxLayout(groupBox_6);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
@@ -395,87 +467,78 @@ public:
         horizontalLayout_2->addWidget(btnClose);
 
 
-        verticalLayout->addWidget(groupBox_6);
+        verticalLayout_7->addWidget(groupBox_6);
 
-        splitter->addWidget(groupBox);
-        hdrBox = new QGroupBox(splitter);
-        hdrBox->setObjectName(QString::fromUtf8("hdrBox"));
-        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(hdrBox->sizePolicy().hasHeightForWidth());
-        hdrBox->setSizePolicy(sizePolicy2);
-        splitter->addWidget(hdrBox);
-
-        verticalLayout_7->addWidget(splitter);
-
-        progressBar = new QProgressBar(SaveAsDialog);
+        progressBar = new QProgressBar(DiffDialog);
         progressBar->setObjectName(QString::fromUtf8("progressBar"));
         progressBar->setValue(0);
         progressBar->setAlignment(Qt::AlignCenter);
 
         verticalLayout_7->addWidget(progressBar);
 
-        edMess = new QLineEdit(SaveAsDialog);
+        edMess = new QLineEdit(DiffDialog);
         edMess->setObjectName(QString::fromUtf8("edMess"));
         edMess->setEnabled(false);
 
         verticalLayout_7->addWidget(edMess);
 
 
-        retranslateUi(SaveAsDialog);
+        retranslateUi(DiffDialog);
 
         tabNumExp->setCurrentIndex(0);
 
 
-        QMetaObject::connectSlotsByName(SaveAsDialog);
+        QMetaObject::connectSlotsByName(DiffDialog);
     } // setupUi
 
-    void retranslateUi(QDialog *SaveAsDialog)
+    void retranslateUi(QDialog *DiffDialog)
     {
-        SaveAsDialog->setWindowTitle(QCoreApplication::translate("SaveAsDialog", "Save File As", nullptr));
-        groupBox->setTitle(QString());
-        groupBox_3->setTitle(QCoreApplication::translate("SaveAsDialog", "Trace", nullptr));
-        ckTrAll->setText(QCoreApplication::translate("SaveAsDialog", "All Traces", nullptr));
-        label_2->setText(QCoreApplication::translate("SaveAsDialog", "By:", nullptr));
-        label_3->setText(QCoreApplication::translate("SaveAsDialog", "Min:", nullptr));
-        btnTrMin->setText(QCoreApplication::translate("SaveAsDialog", "Min", nullptr));
-        label_4->setText(QCoreApplication::translate("SaveAsDialog", "Max:", nullptr));
-        btnTrMax->setText(QCoreApplication::translate("SaveAsDialog", "Max", nullptr));
-        label_5->setText(QCoreApplication::translate("SaveAsDialog", "Step:", nullptr));
-        btnTrStp->setText(QCoreApplication::translate("SaveAsDialog", "Every Trace", nullptr));
-        tabNumExp->setTabText(tabNumExp->indexOf(tab), QCoreApplication::translate("SaveAsDialog", "By Number", nullptr));
+        DiffDialog->setWindowTitle(QCoreApplication::translate("DiffDialog", "Difference", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("DiffDialog", "File", nullptr));
+        label->setText(QCoreApplication::translate("DiffDialog", "Minuend File:", nullptr));
+        btnOpenFileIn->setText(QCoreApplication::translate("DiffDialog", "Open", nullptr));
+        label_9->setText(QCoreApplication::translate("DiffDialog", "Subtrahend File:", nullptr));
+        btnOpenFileIn2->setText(QCoreApplication::translate("DiffDialog", "Open", nullptr));
+        label_10->setText(QCoreApplication::translate("DiffDialog", "Difference File:", nullptr));
+        btnOpenFileOut->setText(QCoreApplication::translate("DiffDialog", "Open", nullptr));
+        groupBox_3->setTitle(QCoreApplication::translate("DiffDialog", "Trace", nullptr));
+        ckTrAll->setText(QCoreApplication::translate("DiffDialog", "All Traces", nullptr));
+        label_2->setText(QCoreApplication::translate("DiffDialog", "By:", nullptr));
+        label_3->setText(QCoreApplication::translate("DiffDialog", "Min:", nullptr));
+        btnTrMin->setText(QCoreApplication::translate("DiffDialog", "Min", nullptr));
+        label_4->setText(QCoreApplication::translate("DiffDialog", "Max:", nullptr));
+        btnTrMax->setText(QCoreApplication::translate("DiffDialog", "Max", nullptr));
+        label_5->setText(QCoreApplication::translate("DiffDialog", "Step:", nullptr));
+        btnTrStp->setText(QCoreApplication::translate("DiffDialog", "Every Trace", nullptr));
+        tabNumExp->setTabText(tabNumExp->indexOf(tab), QCoreApplication::translate("DiffDialog", "By Number", nullptr));
         EcBox->setTitle(QString());
         btnHexp->setText(QString());
         btnNexp->setText(QString());
         btnLexp->setText(QString());
         btnClrExp->setText(QString());
-        tabNumExp->setTabText(tabNumExp->indexOf(tab_2), QCoreApplication::translate("SaveAsDialog", "By Expression", nullptr));
-        groupBox_4->setTitle(QCoreApplication::translate("SaveAsDialog", "Time", nullptr));
-        ckTmAll->setText(QCoreApplication::translate("SaveAsDialog", "Whole trace", nullptr));
-        label_6->setText(QCoreApplication::translate("SaveAsDialog", "Min:", nullptr));
-        btnTmMin->setText(QCoreApplication::translate("SaveAsDialog", "Min", nullptr));
-        label_7->setText(QCoreApplication::translate("SaveAsDialog", "Max:", nullptr));
-        btnTmMax->setText(QCoreApplication::translate("SaveAsDialog", "Max", nullptr));
-        groupBox_5->setTitle(QString());
-        label_8->setText(QCoreApplication::translate("SaveAsDialog", "Format:", nullptr));
-        cbFormat->setItemText(0, QCoreApplication::translate("SaveAsDialog", "IEEE 32 Float", nullptr));
-        cbFormat->setItemText(1, QCoreApplication::translate("SaveAsDialog", "IBM 32 Float", nullptr));
+        tabNumExp->setTabText(tabNumExp->indexOf(tab_2), QCoreApplication::translate("DiffDialog", "By Expression", nullptr));
+        groupBox_4->setTitle(QCoreApplication::translate("DiffDialog", "Time", nullptr));
+        ckTmAll->setText(QCoreApplication::translate("DiffDialog", "Whole trace", nullptr));
+        label_6->setText(QCoreApplication::translate("DiffDialog", "Min:", nullptr));
+        btnTmMin->setText(QCoreApplication::translate("DiffDialog", "Min", nullptr));
+        label_7->setText(QCoreApplication::translate("DiffDialog", "Max:", nullptr));
+        btnTmMax->setText(QCoreApplication::translate("DiffDialog", "Max", nullptr));
+        groupBox_5->setTitle(QCoreApplication::translate("DiffDialog", "Format", nullptr));
+        label_8->setText(QCoreApplication::translate("DiffDialog", "Output Format:", nullptr));
+        cbFormat->setItemText(0, QCoreApplication::translate("DiffDialog", "IEEE 32 Float", nullptr));
+        cbFormat->setItemText(1, QCoreApplication::translate("DiffDialog", "IBM 32 Float", nullptr));
 
-        ckRev->setText(QCoreApplication::translate("SaveAsDialog", "Reversal order", nullptr));
-        ckProc->setText(QCoreApplication::translate("SaveAsDialog", "Apply Processing", nullptr));
         groupBox_6->setTitle(QString());
-        btnSave->setText(QCoreApplication::translate("SaveAsDialog", "Save", nullptr));
-        btnClose->setText(QCoreApplication::translate("SaveAsDialog", "Close", nullptr));
-        hdrBox->setTitle(QCoreApplication::translate("SaveAsDialog", "Trace Headers", nullptr));
+        btnSave->setText(QCoreApplication::translate("DiffDialog", "Save", nullptr));
+        btnClose->setText(QCoreApplication::translate("DiffDialog", "Close", nullptr));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class SaveAsDialog: public Ui_SaveAsDialog {};
+    class DiffDialog: public Ui_DiffDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE
 
-#endif // UI_SAVEASDIALOG_H
+#endif // UI_DIFFDIALOG_H

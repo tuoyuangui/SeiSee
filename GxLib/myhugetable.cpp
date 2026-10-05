@@ -6,6 +6,7 @@
 
 MyHugeTable::MyHugeTable(QWidget *parent)
     : QWidget(parent)
+    , m_interfaceScale(1.0)
 {
     vScrollBar = new QScrollBar(Qt::Vertical, this);
     hScrollBar = new QScrollBar(Qt::Horizontal, this);
@@ -75,6 +76,26 @@ MyHugeTable::MyHugeTable(QWidget *parent)
     m_ccol = -1;
 }
 
+void MyHugeTable::setInterfaceScale(qreal scale)
+{
+    m_interfaceScale = qMax<qreal>(0.1, scale);
+    resizeEvent(nullptr);
+    updateGeometry();
+    update();
+    cWidget->update();
+    tWidget->update();
+}
+
+int MyHugeTable::columnWidth(int n) const
+{
+    return qRound(m_cols[n].width * m_interfaceScale);
+}
+
+int MyHugeTable::rowHeight() const
+{
+    return qMax(1, qRound(18 * m_interfaceScale));
+}
+
 QString MyHugeTable::getCellData(int nrow, int ncol)
 {
     int rc = receivers(SIGNAL(cellDataRequest(int, int, QString &)));
@@ -131,7 +152,7 @@ void MyHugeTable::resizeEvent(QResizeEvent *event)
     int h = tWidget->height();
     int w = tWidget->width();
 
-    stp = h / 18;
+    stp = h / rowHeight();
     hmax = int(nr - stp);
     if (hmax <= 0)
         hmax = 0;
@@ -290,7 +311,7 @@ int MyHugeTable::colsW()
     int nc = colCount();
 
     for (n = 0; n < nc; n++) {
-        int wc = m_cols[n].width;
+        int wc = columnWidth(n);
 
         if (wc > 0) {
             ww = ww + wc;
@@ -307,11 +328,11 @@ int MyHugeTable::colsW()
     }
 
     for (n = 0; n < nc; n++) {
-        int wc = m_cols[n].width;
+        int wc = columnWidth(n);
         if (wc < 1)
             wc = ww;
-        if (wc < 30)
-            wc = 30;
+        if (wc < qRound(30 * m_interfaceScale))
+            wc = qRound(30 * m_interfaceScale);
 
         W = W + wc;
     }
@@ -337,7 +358,7 @@ void MyHtWidget::scrollToCurRow()
     int ro = p->vScrollBar->value();
 
     qint64 nr1 = ro;
-    qint64 nr2 = ro + (h / 18);
+    qint64 nr2 = ro + (h / p->rowHeight());
     qint64 nr;
 
     int cr = p->curRow();
@@ -345,7 +366,7 @@ void MyHtWidget::scrollToCurRow()
     if (cr < nr1)
         nr1 = cr;
     if (cr >= nr2)
-        nr1 = cr - h / 18 + 1;
+        nr1 = cr - h / p->rowHeight() + 1;
 
     if (nr1 < 0)
         nr1 = 0;
@@ -372,14 +393,14 @@ void MyHtWidget::paintEvent(QPaintEvent *event)
         ro = 0;
 
     qint64 nr1 = ro;
-    qint64 nr2 = ro + (h / 18);
+    qint64 nr2 = ro + (h / p->rowHeight());
 
     int nc;
     int ww = 0;
     int nw = 0;
 
     for (nc = 0; nc < p->colCount(); nc++) {
-        int wc = p->m_cols[nc].width;
+        int wc = p->columnWidth(nc);
 
         if (wc > 0) {
             ww = ww + wc;
@@ -400,21 +421,26 @@ void MyHtWidget::paintEvent(QPaintEvent *event)
         int wc = 0;
 
         for (nc = 0; nc < p->colCount(); nc++) {
-            wc = p->m_cols[nc].width;
+            wc = p->columnWidth(nc);
             if (wc < 1)
                 wc = ww;
-            if (wc < 30)
-                wc = 30;
+            if (wc < qRound(30 * p->m_interfaceScale))
+                wc = qRound(30 * p->m_interfaceScale);
 
             if (nr == p->curRow()) {
-                painter.fillRect(QRect(x - xo, (nr - ro) * 18, wc, 18),
+                painter.fillRect(QRect(x - xo, (nr - ro) * p->rowHeight(), wc,
+                                       p->rowHeight()),
                                  Qt::lightGray);
             }
 
             QString data = p->getCellData(nr, nc);
 
-            painter.drawText(x - xo + 2, (nr + 1 - ro) * 18 - 4, data);
-            painter.drawRect(QRect(x - xo, (nr - ro) * 18, wc, 18));
+            painter.drawText(x - xo + qRound(2 * p->m_interfaceScale),
+                             (nr + 1 - ro) * p->rowHeight() -
+                                 qRound(4 * p->m_interfaceScale),
+                             data);
+            painter.drawRect(QRect(x - xo, (nr - ro) * p->rowHeight(), wc,
+                                   p->rowHeight()));
             x += wc;
         }
     }
@@ -427,7 +453,7 @@ int MyHtWidget::xy2cr(int x, int y, int &c, qint64 &r)
     int ro = p->vScrollBar->value();
     int co = p->hScrollBar->value();
 
-    y = y / 18;
+    y = y / p->rowHeight();
 
     r = ro + y;
 
@@ -442,7 +468,7 @@ int MyHtWidget::xy2cr(int x, int y, int &c, qint64 &r)
     c = -1;
 
     for (nc = 0; nc < p->colCount(); nc++) {
-        wc = p->m_cols[nc].width;
+        wc = p->columnWidth(nc);
 
         if (wc > 0) {
             //          qDebug() << "nc=" << nc << "x=" << x << " ww=" << ww;
@@ -474,7 +500,7 @@ void MyHtWidget::mouseDoubleClickEvent(QMouseEvent *event)
     xy2cr(event->x(), event->y(), cx, ry);
 
     /*
-        int     y=   event->y()/18;
+        int y = event->y() / p->rowHeight();
 
         int     x=   event->x();
 
@@ -490,7 +516,7 @@ void MyHtWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
         for(nc=0;nc<p->colCount();nc++)
         {
-            wc = p->m_cols[nc].width;
+            wc = p->columnWidth(nc);
 
             if(wc>0)
             {
@@ -516,7 +542,7 @@ void MyHtWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
         lEdit->setFocus();
         lEdit->move(ww, (r-ro)*18);
-        lEdit->resize(wc, 18);
+        lEdit->resize(wc, p->rowHeight());
         lEdit->setText(data);
         lEdit->show();
     */
@@ -530,7 +556,7 @@ void MyHtWidget::mousePressEvent(QMouseEvent *event)
     xy2cr(event->x(), event->y(), c, r);
     /*
         int     ro = p->vScrollBar->value();
-        int     y=   event->y()/18;
+        int y = event->y() / p->rowHeight();
 
         int r = ro+y;
 
@@ -650,7 +676,7 @@ void MyHcWidget::paintEvent(QPaintEvent *event)
     int nw = 0;
 
     for (nc = 0; nc < p->colCount(); nc++) {
-        int wc = p->m_cols[nc].width;
+        int wc = p->columnWidth(nc);
 
         if (wc > 0) {
             ww = ww + wc;
@@ -669,7 +695,7 @@ void MyHcWidget::paintEvent(QPaintEvent *event)
     QColor hc;
 
     for (nc = 0; nc < p->colCount(); nc++) {
-        wc = p->m_cols[nc].width;
+        wc = p->columnWidth(nc);
         hc = p->m_cols[nc].hbgc;
         if (wc < 1)
             wc = ww;
@@ -679,10 +705,12 @@ void MyHcWidget::paintEvent(QPaintEvent *event)
         QString data = p->colLabel(nc);
 
         QBrush b = QBrush(hc);
-        painter.fillRect(QRect(x - xo, 0, wc, 18), b);
+        painter.fillRect(QRect(x - xo, 0, wc, p->rowHeight()), b);
 
-        painter.drawText(x - xo + 2, 18 - 4 /*(nr+1-ro)*18-4*/, data);
-        painter.drawRect(QRect(x - xo, 0, wc, 18));
+        painter.drawText(x - xo + qRound(2 * p->m_interfaceScale),
+                         p->rowHeight() - qRound(4 * p->m_interfaceScale),
+                         data);
+        painter.drawRect(QRect(x - xo, 0, wc, p->rowHeight()));
         x += wc;
     }
 }
@@ -698,7 +726,7 @@ int MyHcWidget::x2c(int x)
     c = -1;
 
     for (nc = 0; nc < p->colCount(); nc++) {
-        wc = p->m_cols[nc].width;
+        wc = p->columnWidth(nc);
 
         if (wc > 0) {
             //          qDebug() << "nc=" << nc << "x=" << x << " ww=" << ww;

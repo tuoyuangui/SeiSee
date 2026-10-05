@@ -21,6 +21,7 @@ class SaveAsDialog : public QDialog
 public:
     SeisFile *sf;
     QString *savDir;
+    QString curDir;
 
     explicit SaveAsDialog(QWidget *parent = 0);
     ~SaveAsDialog();

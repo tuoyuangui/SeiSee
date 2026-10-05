@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QFont>
 #include <QHash>
+#include <QLayout>
 #include <QLabel>
 #include <QMainWindow>
 #include <QPlainTextEdit>
@@ -37,6 +38,7 @@
 #include "edithdrdialog.h"
 #include "procparmdialog.h"
 #include "saveasdialog.h"
+#include "diffdialog.h"
 
 #include "workthread.h"
 
@@ -338,6 +340,8 @@ private slots:
 
     void on_actionSave_As_triggered();
 
+    void on_actionDifference_triggered();
+
     void on_btnLastTr_2_clicked();
 
     void on_btnFirstTr_2_clicked();
@@ -355,11 +359,24 @@ private slots:
     void on_ckDly_toggled(bool checked);
 
 private:
+    struct InterfaceWidgetMetrics {
+        QFont font;
+        QSize minimumSize;
+        QSize maximumSize;
+        QSize windowSize;
+    };
+
+    struct InterfaceLayoutMetrics {
+        QMargins margins;
+        int spacing;
+    };
+
     void applyInterfaceDpi(int dpi);
 
     Ui::MainWindow *ui;
     int m_interfaceDpi = 0;
-    QHash<QWidget *, QFont> m_baseInterfaceFonts;
+    QHash<QWidget *, InterfaceWidgetMetrics> m_baseInterfaceMetrics;
+    QHash<QLayout *, InterfaceLayoutMetrics> m_baseInterfaceLayouts;
 
     //  ReadThread*    WorkThread;
 
@@ -380,6 +397,7 @@ private:
     AxisDialog AxisDlg;
     EditHdrDialog EdHdrDlg;
     SaveAsDialog SaveAsDlg;
+    DiffDialog DiffDlg;
 
     QList<DirItem> dlist;
     QStack<zdata> zstack;

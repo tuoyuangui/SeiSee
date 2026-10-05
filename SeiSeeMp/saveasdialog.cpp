@@ -61,7 +61,7 @@ void SaveAsDialog::on_btnSave_clicked()
 
     int tmmin = ReadTxt(ui->edTmMin, ok);
     int tmmax = ReadTxt(ui->edTmMax, ok);
-    int trmin = ReadTxt(ui->edTrMin, ok);
+    int trmin = ReadTxt(ui->edTrMin, ok) - 1;
     int trmax = ReadTxt(ui->edTrMax, ok);
     int trstp = ReadTxt(ui->edTrStp, ok);
 
@@ -80,12 +80,13 @@ void SaveAsDialog::on_btnSave_clicked()
     QString selh = ui->edIdx->text();
 
     QString fileName = QFileDialog::getSaveFileName(
-        this, "Save File As", *savDir, "SEG-Y File (*.sgy)");
+        this, "Save File As", curDir, "SEG-Y File (*.sgy *.segy)");
     if (fileName == "") {
         return;
     }
 
     bool rev = ui->ckRev->isChecked();
+    bool isProc = ui->ckProc->isChecked();
 
     QFileInfo fi(fileName);
     *savDir = fi.dir().absolutePath();
@@ -96,8 +97,9 @@ void SaveAsDialog::on_btnSave_clicked()
 
     QThread *thread = new QThread;
 
-    SaveAsWorker *worker = new SaveAsWorker(sf, fileName, selh, trmin, trmax,
-                                            trstp, tmmin, tmmax, frmt, rev);
+    SaveAsWorker *worker =
+        new SaveAsWorker(sf, fileName, selh, trmin, trmax, trstp, tmmin, tmmax,
+                         frmt, rev, isProc);
 
     worker->moveToThread(thread);
     connect(thread, SIGNAL(started()), worker, SLOT(process()));
@@ -117,17 +119,18 @@ void SaveAsDialog::ShowProgress(QString mes, int pers)
 {
     if (pers < 0) {
         ui->progressBar->setValue(0);
-        //        m_statMess->setStyleSheet("");
-        //        m_statMess->setText(mes);
+        ui->edMess->setStyleSheet("");
+        ui->edMess->setText(mes);
     } else {
         ui->progressBar->setValue(pers);
-        /*
-                if(mes!="")
-                    m_statMess->setStyleSheet("QLabel { background-color : lime;
-           color : black; }"); else m_statMess->setStyleSheet("");
 
-                m_statMess->setText(mes);
-        */
+        if (mes != "")
+            ui->edMess->setStyleSheet(
+                "QLabel { background-color : lime; color : black; }");
+        else
+            ui->edMess->setStyleSheet("");
+
+        ui->edMess->setText(mes);
     }
 }
 
