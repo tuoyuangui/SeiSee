@@ -1118,6 +1118,11 @@ public:
         splitter_2->setOrientation(Qt::Horizontal);
         groupBox_6 = new QGroupBox(splitter_2);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
+        QSizePolicy sizePolicy5(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy5.setHorizontalStretch(1);
+        sizePolicy5.setVerticalStretch(0);
+        sizePolicy5.setHeightForWidth(groupBox_6->sizePolicy().hasHeightForWidth());
+        groupBox_6->setSizePolicy(sizePolicy5);
         groupBox_6->setMinimumSize(QSize(250, 0));
         groupBox_6->setMaximumSize(QSize(350, 16777215));
         verticalLayout_17 = new QVBoxLayout(groupBox_6);
@@ -1232,11 +1237,11 @@ public:
         cbSsign->addItem(QString());
         cbSsign->addItem(QString());
         cbSsign->setObjectName(QString::fromUtf8("cbSsign"));
-        QSizePolicy sizePolicy5(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        sizePolicy5.setHorizontalStretch(0);
-        sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(cbSsign->sizePolicy().hasHeightForWidth());
-        cbSsign->setSizePolicy(sizePolicy5);
+        QSizePolicy sizePolicy6(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy6.setHorizontalStretch(0);
+        sizePolicy6.setVerticalStretch(0);
+        sizePolicy6.setHeightForWidth(cbSsign->sizePolicy().hasHeightForWidth());
+        cbSsign->setSizePolicy(sizePolicy6);
         cbSsign->setMinimumSize(QSize(40, 0));
         cbSsign->setMaximumSize(QSize(40, 16777215));
 
@@ -1356,11 +1361,11 @@ public:
 
         label_5 = new QLabel(groupBox_9);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        QSizePolicy sizePolicy6(QSizePolicy::Minimum, QSizePolicy::Preferred);
-        sizePolicy6.setHorizontalStretch(0);
-        sizePolicy6.setVerticalStretch(0);
-        sizePolicy6.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy6);
+        QSizePolicy sizePolicy7(QSizePolicy::Minimum, QSizePolicy::Preferred);
+        sizePolicy7.setHorizontalStretch(0);
+        sizePolicy7.setVerticalStretch(0);
+        sizePolicy7.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
+        label_5->setSizePolicy(sizePolicy7);
         label_5->setMaximumSize(QSize(10, 16777215));
 
         horizontalLayout_11->addWidget(label_5);
@@ -1422,6 +1427,8 @@ public:
         splitter_3->setOrientation(Qt::Horizontal);
         HeBox = new QGroupBox(splitter_3);
         HeBox->setObjectName(QString::fromUtf8("HeBox"));
+        sizePolicy5.setHeightForWidth(HeBox->sizePolicy().hasHeightForWidth());
+        HeBox->setSizePolicy(sizePolicy5);
         HeBox->setMinimumSize(QSize(250, 0));
         HeBox->setMaximumSize(QSize(350, 16777215));
         verticalLayout_24 = new QVBoxLayout(HeBox);
@@ -1433,8 +1440,8 @@ public:
         frame_7->setObjectName(QString::fromUtf8("frame_7"));
         sizePolicy.setHeightForWidth(frame_7->sizePolicy().hasHeightForWidth());
         frame_7->setSizePolicy(sizePolicy);
-        frame_7->setMinimumSize(QSize(0, 30));
-        frame_7->setMaximumSize(QSize(16777215, 30));
+        frame_7->setMinimumSize(QSize(0, 40));
+        frame_7->setMaximumSize(QSize(16777215, 40));
         frame_7->setFrameShape(QFrame::Box);
         frame_7->setFrameShadow(QFrame::Raised);
         horizontalLayout_17 = new QHBoxLayout(frame_7);
