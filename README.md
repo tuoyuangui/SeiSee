@@ -34,6 +34,9 @@
 
 ## 安装方法
 
+## 第三方库
+
+- [qt-toast](https://github.com/niklashenning/qt-toast)：截图操作提示，源码及 MIT 许可证位于 `third_party/qt-toast`，通过独立 qmake 静态库项目构建。通知定位使用 Qt `QScreen::availableGeometry()`，适配 Windows 任务栏及 Linux 桌面保留区域。
 
 ## 更新日志
 

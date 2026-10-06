@@ -33,6 +33,8 @@
 
 #include <functional>
 
+#include "Toast.h"
+
 #include <fcntl.h>
 #include <math.h>
 #include <sys/stat.h>
@@ -58,6 +60,18 @@ int currentScreenLogicalDpiY(const QWidget *widget)
         currentScreen = QApplication::primaryScreen();
     return currentScreen ? GfxStyle::ScreenDpiY(currentScreen)
                          : qMax(1, QApplication::desktop()->logicalDpiY());
+}
+
+void showScreenshotToast(QWidget *parent, const QString &title,
+                         const QString &text, ToastPreset preset)
+{
+    Toast *toast = new Toast(parent);
+    toast->setDuration(5000);
+    toast->setTitle(title);
+    toast->setText(text);
+    toast->setMaximumWidth(qMax(250, parent->width() / 2));
+    toast->applyPreset(preset);
+    toast->show();
 }
 
 } // namespace
@@ -3003,8 +3017,10 @@ void MainWindow::on_captureBtn_pressed()
 {
     SeisFile *file = seisSrc.Sfile();
     if (!file || !file->Active()) {
-        QMessageBox::warning(this, tr("Screenshot unavailable"),
-                             tr("Open a seismic data file before capturing."));
+        showScreenshotToast(
+            this, tr("Screenshot unavailable"),
+            tr("Open a seismic data file before capturing."),
+            ToastPreset::WARNING);
         return;
     }
 
@@ -3024,8 +3040,10 @@ void MainWindow::on_captureBtn_pressed()
         qMax(1, qRound(captureRect.height() * captureScaleY)));
     QImage capturedImage(captureSize, QImage::Format_RGB32);
     if (capturedImage.isNull()) {
-        QMessageBox::warning(this, tr("Screenshot failed"),
-                             tr("Could not capture the visible seismic area."));
+        showScreenshotToast(
+            this, tr("Screenshot failed"),
+            tr("Could not capture the visible seismic area."),
+            ToastPreset::ERROR_NOTIFICATION);
         return;
     }
     capturedImage.fill(ui->seisFrame->palette().color(QPalette::Window));
@@ -3101,27 +3119,18 @@ void MainWindow::on_captureBtn_pressed()
     }
 
     if (!capturedImage.save(outputPath, "PNG")) {
-        QMessageBox::warning(
+        showScreenshotToast(
             this, tr("Screenshot failed"),
-            tr("Could not save the screenshot to %1").arg(outputPath));
+            tr("Could not save the screenshot to %1").arg(outputPath),
+            ToastPreset::ERROR_NOTIFICATION);
         return;
     }
 
-    QLabel *message = new QLabel(
-        tr("Screenshot saved to %1").arg(QDir::toNativeSeparators(outputPath)),
-        this);
-    message->setWordWrap(true);
-    message->setStyleSheet(
-        "QLabel { background: #323232; color: white; padding: 8px; "
-        "border-radius: 4px; }");
-    message->setMaximumWidth(qMax(250, width() / 2));
-    message->adjustSize();
-    const int statusBarHeight = statusBar()->height();
-    message->move(width() - message->width() - 12,
-                  height() - statusBarHeight - message->height() - 12);
-    message->show();
-    message->raise();
-    QTimer::singleShot(4000, message, &QObject::deleteLater);
+    showScreenshotToast(
+        this, tr("Screenshot saved"),
+        tr("Screenshot saved to %1")
+            .arg(QDir::toNativeSeparators(outputPath)),
+        ToastPreset::SUCCESS);
 }
 
 void MainWindow::on_actionAxes_Setup_triggered()

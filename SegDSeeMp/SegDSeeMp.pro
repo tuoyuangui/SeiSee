@@ -29,7 +29,7 @@ FORMS    += mainwindow.ui \
     aboutdialog.ui
 
 # ADD THIS LINE!
-RC_FILE += app.rc
+win32: RC_FILE += app.rc
 
 RESOURCES += \
     myrc.qrc
