@@ -39,7 +39,7 @@ namespace GfxStyle {
     // 应用界面字体；Qt 资源路径对应 fonts/Roboto-Regular-14.ttf。
     static const char UiFontResource[] = ":/fonts/Roboto-Regular-14.ttf";
     static const char UiFontFamily[] = "Roboto";
-    constexpr double UiFontPointSize = 9.75;
+    constexpr double UiFontPointSize = 9;
     constexpr double DirectoryGridFontPointSize = 8.0;
     constexpr double AboutTitleFontPointSize = 22.0;
     constexpr double AboutSubtitleFontPointSize = 10.0;
@@ -50,10 +50,10 @@ namespace GfxStyle {
     // InfoTxt 和 TxtHdrEdit 使用 Courier New 等宽字体。
     static const char TextEditorFontFamily[] = "Courier New";
     constexpr QFont::StyleHint TextEditorFontStyleHint = QFont::Courier;
-    constexpr double TextEditorFontPointSize = 8.25;
+    constexpr double TextEditorFontPointSize = 8;
 
     // 地震图、坐标轴及 Time 标签字体字号，单位为 point。
-    constexpr double LabelFontPointSize = 8.25;
+    constexpr double LabelFontPointSize = 8;
     static const char LabelFontFamily[] = "Times New Roman";
     // Qt 资源路径对应 SeiSeeMp/fonts/TIMES.TTF。
     static const char LabelFontResource[] = ":/fonts/TIMES.TTF";
@@ -85,10 +85,10 @@ namespace GfxStyle {
     constexpr int DirectoryTypeCharacterCount = 7;
     constexpr int BinaryHeaderValueCharacterCount = 6;
     constexpr int HeaderBytesCharacterCount = 7;
-    constexpr int HeaderNameCharacterCount = 7; 
+    constexpr int HeaderNameCharacterCount = 8; 
     constexpr int TraceDataIndexCharacterCount = 7;
     constexpr int TraceDataTimeCharacterCount = 7;
-    constexpr int AvailableHeaderNameCharacterCount = 7;
+    constexpr int AvailableHeaderNameCharacterCount = 8;
     constexpr int SelectedHeaderNameCharacterCount = 15;
 
     // SeiSeeMp 道头表格myhugetable表格列宽，单位为字符所占的个数。

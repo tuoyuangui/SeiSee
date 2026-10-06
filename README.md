@@ -34,6 +34,27 @@
 
 ## 安装方法
 
+### Windows
+
+需要 Qt 5.15.2 MinGW 8.1、Inno Setup 6.3 或更高版本，并将项目使用的 Qt 和 MinGW `bin` 目录配置在默认路径或传入参数。脚本通过 `windeployqt` 扫描并打包应用所需的 Qt DLL、平台插件和运行库。默认安装包版本为 `3.0-alpha.37`：
+
+```powershell
+.\scripts\package-windows.ps1
+```
+
+可通过 `-QtBin`、`-MinGWBin`、`-InnoSetupCompiler`、`-Version` 和 `-Jobs` 覆盖工具路径及构建参数。安装程序输出到 `dist/windows`。
+
+### Linux
+
+需要 Qt 5 开发环境、C++ 编译工具、`linuxdeploy`、`linuxdeploy-plugin-qt` 和 `appimagetool`，并在 x86_64 Linux 上运行。默认安装包版本为 `3.0-alpha.37`：
+
+```bash
+chmod +x scripts/package-linux.sh
+./scripts/package-linux.sh
+```
+
+可通过 `QMAKE`、`MAKE`、`LINUXDEPLOY`、`APPIMAGETOOL`、`VERSION` 和 `JOBS` 环境变量覆盖工具及构建参数。AppImage 输出到 `dist/linux`。建议在目标用户所需支持范围内较旧的 Linux 发行版上构建，以提高 glibc 兼容性。
+
 ## 第三方库
 
 - [qt-toast](https://github.com/niklashenning/qt-toast)：截图操作提示，源码及 MIT 许可证位于 `third_party/qt-toast`，通过独立 qmake 静态库项目构建。通知定位使用 Qt `QScreen::availableGeometry()`，适配 Windows 任务栏及 Linux 桌面保留区域。

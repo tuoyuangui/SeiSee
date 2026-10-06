@@ -1432,7 +1432,7 @@ void MainWindow::SelectTrace(int it)
                 double val = smp[i];
 
                 QString v;
-                v.sprintf("%10.2f", val);
+                v.sprintf("%10.6f", val);
 
                 trcDatGrid.setCell(i, 0, QString::number(i));
                 trcDatGrid.setCell(i, 1, QString::number(i * sf->Si() * 1000.));
