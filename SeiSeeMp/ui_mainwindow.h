@@ -1413,9 +1413,10 @@ public:
         hdrsEditTab->setObjectName(QString::fromUtf8("hdrsEditTab"));
         hdrsEditTab->setAutoFillBackground(true);
         verticalLayout_25 = new QVBoxLayout(hdrsEditTab);
-        verticalLayout_25->setSpacing(6);
+        verticalLayout_25->setSpacing(0);
         verticalLayout_25->setContentsMargins(11, 11, 11, 11);
         verticalLayout_25->setObjectName(QString::fromUtf8("verticalLayout_25"));
+        verticalLayout_25->setContentsMargins(0, 0, 0, 0);
         splitter_3 = new QSplitter(hdrsEditTab);
         splitter_3->setObjectName(QString::fromUtf8("splitter_3"));
         splitter_3->setOrientation(Qt::Horizontal);
