@@ -69,6 +69,7 @@ void showScreenshotToast(QWidget *parent, const QString &title,
     toast->setDuration(5000);
     toast->setTitle(title);
     toast->setText(text);
+    toast->setBorderRadius(10);
     toast->setMaximumWidth(qMax(250, parent->width() / 2));
     toast->applyPreset(preset);
     toast->show();
