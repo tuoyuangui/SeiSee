@@ -57,7 +57,7 @@ public:
     QGroupBox *dirGroup;
     QVBoxLayout *verticalLayout_2;
     QFrame *frame_3;
-    QWidget *layoutWidget;
+    QWidget *dirButtonsWidget;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *selDirBtn;
     QPushButton *opFileBtn;
@@ -316,19 +316,19 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(frame_3->sizePolicy().hasHeightForWidth());
         frame_3->setSizePolicy(sizePolicy);
-        frame_3->setMinimumSize(QSize(0, 30));
-        frame_3->setMaximumSize(QSize(16777215, 30));
+        frame_3->setMinimumSize(QSize(0, 36));
+        frame_3->setMaximumSize(QSize(16777215, 36));
         frame_3->setFrameShape(QFrame::Box);
         frame_3->setFrameShadow(QFrame::Raised);
-        layoutWidget = new QWidget(frame_3);
-        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(1, 1, 107, 28));
-        horizontalLayout_3 = new QHBoxLayout(layoutWidget);
-        horizontalLayout_3->setSpacing(1);
+        dirButtonsWidget = new QWidget(frame_3);
+        dirButtonsWidget->setObjectName(QString::fromUtf8("dirButtonsWidget"));
+        dirButtonsWidget->setGeometry(QRect(1, 1, 130, 34));
+        horizontalLayout_3 = new QHBoxLayout(dirButtonsWidget);
+        horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        horizontalLayout_3->setContentsMargins(0, 2, 0, 0);
-        selDirBtn = new QPushButton(layoutWidget);
+        horizontalLayout_3->setContentsMargins(2, 2, 2, 1);
+        selDirBtn = new QPushButton(dirButtonsWidget);
         selDirBtn->setObjectName(QString::fromUtf8("selDirBtn"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
@@ -341,7 +341,7 @@ public:
 
         horizontalLayout_3->addWidget(selDirBtn);
 
-        opFileBtn = new QPushButton(layoutWidget);
+        opFileBtn = new QPushButton(dirButtonsWidget);
         opFileBtn->setObjectName(QString::fromUtf8("opFileBtn"));
         sizePolicy1.setHeightForWidth(opFileBtn->sizePolicy().hasHeightForWidth());
         opFileBtn->setSizePolicy(sizePolicy1);
@@ -351,7 +351,7 @@ public:
 
         horizontalLayout_3->addWidget(opFileBtn);
 
-        refreshBtn = new QPushButton(layoutWidget);
+        refreshBtn = new QPushButton(dirButtonsWidget);
         refreshBtn->setObjectName(QString::fromUtf8("refreshBtn"));
         sizePolicy1.setHeightForWidth(refreshBtn->sizePolicy().hasHeightForWidth());
         refreshBtn->setSizePolicy(sizePolicy1);
@@ -363,7 +363,7 @@ public:
 
         horizontalLayout_3->addWidget(refreshBtn);
 
-        goBackBtn = new QPushButton(layoutWidget);
+        goBackBtn = new QPushButton(dirButtonsWidget);
         goBackBtn->setObjectName(QString::fromUtf8("goBackBtn"));
         sizePolicy1.setHeightForWidth(goBackBtn->sizePolicy().hasHeightForWidth());
         goBackBtn->setSizePolicy(sizePolicy1);
@@ -762,8 +762,8 @@ public:
 
         autoGainBtn = new QPushButton(groupBox_3);
         autoGainBtn->setObjectName(QString::fromUtf8("autoGainBtn"));
-        autoGainBtn->setMinimumSize(QSize(18, 18));
-        autoGainBtn->setMaximumSize(QSize(18, 18));
+        autoGainBtn->setMinimumSize(QSize(25, 25));
+        autoGainBtn->setMaximumSize(QSize(25, 25));
 
         gridLayout->addWidget(autoGainBtn, 3, 3, 1, 1);
 
@@ -819,8 +819,8 @@ public:
 
         zoomVallBtn = new QPushButton(groupBox_3);
         zoomVallBtn->setObjectName(QString::fromUtf8("zoomVallBtn"));
-        zoomVallBtn->setMinimumSize(QSize(18, 18));
-        zoomVallBtn->setMaximumSize(QSize(18, 18));
+        zoomVallBtn->setMinimumSize(QSize(25, 25));
+        zoomVallBtn->setMaximumSize(QSize(25, 25));
         QIcon icon8;
         icon8.addFile(QString::fromUtf8(":/images/Zv.png"), QSize(), QIcon::Normal, QIcon::Off);
         zoomVallBtn->setIcon(icon8);
@@ -851,9 +851,9 @@ public:
         verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
         verticalLayout_9->setContentsMargins(2, 2, 2, 2);
         horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setSpacing(4);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        horizontalLayout_4->setContentsMargins(2, -1, 2, -1);
+        horizontalLayout_4->setContentsMargins(2, -1, 3, -1);
         verticalLayout_5 = new QVBoxLayout();
         verticalLayout_5->setSpacing(3);
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
@@ -883,7 +883,8 @@ public:
 
         procParmBtn = new QPushButton(groupBox_4);
         procParmBtn->setObjectName(QString::fromUtf8("procParmBtn"));
-        procParmBtn->setMaximumSize(QSize(23, 23));
+        procParmBtn->setMinimumSize(QSize(25, 25));
+        procParmBtn->setMaximumSize(QSize(25, 25));
         QIcon icon10;
         icon10.addFile(QString::fromUtf8(":/images/Procp.png"), QSize(), QIcon::Normal, QIcon::Off);
         procParmBtn->setIcon(icon10);
@@ -919,7 +920,7 @@ public:
 
         verticalLayout_27->addWidget(rbDirRev);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer = new QSpacerItem(20, 30, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_27->addItem(verticalSpacer);
 
@@ -946,8 +947,8 @@ public:
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(frame_8->sizePolicy().hasHeightForWidth());
         frame_8->setSizePolicy(sizePolicy3);
-        frame_8->setMinimumSize(QSize(32, 150));
-        frame_8->setMaximumSize(QSize(32, 16777215));
+        frame_8->setMinimumSize(QSize(36, 164));
+        frame_8->setMaximumSize(QSize(36, 16777215));
         frame_8->setAutoFillBackground(true);
         frame_8->setFrameShape(QFrame::Box);
         frame_8->setFrameShadow(QFrame::Raised);
@@ -955,7 +956,7 @@ public:
         verticalLayout_28->setSpacing(6);
         verticalLayout_28->setContentsMargins(11, 11, 11, 11);
         verticalLayout_28->setObjectName(QString::fromUtf8("verticalLayout_28"));
-        verticalLayout_28->setContentsMargins(3, 4, 3, 4);
+        verticalLayout_28->setContentsMargins(3, 5, 3, 5);
         zoomAllBtn = new QPushButton(frame_8);
         zoomAllBtn->setObjectName(QString::fromUtf8("zoomAllBtn"));
         sizePolicy1.setHeightForWidth(zoomAllBtn->sizePolicy().hasHeightForWidth());
@@ -1044,7 +1045,7 @@ public:
 
         verticalLayout_28->addWidget(captureBtn);
 
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer_3 = new QSpacerItem(20, 30, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_28->addItem(verticalSpacer_3);
 
@@ -1128,8 +1129,8 @@ public:
         frame_4->setObjectName(QString::fromUtf8("frame_4"));
         sizePolicy.setHeightForWidth(frame_4->sizePolicy().hasHeightForWidth());
         frame_4->setSizePolicy(sizePolicy);
-        frame_4->setMinimumSize(QSize(0, 30));
-        frame_4->setMaximumSize(QSize(16777215, 30));
+        frame_4->setMinimumSize(QSize(0, 40));
+        frame_4->setMaximumSize(QSize(16777215, 40));
         frame_4->setFrameShape(QFrame::Box);
         frame_4->setFrameShadow(QFrame::Raised);
         horizontalLayout = new QHBoxLayout(frame_4);

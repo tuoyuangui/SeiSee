@@ -3,7 +3,14 @@
 #include <QApplication>
 #include <QFontDatabase>
 #include <QDebug>
+#include <QIcon>
 #include <QStringList>
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+extern "C" HRESULT WINAPI
+SetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
+#endif
 
 #include "gfxstyle.h"
 
@@ -53,7 +60,17 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 
+#ifdef Q_OS_WIN
+    const HRESULT appIdResult =
+        SetCurrentProcessExplicitAppUserModelID(
+            L"wangweiwei104.SeiSee.SeiSeeMp");
+    if (FAILED(appIdResult))
+        qWarning() << "Unable to set Windows application ID:"
+                   << Qt::hex << appIdResult;
+#endif
+
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/images/SeiSeeMp.png"));
     if (!setDefaultFont(&a))
         return 1;
 

@@ -9,26 +9,25 @@ AboutDialog::AboutDialog(QWidget *parent)
     , ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
-    resize(GfxStyle::AboutDialogWidth, GfxStyle::AboutDialogHeight);
+    const QSize aboutIconSize(GfxStyle::AboutIconSize,
+                              GfxStyle::AboutIconSize);
+    ui->label_icon->setFixedSize(aboutIconSize);
+
+    QFont titleFont = QApplication::font();
+    titleFont.setPointSizeF(GfxStyle::AboutTitleFontPointSize);
+    titleFont.setBold(true);
+    ui->label_title->setFont(titleFont);
+    ui->label_title->setStyleSheet("color: #294f91;");  //图标的主题色
+
+    QFont subtitleFont = QApplication::font();
+    subtitleFont.setPointSizeF(GfxStyle::AboutProductFontPointSize);
+    ui->label_sub_title->setFont(subtitleFont);
 
     QFont detailsFont = QApplication::font();
     detailsFont.setPointSizeF(GfxStyle::AboutDetailsFontPointSize);
     ui->label_rev->setFont(detailsFont);
-    ui->label->setFont(detailsFont);
+    ui->label_author->setFont(detailsFont);
     ui->label_ww->setFont(detailsFont);
-
-    const QString aboutHeader =
-        QString("<html><head/><body><p align=\"center\"><span "
-                "style=\"font-size:%1pt;font-weight:600;color:#00007f;\">"
-                "SeiSee</span></p><p align=\"center\"><span "
-                "style=\"font-size:%2pt;font-weight:600;color:#00007f;\">"
-                "MultiPlatform</span></p><p align=\"center\"><span "
-                "style=\"font-size:%3pt;font-weight:600;color:#00007f;\">"
-                "SEG-Y Viewer</span></p></body></html>")
-            .arg(GfxStyle::AboutTitleFontPointSize)
-            .arg(GfxStyle::AboutSubtitleFontPointSize)
-            .arg(GfxStyle::AboutProductFontPointSize);
-    ui->label_3->setText(aboutHeader);
 
     QString txt =
         Tprintf("<html><head/><body><p align=\"center\">Rev: %s (build: %s) "

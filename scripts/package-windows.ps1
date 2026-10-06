@@ -31,7 +31,7 @@ $outputDir = Join-Path $repoRoot "dist\windows"
 $outputName = "SeiSee-$safeVersion-Setup"
 $issPath = Join-Path $tempRoot "SeiSee.iss"
 $exePath = Join-Path $repoRoot "SeiSeeMp\release\SeiSeeMp.exe"
-$iconPath = Join-Path $repoRoot "SeiSeeMp\images\SeiSeeMp.ico"
+$iconPath = Join-Path $repoRoot "SeiSeeMp\images\SeiSeeSetup.ico"
 
 New-Item -ItemType Directory -Path $stageDir, $outputDir -Force | Out-Null
 try {
@@ -54,7 +54,7 @@ try {
         throw "Expected release executable not found: $exePath"
     }
     if (-not (Test-Path -LiteralPath $iconPath -PathType Leaf)) {
-        throw "Application icon not found: $iconPath"
+        throw "Installer icon not found: $iconPath"
     }
 
     Copy-Item -LiteralPath $exePath -Destination $stageDir
@@ -75,6 +75,7 @@ AppId={{4F15CB68-BEB3-4C36-9E98-61F9BCAC8125}
 AppName=SeiSee
 AppVersion=$Version
 DefaultDirName={autopf}\SeiSee
+DisableDirPage=no
 DefaultGroupName=SeiSee
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin
@@ -98,8 +99,8 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 Source: "$stageDir\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\SeiSee"; Filename: "{app}\SeiSeeMp.exe"
-Name: "{autodesktop}\SeiSee"; Filename: "{app}\SeiSeeMp.exe"; Tasks: desktopicon
+Name: "{autoprograms}\SeiSee"; Filename: "{app}\SeiSeeMp.exe"; AppUserModelID: "wangweiwei104.SeiSee.SeiSeeMp"
+Name: "{autodesktop}\SeiSee"; Filename: "{app}\SeiSeeMp.exe"; Tasks: desktopicon; AppUserModelID: "wangweiwei104.SeiSee.SeiSeeMp"
 
 [Run]
 Filename: "{app}\SeiSeeMp.exe"; Description: "Launch SeiSee"; Flags: postinstall nowait skipifsilent

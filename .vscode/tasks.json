@@ -98,6 +98,18 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "Run SeiSeeMp (no build)",
+			"type": "process",
+			"command": "${workspaceFolder}/SeiSeeMp/release/SeiSeeMp.exe",
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+				}
+			},
+			"problemMatcher": []
+		},
+		{
 			"label": "Run SegDSeeMp",
 			"type": "process",
 			"command": "${workspaceFolder}/SegDSeeMp/release/SegDSeeMp.exe",

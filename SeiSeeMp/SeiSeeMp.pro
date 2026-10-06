@@ -42,6 +42,17 @@ FORMS    += mainwindow.ui \
 # ADD THIS LINE!
 win32: RC_FILE += app.rc
 
+win32:CONFIG(release, debug|release) {
+    QMAKE_EXTRA_TARGETS += releaseAppIconResourceDependency
+    releaseAppIconResourceDependency.target = release/app_res.o
+    releaseAppIconResourceDependency.depends = $$PWD/images/SeiSeeMp.ico
+}
+win32:CONFIG(debug, debug|release) {
+    QMAKE_EXTRA_TARGETS += debugAppIconResourceDependency
+    debugAppIconResourceDependency.target = debug/app_res.o
+    debugAppIconResourceDependency.depends = $$PWD/images/SeiSeeMp.ico
+}
+
 RESOURCES += \
     myrc.qrc
 

@@ -365,9 +365,11 @@ private slots:
 private:
     struct InterfaceWidgetMetrics {
         QFont font;
+        QSize iconSize;
         QSize minimumSize;
         QSize maximumSize;
         QSize windowSize;
+        bool hasIcon = false;
     };
 
     struct InterfaceLayoutMetrics {
@@ -379,6 +381,7 @@ private:
 
     Ui::MainWindow *ui;
     int m_interfaceDpi = 0;
+    QWindow *m_dpiTrackedWindow = nullptr;
     QHash<QWidget *, InterfaceWidgetMetrics> m_baseInterfaceMetrics;
     QHash<QLayout *, InterfaceLayoutMetrics> m_baseInterfaceLayouts;
 

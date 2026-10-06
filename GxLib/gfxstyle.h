@@ -8,6 +8,11 @@ namespace GfxStyle {
 
     // DPI 与物理单位换算基准。
     constexpr int ReferenceDpi = 96;
+    constexpr int StandardIconSize = 18;
+    constexpr int StandardIconButtonSize = 25;
+    constexpr int DirectoryButtonsWidth = 130;
+    constexpr int DirectoryButtonsHeight = 30;
+    constexpr int StandardIconCellSize = StandardIconButtonSize + 4;
     constexpr double MillimetersPerInch = 25.4;
     constexpr double MillimetersPerMeter = 1000.0;
     // 0 表示使用当前屏幕 DPI，而不是固定 DPI。
@@ -45,6 +50,7 @@ namespace GfxStyle {
     constexpr double AboutSubtitleFontPointSize = 10.0;
     constexpr double AboutProductFontPointSize = 12.0;
     constexpr double AboutDetailsFontPointSize = 10.0;
+    constexpr int AboutIconSize = 64;
     constexpr double SaveAsLabelFontPointSize = 8.0;
 
     // InfoTxt 和 TxtHdrEdit 使用 Courier New 等宽字体。
@@ -64,8 +70,8 @@ namespace GfxStyle {
     // SeiSeeMp 初始窗口尺寸，单位为 Qt 逻辑像素。
     constexpr int MainWindowWidth = 1282;
     constexpr int MainWindowHeight = 702;
-    constexpr int AboutDialogWidth = 387;
-    constexpr int AboutDialogHeight = 228;
+    constexpr int AboutDialogWidth = 246;
+    constexpr int AboutDialogHeight = 219;
     constexpr int AxisDialogWidth = 698;
     constexpr int AxisDialogHeight = 478;
     constexpr int EditHeaderDialogWidth = 726;

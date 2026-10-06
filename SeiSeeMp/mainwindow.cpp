@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QAbstractButton>
+#include <QBoxLayout>
 #include <QComboBox>
 #include <QClipboard>
 #include <QDebug>
@@ -13,6 +15,7 @@
 #include <QHBoxLayout>
 #include <QImage>
 #include <QInputDialog>
+#include <QIcon>
 #include <QLabel>
 #include <QMessageBox>
 #include <QMenu>
@@ -30,6 +33,7 @@
 #include <QUuid>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QWindow>
 
 #include <functional>
 
@@ -191,6 +195,23 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setLibraryPaths(paths);
 
     ui->setupUi(this);
+    ui->autoGainBtn->setIcon(QIcon(":/images/Autogain.png"));
+    ui->autoGainBtn->setText(QString());
+
+    QBoxLayout *zoomLayout =
+        qobject_cast<QBoxLayout *>(ui->zoomAllBtn->parentWidget()->layout());
+    if (zoomLayout) {
+        const QList<QPushButton *> zoomButtons = {
+            ui->zoomAllBtn, ui->zoomInBtn, ui->zoomOutBtn,
+            ui->zoomWinBtn, ui->zoomPreBtn
+        };
+        for (QPushButton *button : zoomButtons)
+            zoomLayout->removeWidget(button);
+        for (int index = 0; index < zoomButtons.size(); ++index)
+            zoomLayout->insertWidget(index, zoomButtons[index]);
+    }
+
+    setWindowIcon(QApplication::windowIcon());
     connect(ui->SeisTab, &QTabWidget::currentChanged, this,
             [this](int index) {
                 if (index != ui->SeisTab->indexOf(ui->HdrsPg))
@@ -889,7 +910,23 @@ MainWindow::MainWindow(QWidget *parent)
 bool MainWindow::event(QEvent *event)
 {
     const bool result = QMainWindow::event(event);
-    if (event->type() == QEvent::ScreenChangeInternal) {
+    if (event->type() == QEvent::Show ||
+        event->type() == QEvent::WinIdChange) {
+        QWindow *nativeWindow = windowHandle();
+        if (nativeWindow && nativeWindow != m_dpiTrackedWindow) {
+            m_dpiTrackedWindow = nativeWindow;
+            connect(nativeWindow, &QWindow::screenChanged, this,
+                    [this](QScreen *) {
+                        QTimer::singleShot(
+                            0, this, [this]() {
+                                applyInterfaceDpi(m_interfaceDpi);
+                            });
+                    });
+        }
+    }
+
+    if (event->type() == QEvent::ScreenChangeInternal ||
+        event->type() == QEvent::Show) {
         QTimer::singleShot(0, this,
                            [this]() { applyInterfaceDpi(m_interfaceDpi); });
     }
@@ -902,10 +939,15 @@ void MainWindow::applyInterfaceDpi(int dpi)
     const int screenDpi = currentScreenLogicalDpiY(this);
     const int targetDpi =
         m_interfaceDpi > GfxStyle::UseScreenDpi ? m_interfaceDpi : screenDpi;
-    const qreal scale = static_cast<qreal>(targetDpi) / screenDpi;
+    const qreal scale =
+        static_cast<qreal>(targetDpi) / GfxStyle::ReferenceDpi;
+    const qreal fontScale =
+        m_interfaceDpi > GfxStyle::UseScreenDpi
+            ? static_cast<qreal>(targetDpi) / screenDpi
+            : 1.0;
+    const int maxWidgetSize = QWIDGETSIZE_MAX;
 
-    auto scaleSize = [scale](const QSize &size) {
-        const int maxWidgetSize = QWIDGETSIZE_MAX;
+    auto scaleSize = [scale, maxWidgetSize](const QSize &size) {
         const int width = size.width() >= maxWidgetSize
                               ? maxWidgetSize
                               : qMax(0, qRound(size.width() * scale));
@@ -919,6 +961,29 @@ void MainWindow::applyInterfaceDpi(int dpi)
     for (QWidget *widget : widgets) {
         if (!m_baseInterfaceMetrics.contains(widget)) {
             InterfaceWidgetMetrics metrics;
+            if (QAbstractButton *button =
+                    qobject_cast<QAbstractButton *>(widget)) {
+                if (!button->icon().isNull()) {
+                    const QSize iconSize(GfxStyle::StandardIconSize,
+                                         GfxStyle::StandardIconSize);
+                    button->setIconSize(iconSize);
+
+                    const QSize buttonSize(GfxStyle::StandardIconButtonSize,
+                                           GfxStyle::StandardIconButtonSize);
+                    QSize minimumSize =
+                        button->minimumSize().expandedTo(buttonSize);
+                    QSize maximumSize = button->maximumSize();
+                    if (maximumSize.width() < buttonSize.width())
+                        maximumSize.setWidth(buttonSize.width());
+                    if (maximumSize.height() < buttonSize.height())
+                        maximumSize.setHeight(buttonSize.height());
+                    button->setMinimumSize(minimumSize);
+                    button->setMaximumSize(maximumSize);
+
+                    metrics.hasIcon = true;
+                    metrics.iconSize = iconSize;
+                }
+            }
             metrics.font = widget->font();
             metrics.minimumSize = widget->minimumSize();
             metrics.maximumSize = widget->maximumSize();
@@ -932,13 +997,19 @@ void MainWindow::applyInterfaceDpi(int dpi)
 
         const InterfaceWidgetMetrics metrics =
             m_baseInterfaceMetrics.value(widget);
+        if (metrics.hasIcon) {
+            if (QAbstractButton *button =
+                    qobject_cast<QAbstractButton *>(widget)) {
+                button->setIconSize(scaleSize(metrics.iconSize));
+            }
+        }
         const bool isPlot = qobject_cast<GfxView *>(widget) != nullptr;
         QFont scaledFont = metrics.font;
         if (metrics.font.pointSizeF() > 0)
-            scaledFont.setPointSizeF(metrics.font.pointSizeF() * scale);
+            scaledFont.setPointSizeF(metrics.font.pointSizeF() * fontScale);
         else if (metrics.font.pixelSize() > 0)
             scaledFont.setPixelSize(
-                qMax(1, qRound(metrics.font.pixelSize() * scale)));
+                qMax(1, qRound(metrics.font.pixelSize() * fontScale)));
         widget->setFont(isPlot ? metrics.font : scaledFont);
 
         if (isPlot)
@@ -947,7 +1018,7 @@ void MainWindow::applyInterfaceDpi(int dpi)
         widget->setMaximumSize(scaleSize(metrics.maximumSize));
         widget->setMinimumSize(scaleSize(metrics.minimumSize));
 
-        if (widget == this || widget == &AboutDlg || widget == &AxisDlg ||
+        if (widget == &AboutDlg || widget == &AxisDlg ||
             widget == &EdHdrDlg || widget == &ProcParmDlg ||
             widget == &SaveAsDlg) {
             widget->resize(scaleSize(metrics.windowSize));
@@ -986,6 +1057,18 @@ void MainWindow::applyInterfaceDpi(int dpi)
     for (QWidget *widget : widgets) {
         if (widget->layout())
             scaleLayout(widget->layout());
+    }
+
+    ui->gridLayout->setColumnMinimumWidth(
+        3, qRound(GfxStyle::StandardIconCellSize * scale));
+
+    if (QWidget *directoryButtons =
+            findChild<QWidget *>("dirButtonsWidget")) {
+        const int frameInset = qRound(scale);
+        directoryButtons->setGeometry(
+            frameInset, frameInset,
+            qRound(GfxStyle::DirectoryButtonsWidth * scale),
+            qRound(GfxStyle::DirectoryButtonsHeight * scale));
     }
 
     for (QWidget *widget : widgets) {
@@ -1364,7 +1447,7 @@ void MainWindow::FillDirGrid(QList<DirItem> list)
                 // dirGrid.setCell(nr, 1, "");
 
                 if (type == 1) {
-                    dirGrid.setImgName(nr, 0, ":/images/segyfile.png");
+                    dirGrid.setImgName(nr, 0, ":/images/SeisFile.png");
                     dirGrid.setCell(nr, 1, "SEG-Y");
                 } else if (type == 2) {
                     dirGrid.setImgName(nr, 0, ":/images/sufile.png");
