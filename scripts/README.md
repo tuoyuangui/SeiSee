@@ -79,21 +79,26 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ### 使用 Docker 构建
 
-推荐使用仓库根目录的 `docker/linux.Dockerfile`。它在 CentOS 7 兼容的 manylinux2014 环境（glibc 2.17）中使用宿主机 `/home/ww/Qt/5.15.2/gcc_64` 下的 Qt 5.15.2 编译并创建 AppImage，以便同一 x86_64 构建可在较新的 Ubuntu 版本上运行。容器会配置 `QMAKE`、`PATH`、`LD_LIBRARY_PATH`、`QT_PLUGIN_PATH`、`QT_QPA_PLATFORM_PLUGIN_PATH`、`QML2_IMPORT_PATH`、`CMAKE_PREFIX_PATH` 和 `PKG_CONFIG_PATH`：
+推荐使用仓库根目录的 `docker/linux.Dockerfile`。它在 CentOS 7 兼容的 manylinux2014 环境（glibc 2.17）中使用宿主机 `/home/ww/Qt/5.15.2/gcc_64` 下的 Qt 5.15.2 编译并创建 AppImage，目标支持 CentOS 7 及以上和 Ubuntu 20.04 及以上的 x86_64 系统。容器会配置 `QMAKE`、`PATH`、`LD_LIBRARY_PATH`、`QT_PLUGIN_PATH`、`QT_QPA_PLATFORM_PLUGIN_PATH`、`QML2_IMPORT_PATH`、`CMAKE_PREFIX_PATH` 和 `PKG_CONFIG_PATH`：
 
 ```bash
 docker build -f docker/linux.Dockerfile -t seisee-linux-builder .
 mkdir -p dist/linux
+```
+
+之后每次打包，在项目根目录运行：
+
+```bash
 docker run --rm \
   --user "$(id -u):$(id -g)" \
   -e VERSION=4.0.0-alpha.1 \
   -e JOBS="$(nproc)" \
   -v /home/ww/Qt:/home/ww/Qt:ro \
-  -v "$PWD/dist/linux:/workspace/dist/linux" \
+  -v "$PWD:/workspace" \
   seisee-linux-builder
 ```
 
-产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
+`docker build` 只需首次运行，或修改 Dockerfile/容器工具后重新运行。打包时会将当前项目目录挂载到容器，使用最新源码并把产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
 
 ### 前置条件
 
@@ -165,6 +170,34 @@ JOBS=8 \
 ```
 
 `-CreateDraft` 和 `-Publish` 不能同时使用。可分别添加 `-WhatIf` 模拟创建草稿或正式发布时将执行的操作。
+
+## 开发环境
+
+### VS Code（Windows 和 Linux 共用）
+
+仓库中的 `.vscode` 配置同时包含 Windows 和 Linux 工具链：任务会按当前操作系统选择 qmake、make、运行程序及 Qt Designer；调试器分别提供 Linux 和 Windows 启动项。C/C++ 扩展的配置可在状态栏的配置选择器中切换 `Linux` 或 `Windows MinGW`。两边需要分别安装与各自 Qt 工具链相匹配的 C/C++ 扩展及编译工具。qmake 会在源码目录生成平台相关的 Makefile 和目标文件；如果在同一工作区切换操作系统，先运行 `Clean build outputs` 再重新构建。
+
+### Git 用户名和邮箱
+
+Git 提交需要配置作者姓名和邮箱。为当前用户的所有仓库设置（全局配置）：
+
+```bash
+git config --global user.name "你的姓名"
+git config --global user.email "你的邮箱"
+```
+
+如果只想为当前仓库设置，请先进入项目目录，再省略 `--global`。查看当前仓库最终生效的配置：
+
+```bash
+git config user.name
+git config user.email
+```
+
+仓库级配置优先于全局配置。提交记录会包含配置的姓名和邮箱；如果不希望公开个人邮箱，可以使用代码托管平台提供的隐私邮箱地址。此配置用于标记提交作者，不会设置 GitHub 登录或推送认证。
+
+## 项目依赖说明
+
+- [qt-toast](https://github.com/niklashenning/qt-toast)：截图操作提示，源码及 MIT 许可证位于 `third_party/qt-toast`，通过独立 qmake 静态库项目构建。通知定位使用 Qt `QScreen::availableGeometry()`，适配 Windows 任务栏及 Linux 桌面保留区域。
 
 ## 常见问题
 

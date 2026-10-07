@@ -15,12 +15,13 @@ ENV LINUXDEPLOY=/usr/local/bin/linuxdeploy
 ENV APPIMAGETOOL=/usr/local/bin/appimagetool
 ENV HOME=/tmp
 
-RUN yum install -y epel-release && \
-    yum install -y \
+RUN yum --disablerepo='*' \
+        --enablerepo=base \
+        --setopt=base.baseurl=https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009/os/x86_64/ \
+        install -y \
         curl \
         fontconfig \
         libX11 \
-        libX11-xcb \
         libXext \
         libXrender \
         libxcb \
