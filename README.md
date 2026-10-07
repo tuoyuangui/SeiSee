@@ -94,6 +94,31 @@ source scripts/qt-env.sh
 
 可通过 `QMAKE`、`MAKE`、`LINUXDEPLOY`、`APPIMAGETOOL`、`VERSION` 和 `JOBS` 环境变量覆盖工具及构建参数。AppImage 输出到 `dist/linux`。建议在目标用户所需支持范围内较旧的 Linux 发行版上构建，以提高 glibc 兼容性。
 
+## Git 用户名和邮箱配置
+
+Git 提交需要配置作者姓名和邮箱。为当前用户的所有仓库设置（全局配置）：
+
+```bash
+git config --global user.name "你的姓名"
+git config --global user.email "你的邮箱"
+```
+
+如果只想为当前仓库设置，请先进入仓库目录，再省略 `--global`：
+
+```bash
+git config user.name "你的姓名"
+git config user.email "你的邮箱"
+```
+
+查看当前仓库最终生效的配置：
+
+```bash
+git config user.name
+git config user.email
+```
+
+仓库级配置优先于全局配置。提交记录会包含配置的姓名和邮箱；如果不希望公开个人邮箱，可以使用代码托管平台提供的隐私邮箱地址。此配置用于标记提交作者，不会设置 GitHub 登录或推送认证。
+
 ## 第三方库
 
 - [qt-toast](https://github.com/niklashenning/qt-toast)：截图操作提示，源码及 MIT 许可证位于 `third_party/qt-toast`，通过独立 qmake 静态库项目构建。通知定位使用 Qt `QScreen::availableGeometry()`，适配 Windows 任务栏及 Linux 桌面保留区域。
