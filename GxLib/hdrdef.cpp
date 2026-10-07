@@ -127,14 +127,14 @@ TrHdrDefList::TrHdrDefList(int type)
             "Time basis code 1-local,2-GMT,3-other",     // 63
             "Trace weighting factor",                    // 64
             "Geophone group number of roll sw pos 1",    // 65
-            "Geophone group number of trace # 1",        // 66
+            "Geophone group number of trace 1",          // 66
             "Geophone group number of last trace",       // 67
             "Gap size (total # of groups dropped)",      // 68
             "Overtravel assoc w taper of beg/end line",  // 69
             "X coordinate of CDP of this trace",         // 70
             "Y coordinate of CDP of this trace",         // 71
             "Inline Number",                             // 72
-            "Clossline Number",                          // 73
+            "Crossline Number",                          // 73
             "Shot Point Number",                         // 74
             "Shot Point Scalar",                         // 75
             "Trace value measurement unit",              // 76
@@ -275,7 +275,7 @@ TrHdrDefList::TrHdrDefList(int type)
         fmt[0] = 0;
         pos[0] = 0;
         desc[0] = "Trace Index";
-        name[0] = "Trace #";
+        name[0] = "Trace";
 
         fmt[1] = 2;
         pos[1] = 5;

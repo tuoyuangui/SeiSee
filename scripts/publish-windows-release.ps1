@@ -181,8 +181,11 @@ try {
     if ($CreateDraft) {
         $ghArguments += "--draft"
     }
-    if ($version -match '-(alpha|beta|rc)(\.|$)') {
+    if ($CreateDraft -and $version -match '-(alpha|beta|rc)(\.|$)') {
         $ghArguments += "--prerelease"
+    }
+    if ($Publish) {
+        $ghArguments += "--latest"
     }
     $ghArguments += $assetPaths
 

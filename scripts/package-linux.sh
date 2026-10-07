@@ -46,6 +46,8 @@ mkdir -p "$OUTPUT_DIR" "$APP_DIR/usr/bin" \
 
 cd "$REPO_ROOT"
 "$QMAKE" "$REPO_ROOT/GxApps.pro" -r CONFIG+=release
+"$MAKE" distclean
+"$QMAKE" "$REPO_ROOT/GxApps.pro" -r CONFIG+=release
 "$MAKE" -j"$JOBS"
 
 for candidate in \

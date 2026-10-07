@@ -101,7 +101,7 @@ docker run --rm \
   seisee-linux-builder
 ```
 
-脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION`，并将其传给容器作为安装包版本。`docker build` 只需首次运行，或修改 Dockerfile/容器工具后重新运行。打包时会将当前项目目录挂载到容器，使用最新源码并把产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
+脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION`，并将其传给容器作为安装包版本。打包脚本先通过 qmake `distclean` 清除生成型构建输出，再在容器中完整重建，避免复用宿主机上使用其他 glibc 版本编译的目标文件。清理会移除 `.o`、`.a`、可执行文件和 qmake Makefile 等生成文件，不会删除源码。`docker build` 只需首次运行，或修改 Dockerfile/容器工具后重新运行。打包时会将当前项目目录挂载到容器，使用最新源码并把产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
 
 ### 前置条件
 
@@ -157,22 +157,22 @@ JOBS=8 \
 先运行预览并检查输出：
 
 ```powershell
-.\scripts\publish-github-release.ps1
+.\scripts\publish-windows-release.ps1
 ```
 
 确认更新说明和待上传文件无误后，安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如需先在 GitHub 上复核，可创建草稿 Release 并上传文件：
 
 ```powershell
-.\scripts\publish-github-release.ps1 -CreateDraft
+.\scripts\publish-windows-release.ps1 -CreateDraft
 ```
 
 脚本默认只预览，不会创建 Release。确认内容无误且希望直接正式发布时，使用 `-Publish`；该操作会立即创建并公开 Release：
 
 ```powershell
-.\scripts\publish-github-release.ps1 -Publish
+.\scripts\publish-windows-release.ps1 -Publish
 ```
 
-如果相同版本的 Release（例如已发布 Linux AppImage）已经存在，使用 `-Publish` 时脚本只会向该 Release 添加版本匹配的 `.exe` 文件，不会重复上传 Linux 文件或更改发布说明、发布状态和其他附件；同名 `.exe` 会被替换。若该版本尚无 Release，则按原流程创建 Release 并上传所有版本匹配的文件。`-CreateDraft` 和 `-Publish` 不能同时使用。可分别添加 `-WhatIf` 模拟创建草稿或正式发布时将执行的操作。
+如果相同版本的 Release（例如已发布 Linux AppImage）已经存在，使用 `-Publish` 时脚本只会向该 Release 添加版本匹配的 `.exe` 文件，不会重复上传 Linux 文件或更改发布说明、发布状态和其他附件；同名 `.exe` 会被替换。若该版本尚无 Release，`-Publish` 创建的新 Release 会标记为 Latest；仅 `-CreateDraft` 且版本号含 `alpha`/`beta`/`rc` 时才会附加 pre-release 标记。`-CreateDraft` 和 `-Publish` 不能同时使用。可分别添加 `-WhatIf` 模拟创建草稿或正式发布时将执行的操作。
 
 ### 发布 Linux AppImage
 

@@ -72,7 +72,7 @@ docker run --rm \
   seisee-linux-builder
 ```
 
-脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION` 并传给容器。命令会把当前工作区挂载到容器，因此使用最新源码；构建文件和安装包写入宿主机，安装包路径为 `dist/linux/SeiSee-${VERSION}-x86_64.AppImage`。可通过修改 `JOBS` 调整并行构建任务数。只有修改 `docker/linux.Dockerfile` 或需要更新容器内工具时，才需要重新运行 `docker build`。首次构建镜像需要网络访问基础镜像仓库和 Dockerfile 中使用的 AppImage 工具下载地址。
+脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION` 并传给容器。命令会把当前工作区挂载到容器，因此使用最新源码；构建文件和安装包写入宿主机，安装包路径为 `dist/linux/SeiSee-${VERSION}-x86_64.AppImage`。打包脚本会先运行 qmake `distclean`，再在容器中重新生成并编译所有目标，避免复用由较新 Linux/glibc 构建的宿主机 `.o` 和 `.a` 文件。清理会移除项目中的生成型构建输出（目标文件、静态库、可执行文件和 qmake Makefile），不会删除源码。可通过修改 `JOBS` 调整并行构建任务数。只有修改 `docker/linux.Dockerfile` 或需要更新容器内工具时，才需要重新运行 `docker build`。首次构建镜像需要网络访问基础镜像仓库和 Dockerfile 中使用的 AppImage 工具下载地址。
 
 CentOS 7 已停止维护，Dockerfile 从 Tsinghua 镜像的 CentOS 7.9.2009 归档仓库安装构建依赖；若该镜像无法访问，可在 `docker/linux.Dockerfile` 中替换对应仓库 URL。
 
