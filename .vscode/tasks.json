@@ -4,15 +4,22 @@
 		{
 			"label": "qmake",
 			"type": "process",
-			"command": "C:/Qt/5.15.2/mingw81_64/bin/qmake.exe",
-			"args": [
-				"GxApps.pro",
-				"-r"
-			],
+			"command": "/home/ww/Qt/5.15.2/gcc_64/bin/qmake",
+			"args": ["GxApps.pro", "-r", "CONFIG+=release"],
 			"options": {
 				"cwd": "${workspaceFolder}",
 				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					"PATH": "/home/ww/Qt/5.15.2/gcc_64/bin:${env:PATH}",
+					"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}"
+				}
+			},
+			"windows": {
+				"command": "C:/Qt/5.15.2/mingw81_64/bin/qmake.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
 				}
 			},
 			"problemMatcher": []
@@ -20,12 +27,22 @@
 		{
 			"label": "qmake Debug",
 			"type": "process",
-			"command": "C:/Qt/5.15.2/mingw81_64/bin/qmake.exe",
+			"command": "/home/ww/Qt/5.15.2/gcc_64/bin/qmake",
 			"args": ["GxApps.pro", "-r", "CONFIG+=debug"],
 			"options": {
 				"cwd": "${workspaceFolder}",
 				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					"PATH": "/home/ww/Qt/5.15.2/gcc_64/bin:${env:PATH}",
+					"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}"
+				}
+			},
+			"windows": {
+				"command": "C:/Qt/5.15.2/mingw81_64/bin/qmake.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
 				}
 			},
 			"problemMatcher": []
@@ -33,12 +50,25 @@
 		{
 			"label": "Build Debug",
 			"type": "process",
-			"command": "C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe",
+			"command": "make",
 			"args": ["-j8"],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+			"options": {"cwd": "${workspaceFolder}"},
+			"linux": {
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "/home/ww/Qt/5.15.2/gcc_64/bin:${env:PATH}",
+						"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}"
+					}
+				}
+			},
+			"windows": {
+				"command": "C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
 				}
 			},
 			"dependsOn": "qmake Debug",
@@ -48,14 +78,25 @@
 		{
 			"label": "Build all",
 			"type": "process",
-			"command": "C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe",
-			"args": [
-				"-j8"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+			"command": "make",
+			"args": ["-j8"],
+			"options": {"cwd": "${workspaceFolder}"},
+			"linux": {
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "/home/ww/Qt/5.15.2/gcc_64/bin:${env:PATH}",
+						"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}"
+					}
+				}
+			},
+			"windows": {
+				"command": "C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
 				}
 			},
 			"dependsOn": "qmake",
@@ -69,28 +110,41 @@
 		{
 			"label": "Clean build outputs",
 			"type": "process",
-			"command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+			"command": "bash",
 			"args": [
-				"-NoProfile",
-				"-Command",
-				"$make = 'C:/Qt/Tools/mingw810_64/bin/mingw32-make.exe'; if (Test-Path -LiteralPath 'Makefile') { & $make clean; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE } }; Get-ChildItem -Path . -File -Recurse -Force | Where-Object { $_.Name -like 'Makefile*' -or $_.Name -match '\\.(Debug|Release)$' -or $_.Name -eq '.qmake.stash' } | Remove-Item -Force; Get-ChildItem -Path . -Directory -Recurse -Force | Where-Object { $_.Name -in @('debug', 'release') } | Sort-Object { $_.FullName.Length } -Descending | Remove-Item -Recurse -Force"
+				"-lc",
+				"find . -type f \\( -name 'Makefile*' -o -name '.qmake.stash' -o -name '*.Debug' -o -name '*.Release' -o -name '*.o' -o -name '*.a' \\) -delete && find . -depth -type d \\( -name debug -o -name release \\) -exec rm -rf -- {} +"
 			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
-				}
+			"options": {"cwd": "${workspaceFolder}"},
+			"windows": {
+				"command": "powershell.exe",
+				"args": [
+					"-NoProfile",
+					"-Command",
+					"Get-ChildItem -Path . -File -Recurse -Force | Where-Object { $_.Name -like 'Makefile*' -or $_.Name -eq '.qmake.stash' -or $_.Extension -in @('.Debug','.Release','.o','.a') } | Remove-Item -Force; Get-ChildItem -Path . -Directory -Recurse -Force | Where-Object { $_.Name -in @('debug','release') } | Sort-Object { $_.FullName.Length } -Descending | Remove-Item -Recurse -Force"
+				]
 			},
-			"problemMatcher": []
+			"problemMatcher": "$gcc"
 		},
 		{
 			"label": "Run SeiSeeMp",
 			"type": "process",
-			"command": "${workspaceFolder}/SeiSeeMp/release/SeiSeeMp.exe",
+			"command": "${workspaceFolder}/SeiSeeMp/SeiSeeMp",
 			"options": {
 				"cwd": "${workspaceFolder}",
 				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}",
+					"QT_PLUGIN_PATH": "/home/ww/Qt/5.15.2/gcc_64/plugins",
+					"QT_QPA_PLATFORM_PLUGIN_PATH": "/home/ww/Qt/5.15.2/gcc_64/plugins/platforms"
+				}
+			},
+			"windows": {
+				"command": "${workspaceFolder}/SeiSeeMp/release/SeiSeeMp.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
 				}
 			},
 			"dependsOn": "Build all",
@@ -100,11 +154,22 @@
 		{
 			"label": "Run SeiSeeMp (no build)",
 			"type": "process",
-			"command": "${workspaceFolder}/SeiSeeMp/release/SeiSeeMp.exe",
+			"command": "${workspaceFolder}/SeiSeeMp/SeiSeeMp",
 			"options": {
 				"cwd": "${workspaceFolder}",
 				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}",
+					"QT_PLUGIN_PATH": "/home/ww/Qt/5.15.2/gcc_64/plugins",
+					"QT_QPA_PLATFORM_PLUGIN_PATH": "/home/ww/Qt/5.15.2/gcc_64/plugins/platforms"
+				}
+			},
+			"windows": {
+				"command": "${workspaceFolder}/SeiSeeMp/release/SeiSeeMp.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
 				}
 			},
 			"problemMatcher": []
@@ -112,11 +177,22 @@
 		{
 			"label": "Run SegDSeeMp",
 			"type": "process",
-			"command": "${workspaceFolder}/SegDSeeMp/release/SegDSeeMp.exe",
+			"command": "${workspaceFolder}/SegDSeeMp/SegDSeeMp",
 			"options": {
 				"cwd": "${workspaceFolder}",
 				"env": {
-					"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}",
+					"QT_PLUGIN_PATH": "/home/ww/Qt/5.15.2/gcc_64/plugins",
+					"QT_QPA_PLATFORM_PLUGIN_PATH": "/home/ww/Qt/5.15.2/gcc_64/plugins/platforms"
+				}
+			},
+			"windows": {
+				"command": "${workspaceFolder}/SegDSeeMp/release/SegDSeeMp.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
 				}
 			},
 			"dependsOn": "Build all",
@@ -126,14 +202,23 @@
 		{
 			"label": "Open current .ui in Qt Designer",
 			"type": "process",
-			"command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
-			"args": [
-				"-NoProfile",
-				"-Command",
-				"Start-Process -FilePath 'C:/Qt/5.15.2/mingw81_64/bin/designer.exe' -ArgumentList '\"${file}\"'"
-			],
+			"command": "/home/ww/Qt/5.15.2/gcc_64/bin/designer",
+			"args": ["${file}"],
 			"options": {
-				"cwd": "${workspaceFolder}"
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"LD_LIBRARY_PATH": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}",
+					"QT_PLUGIN_PATH": "/home/ww/Qt/5.15.2/gcc_64/plugins"
+				}
+			},
+			"windows": {
+				"command": "C:/Qt/5.15.2/mingw81_64/bin/designer.exe",
+				"options": {
+					"cwd": "${workspaceFolder}",
+					"env": {
+						"PATH": "C:/Qt/5.15.2/mingw81_64/bin;C:/Qt/Tools/mingw810_64/bin;${env:PATH}"
+					}
+				}
 			},
 			"problemMatcher": []
 		}

@@ -6,10 +6,9 @@
 #include "compatx.h"
 
 #include <inttypes.h>
+#include <cstddef>
 #include <stdarg.h>
 #include <string>
-
-using namespace std;
 
 typedef unsigned char byte;
 typedef unsigned int uns;
@@ -126,7 +125,7 @@ off64_t getfilesize64(int fd);
 off64_t getfilesize64(const char *fname);
 off64_t tell64(int fd);
 
-string Sprintf(const char *fmt, ...);
+std::string Sprintf(const char *fmt, ...);
 
 char *Tprintf(const char *fmt, ...);
 
@@ -182,7 +181,7 @@ int getto(int pos, char *str, char to, char *data, int datalen);
 
 //---------------------------------------------------------------------------
 
-int strncmp(void *str1, void *str2, size_t len);
+int strncmp(void *str1, void *str2, std::size_t len);
 
 //---------------------------------------------------------------------------
 

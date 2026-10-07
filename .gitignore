@@ -69,10 +69,15 @@ out/
 *.dylib
 *.o
 *.a
-debug/
-release/
 *.Debug
 *.Release
+moc_*.cpp
+moc_predefs.h
+qrc_*.cpp
+/SegDSeeMp/SegDSeeMp
+/SeiSeeMp/SeiSeeMp
+debug/
+release/
 Makefile*
 
 # 日志文件

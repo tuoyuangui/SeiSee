@@ -17,7 +17,7 @@
 
 #include "gfx.h"
 
-using namespace std;
+using std::string;
 
 extern TrHdrsMap TraceHdrsSet;
 

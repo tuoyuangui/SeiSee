@@ -11,7 +11,7 @@
 typedef unsigned char byte;
 
 using namespace ExprEval;
-using namespace std;
+using std::string;
 
 class TrcHdrNode : public FunctionNode
 {
@@ -28,7 +28,7 @@ public:
 class TrcHdrFactory : public FunctionFactory
 {
 public:
-    string GetName() const
+    std::string GetName() const
     {
         return "H";
     }

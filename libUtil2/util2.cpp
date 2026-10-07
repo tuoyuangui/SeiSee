@@ -1194,7 +1194,7 @@ off64_t tell64(int fd)
     return lseek64(fd, 0, SEEK_CUR);
 }
 
-string Sprintf(const char *fmt, ...)
+std::string Sprintf(const char *fmt, ...)
 {
     char buffer[4096];
 

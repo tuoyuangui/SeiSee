@@ -2,7 +2,43 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "SeiSeeMp",
+            "name": "SeiSeeMp (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/SeiSeeMp/SeiSeeMp",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {"name": "LD_LIBRARY_PATH", "value": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}"},
+                {"name": "QT_PLUGIN_PATH", "value": "/home/ww/Qt/5.15.2/gcc_64/plugins"},
+                {"name": "QT_QPA_PLATFORM_PLUGIN_PATH", "value": "/home/ww/Qt/5.15.2/gcc_64/plugins/platforms"}
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "Build Debug"
+        },
+        {
+            "name": "SegDSeeMp (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/SegDSeeMp/SegDSeeMp",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {"name": "LD_LIBRARY_PATH", "value": "/home/ww/Qt/5.15.2/gcc_64/lib:${env:LD_LIBRARY_PATH}"},
+                {"name": "QT_PLUGIN_PATH", "value": "/home/ww/Qt/5.15.2/gcc_64/plugins"},
+                {"name": "QT_QPA_PLATFORM_PLUGIN_PATH", "value": "/home/ww/Qt/5.15.2/gcc_64/plugins/platforms"}
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "Build Debug"
+        },
+        {
+            "name": "SeiSeeMp (Windows)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/SeiSeeMp/debug/SeiSeeMp.exe",
@@ -21,7 +57,7 @@
             "preLaunchTask": "Build Debug"
         },
         {
-            "name": "SegDSeeMp",
+            "name": "SegDSeeMp (Windows)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/SegDSeeMp/debug/SegDSeeMp.exe",

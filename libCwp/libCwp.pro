@@ -9,6 +9,7 @@ QT       += widgets
 TARGET = libCwp
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG += c++11
 
 SOURCES += \
     cwp.cpp \

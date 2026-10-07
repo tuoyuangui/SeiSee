@@ -1,0 +1,11 @@
+.git
+.vscode
+dist
+build
+out
+**/debug
+**/release
+**/Makefile*
+**/*.o
+**/*.a
+**/.qmake.stash

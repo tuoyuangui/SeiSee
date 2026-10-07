@@ -9,6 +9,7 @@ QT       += widgets
 TARGET = libUtil2
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG += c++11
 
 SOURCES += \
     util2.cpp \
@@ -17,5 +18,4 @@ SOURCES += \
 HEADERS += \
     util2.h \
     util2qt.h
-
 

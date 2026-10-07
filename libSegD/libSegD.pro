@@ -9,6 +9,7 @@ QT       += widgets
 TARGET = libSegD
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG += c++11
 
 SOURCES += \
     libSegD.cpp

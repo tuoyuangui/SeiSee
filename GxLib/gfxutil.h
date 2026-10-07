@@ -6,8 +6,6 @@
 
 #include <string>
 
-using namespace std;
-
 class zdata
 {
 public:
@@ -28,7 +26,7 @@ public:
 };
 
 char *q2s(QString qs);
-string q2S(QString qs);
+std::string q2S(QString qs);
 
 void CreatePalette24(QRgb *mrkc, int *mrkv, QRgb *rgb, int nmrk);
 void CreatePalette24(QRgb *mrkc, double *v, double vmin, double vmax, QRgb *rgb,

@@ -77,6 +77,24 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ## Linux AppImage
 
+### 使用 Docker 构建
+
+推荐使用仓库根目录的 `docker/linux.Dockerfile`。它在 CentOS 7 兼容的 manylinux2014 环境（glibc 2.17）中使用宿主机 `/home/ww/Qt/5.15.2/gcc_64` 下的 Qt 5.15.2 编译并创建 AppImage，以便同一 x86_64 构建可在较新的 Ubuntu 版本上运行。容器会配置 `QMAKE`、`PATH`、`LD_LIBRARY_PATH`、`QT_PLUGIN_PATH`、`QT_QPA_PLATFORM_PLUGIN_PATH`、`QML2_IMPORT_PATH`、`CMAKE_PREFIX_PATH` 和 `PKG_CONFIG_PATH`：
+
+```bash
+docker build -f docker/linux.Dockerfile -t seisee-linux-builder .
+mkdir -p dist/linux
+docker run --rm \
+  --user "$(id -u):$(id -g)" \
+  -e VERSION=4.0.0-alpha.1 \
+  -e JOBS="$(nproc)" \
+  -v /home/ww/Qt:/home/ww/Qt:ro \
+  -v "$PWD/dist/linux:/workspace/dist/linux" \
+  seisee-linux-builder
+```
+
+产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
+
 ### 前置条件
 
 - x86_64 Linux
@@ -85,7 +103,21 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 - `linuxdeploy-plugin-qt`（需能从 `PATH` 找到）
 - `appimagetool`
 
+Ubuntu 本机开发可通过 `sudo apt install build-essential gdb` 安装编译器、Make 和调试器。
+使用 Qt 的 XCB 图形平台插件还需要安装 `libxcb-xinerama0`：`sudo apt install libxcb-xinerama0`。缺少它时，Qt 可能显示已找到 `libqxcb.so`，但仍无法加载 XCB 平台插件。
+
 建议在计划支持的较旧 Linux 发行版上构建，以提高生成的 AppImage 对不同 glibc 版本的兼容性。
+
+### 本机 Qt 环境变量
+
+在本机直接构建时，从项目根目录加载环境配置脚本，然后运行打包脚本：
+
+```bash
+source scripts/qt-env.sh
+./scripts/package-linux.sh
+```
+
+该脚本默认使用 `/home/ww/Qt/5.15.2/gcc_64`，设置 `QT_ROOT`、`QMAKE`、`PATH`、`LD_LIBRARY_PATH`、`QT_PLUGIN_PATH`、`QT_QPA_PLATFORM_PLUGIN_PATH`、`QML2_IMPORT_PATH`、`CMAKE_PREFIX_PATH` 和 `PKG_CONFIG_PATH`。如 Qt 安装在其他位置，可先设置 `QT_ROOT` 覆盖默认值。本机的 `~/.bashrc` 已直接配置这些环境变量；改动后执行 `source ~/.bashrc` 使当前终端生效，新开的 Bash 终端会自动加载。
 
 ### 运行
 

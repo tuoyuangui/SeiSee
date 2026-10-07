@@ -1,8 +1,6 @@
 #ifndef HDRDEF_H
 #define HDRDEF_H
 
-using namespace std;
-
 #include <stdio.h>
 #include <string>
 

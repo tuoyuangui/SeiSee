@@ -13,9 +13,9 @@ char *q2s(QString qs)
     return s;
 }
 
-string q2S(QString qs)
+std::string q2S(QString qs)
 {
-    string S;
+    std::string S;
 
     QByteArray qfn = qs.toUtf8();
     //  QByteArray qfn = qs.toLocal8Bit();
