@@ -172,7 +172,7 @@ JOBS=8 \
 .\scripts\publish-github-release.ps1 -Publish
 ```
 
-`-CreateDraft` 和 `-Publish` 不能同时使用。可分别添加 `-WhatIf` 模拟创建草稿或正式发布时将执行的操作。
+如果相同版本的 Release（例如已发布 Linux AppImage）已经存在，使用 `-Publish` 时脚本只会向该 Release 添加版本匹配的 `.exe` 文件，不会重复上传 Linux 文件或更改发布说明、发布状态和其他附件；同名 `.exe` 会被替换。若该版本尚无 Release，则按原流程创建 Release 并上传所有版本匹配的文件。`-CreateDraft` 和 `-Publish` 不能同时使用。可分别添加 `-WhatIf` 模拟创建草稿或正式发布时将执行的操作。
 
 ### 发布 Linux AppImage
 
