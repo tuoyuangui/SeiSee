@@ -4,9 +4,9 @@
 
 ## 从 SVG 重新生成数据文件图标
 
-`render-file-icons.ps1` 使用 Qt SVG 模块，从 `SeiSeeMp/images` 中的四个 SVG 源文件重新生成对应的 PNG 文件。需要安装 Qt（包含 QtSvg）、C++ 编译器和 qmake；Windows 上使用 Qt 5.15.2 MinGW 8.1，Linux 上需安装 PowerShell 7、Qt 开发包及 make。
+`render-file-icons.ps1` 使用 Qt SVG 模块，从 `SeiSeeMp/images` 中的四个 SVG 源文件重新生成对应的 PNG 文件。需要安装 Qt（包含 QtSvg）、C++ 编译器和 qmake；Windows 上使用 Qt 5.15.2 MinGW 8.1，Linux 上如果要运行这个图标生成脚本，需另行安装 PowerShell 7、Qt 开发包及 make。PowerShell 7 只用于运行此 `.ps1` 图标脚本；Linux Docker 打包和 Linux AppImage 发布脚本均使用 Bash，不依赖 PowerShell。
 
-在项目根目录运行（Windows PowerShell 或 Linux PowerShell 7）：
+在项目根目录运行（Windows PowerShell 或已安装 PowerShell 7 的 Linux）：
 
 ```powershell
 ./scripts/render-file-icons.ps1
@@ -178,19 +178,19 @@ JOBS=8 \
 
 先确认 `dist/linux` 中有与 `SeiSeeMp/mainwindow.h` 版本一致的 AppImage，并在 [CHANGELOG.md](../CHANGELOG.md) 中维护该版本的发布说明。脚本从版本宏读取发布标签，从对应的 Changelog 章节读取新建 Release 的说明。
 
-在仓库根目录预览：
+在仓库根目录预览（Linux 使用 Bash；Windows 可在 Git Bash 或 WSL 中运行）：
 
-```powershell
-pwsh ./scripts/publish-linux-release.ps1
+```bash
+bash ./scripts/publish-linux-release.sh
 ```
 
 确认版本和文件无误后发布：
 
-```powershell
-pwsh ./scripts/publish-linux-release.ps1 -Publish
+```bash
+bash ./scripts/publish-linux-release.sh --publish
 ```
 
-发布前需安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如果该版本的 Release 已存在（例如已发布 Windows 安装程序），脚本只上传 Linux AppImage；同名 Linux 文件会被替换，原有 Windows 附件、Release 说明和发布状态保持不变。如果 Release 尚不存在，则根据 `CHANGELOG.md` 创建 Release 并附上 Linux AppImage。使用 `pwsh ./scripts/publish-linux-release.ps1 -Publish -WhatIf` 可模拟发布操作而不上传文件。
+发布前需安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如果该版本的 Release 已存在（例如已发布 Windows 安装程序），脚本只上传 Linux AppImage；同名 Linux 文件会被替换，原有 Windows 附件、Release 说明和发布状态保持不变。如果 Release 尚不存在，则根据 `CHANGELOG.md` 创建 Release 并附上 Linux AppImage。默认不带 `--publish` 时只预览，不会连接 GitHub 或上传文件；如需发布到其他仓库，可传入 `--repo OWNER/REPO`。
 
 ## 开发环境
 
