@@ -105,8 +105,16 @@ if ($LASTEXITCODE -ne 0) {
 
 $apiVersion = [Uri]::EscapeDataString($version)
 $releaseEndpoint = "repos/$Repository/releases/tags/$apiVersion"
-$releaseResponse = @(& $gh.Source api $releaseEndpoint 2>&1)
-$releaseLookupExitCode = $LASTEXITCODE
+$previousErrorActionPreference = $ErrorActionPreference
+try {
+    # A missing release is reported by gh on stderr with exit code 1; keep it
+    # capturable here so the expected 404 can be distinguished from other errors.
+    $ErrorActionPreference = "Continue"
+    $releaseResponse = @(& $gh.Source api $releaseEndpoint 2>&1)
+    $releaseLookupExitCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
 $releaseExists = $releaseLookupExitCode -eq 0
 $releaseInfo = $null
 if (-not $releaseExists) {
