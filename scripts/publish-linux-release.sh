@@ -105,19 +105,42 @@ command -v gh >/dev/null 2>&1 || {
 gh auth status --hostname github.com
 
 release_info=""
-if release_info="$(gh api "repos/$repo/releases/tags/$version" --jq '[.tag_name, .draft] | @tsv' 2>&1)"; then
+release_tag=""
+release_draft=""
+release_lookup_succeeded=false
+release_lookup_error=""
+for attempt in 1 2 3; do
+    if release_info="$(gh api "repos/$repo/releases/tags/$version" --jq '[.tag_name, .draft] | @tsv' 2>&1)"; then
+        release_lookup_succeeded=true
+        break
+    fi
+
+    release_lookup_error="$release_info"
+    if [[ "$release_lookup_error" == *"HTTP 404"* || "$release_lookup_error" == *"Not Found"* ]]; then
+        break
+    fi
+    if ! grep -Eiq 'EOF|timeout|temporar|connection reset|TLS handshake|server misbehaving|HTTP 5[0-9][0-9]' <<<"$release_lookup_error"; then
+        break
+    fi
+    if ((attempt < 3)); then
+        delay=$((attempt * 2))
+        printf 'Warning: transient GitHub API error (attempt %s/3); retrying in %s seconds: %s\n' \
+            "$attempt" "$delay" "$release_lookup_error" >&2
+        sleep "$delay"
+    fi
+done
+
+if [[ "$release_lookup_succeeded" == true ]]; then
     IFS=$'\t' read -r release_tag release_draft <<<"$release_info"
     if [[ "$release_tag" != "$version" ]]; then
         echo "Error: GitHub returned release tag '$release_tag' while checking for $version." >&2
         exit 1
     fi
 else
-    release_lookup_error="$release_info"
     if [[ "$release_lookup_error" != *"HTTP 404"* && "$release_lookup_error" != *"Not Found"* ]]; then
         printf 'Error: could not check whether release %s exists: %s\n' "$version" "$release_lookup_error" >&2
         exit 1
     fi
-    release_tag=""
 fi
 
 if [[ "$release_tag" == "$version" ]]; then
