@@ -110,6 +110,30 @@ JOBS=8 \
 
 默认使用 `qmake`、`make`、`linuxdeploy` 和 `appimagetool`。生成的文件位于 `dist/linux`，默认文件名为 `SeiSee-4.0.0-alpha.1-x86_64.AppImage`。
 
+## GitHub Release
+
+在 `CHANGELOG.md` 中填写并审核当前版本对应的更新内容。发布脚本会从 `SeiSeeMp/mainwindow.h` 读取版本号，预览该版本的更新说明，并只选择文件名包含该版本号的 `dist` 文件，避免把旧版本安装包一并上传。
+
+先运行预览并检查输出：
+
+```powershell
+.\scripts\publish-github-release.ps1
+```
+
+确认更新说明和待上传文件无误后，安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如需先在 GitHub 上复核，可创建草稿 Release 并上传文件：
+
+```powershell
+.\scripts\publish-github-release.ps1 -CreateDraft
+```
+
+脚本默认只预览，不会创建 Release。确认内容无误且希望直接正式发布时，使用 `-Publish`；该操作会立即创建并公开 Release：
+
+```powershell
+.\scripts\publish-github-release.ps1 -Publish
+```
+
+`-CreateDraft` 和 `-Publish` 不能同时使用。可分别添加 `-WhatIf` 模拟创建草稿或正式发布时将执行的操作。
+
 ## 常见问题
 
 - 脚本会检查必需的编译和打包工具；缺少工具时会指出未找到的命令或文件。
