@@ -2505,7 +2505,7 @@ void MainWindow::GetRegInfo()
         }
 
         if (hlist.count() == 0) {
-            hlist.append("Tarce#");
+            hlist.append("Trace");
         }
 
         hdrAxisCk.setList(hlist);
