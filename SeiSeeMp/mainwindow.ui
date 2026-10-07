@@ -2150,7 +2150,7 @@
                          </property>
                          <item>
                           <property name="text">
-                           <string>Trace#</string>
+                           <string>Trace</string>
                           </property>
                          </item>
                         </widget>

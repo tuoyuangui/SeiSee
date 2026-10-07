@@ -72,6 +72,8 @@ Linux 版本以 glibc 2.17 为兼容基线，目标支持 CentOS 7 及以上、U
 APPIMAGE_EXTRACT_AND_RUN=1 ./SeiSee-*.AppImage
 ```
 
+如果提示 `error loading libfuse.so.2`，可用上述 `APPIMAGE_EXTRACT_AND_RUN=1` 方式启动，或在系统中安装 FUSE 2 兼容运行库后再正常启动。
+
 开发者构建安装包、配置编译环境或参与项目开发，请参阅[打包与开发说明](./scripts/README.md)和 [Docker 构建说明](./docker/README.md)。
 
 ## 更新日志

@@ -89,16 +89,19 @@ mkdir -p dist/linux
 之后每次打包，在项目根目录运行：
 
 ```bash
+VERSION="$(sed -nE 's/^[[:space:]]*#[[:space:]]*define[[:space:]]+VERSION[[:space:]]+"([^"]+)".*/\1/p' SeiSeeMp/mainwindow.h)"
+test -n "$VERSION" || { echo "无法从 SeiSeeMp/mainwindow.h 读取 VERSION" >&2; exit 1; }
+
 docker run --rm \
   --user "$(id -u):$(id -g)" \
-  -e VERSION=4.0.0-alpha.1 \
+  -e VERSION="$VERSION" \
   -e JOBS="$(nproc)" \
   -v /home/ww/Qt:/home/ww/Qt:ro \
   -v "$PWD:/workspace" \
   seisee-linux-builder
 ```
 
-`docker build` 只需首次运行，或修改 Dockerfile/容器工具后重新运行。打包时会将当前项目目录挂载到容器，使用最新源码并把产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
+脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION`，并将其传给容器作为安装包版本。`docker build` 只需首次运行，或修改 Dockerfile/容器工具后重新运行。打包时会将当前项目目录挂载到容器，使用最新源码并把产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
 
 ### 前置条件
 
@@ -170,6 +173,24 @@ JOBS=8 \
 ```
 
 `-CreateDraft` 和 `-Publish` 不能同时使用。可分别添加 `-WhatIf` 模拟创建草稿或正式发布时将执行的操作。
+
+### 发布 Linux AppImage
+
+先确认 `dist/linux` 中有与 `SeiSeeMp/mainwindow.h` 版本一致的 AppImage，并在 [CHANGELOG.md](../CHANGELOG.md) 中维护该版本的发布说明。脚本从版本宏读取发布标签，从对应的 Changelog 章节读取新建 Release 的说明。
+
+在仓库根目录预览：
+
+```powershell
+pwsh ./scripts/publish-linux-release.ps1
+```
+
+确认版本和文件无误后发布：
+
+```powershell
+pwsh ./scripts/publish-linux-release.ps1 -Publish
+```
+
+发布前需安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如果该版本的 Release 已存在（例如已发布 Windows 安装程序），脚本只上传 Linux AppImage；同名 Linux 文件会被替换，原有 Windows 附件、Release 说明和发布状态保持不变。如果 Release 尚不存在，则根据 `CHANGELOG.md` 创建 Release 并附上 Linux AppImage。使用 `pwsh ./scripts/publish-linux-release.ps1 -Publish -WhatIf` 可模拟发布操作而不上传文件。
 
 ## 开发环境
 

@@ -60,16 +60,19 @@ mkdir -p dist/linux
 镜像准备好后，每次打包都在仓库根目录运行：
 
 ```bash
+VERSION="$(sed -nE 's/^[[:space:]]*#[[:space:]]*define[[:space:]]+VERSION[[:space:]]+"([^"]+)".*/\1/p' SeiSeeMp/mainwindow.h)"
+test -n "$VERSION" || { echo "无法从 SeiSeeMp/mainwindow.h 读取 VERSION" >&2; exit 1; }
+
 docker run --rm \
   --user "$(id -u):$(id -g)" \
-  -e VERSION=4.0.0-alpha.1 \
+  -e VERSION="$VERSION" \
   -e JOBS="$(nproc)" \
   -v /home/ww/Qt:/home/ww/Qt:ro \
   -v "$PWD:/workspace" \
   seisee-linux-builder
 ```
 
-这个命令会把当前工作区挂载到容器，因此会使用最新源码；构建文件和安装包会写入宿主机。成功后，安装包位于 `dist/linux/SeiSee-4.0.0-alpha.1-x86_64.AppImage`。可通过修改 `VERSION` 指定输出版本，通过 `JOBS` 调整并行构建任务数。只有修改 `docker/linux.Dockerfile` 或需要更新容器内工具时，才需要重新运行 `docker build`。首次构建镜像需要网络访问基础镜像仓库和 Dockerfile 中使用的 AppImage 工具下载地址。
+脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION` 并传给容器。命令会把当前工作区挂载到容器，因此使用最新源码；构建文件和安装包写入宿主机，安装包路径为 `dist/linux/SeiSee-${VERSION}-x86_64.AppImage`。可通过修改 `JOBS` 调整并行构建任务数。只有修改 `docker/linux.Dockerfile` 或需要更新容器内工具时，才需要重新运行 `docker build`。首次构建镜像需要网络访问基础镜像仓库和 Dockerfile 中使用的 AppImage 工具下载地址。
 
 CentOS 7 已停止维护，Dockerfile 从 Tsinghua 镜像的 CentOS 7.9.2009 归档仓库安装构建依赖；若该镜像无法访问，可在 `docker/linux.Dockerfile` 中替换对应仓库 URL。
 
