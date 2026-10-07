@@ -58,6 +58,7 @@ obj/
 *.docstates
 # QT
 .qmake.stash
+ui_*.h
 
 # 构建输出
 dist/
