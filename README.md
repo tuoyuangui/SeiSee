@@ -76,6 +76,15 @@ APPIMAGE_EXTRACT_AND_RUN=1 ./SeiSee-*.AppImage
 
 开发者构建安装包、配置编译环境或参与项目开发，请参阅[打包与开发说明](./scripts/README.md)和 [Docker 构建说明](./docker/README.md)。
 
+## 用户设置保存位置
+
+程序使用 Qt `QSettings` 保存窗口布局、数据目录和显示选项等用户设置：
+
+- **Windows：**注册表 `HKEY_CURRENT_USER\Software\PSI\SeiSeeMp`
+- **Linux：**配置文件 `~/.config/PSI/SeiSeeMp.conf`（`~` 表示当前用户的主目录）
+
+如果 Linux 设置了 `XDG_CONFIG_HOME` 环境变量，配置文件会位于 `$XDG_CONFIG_HOME/PSI/SeiSeeMp.conf`。
+
 ## 更新日志
 
 [更新日志](./CHANGELOG.md)
