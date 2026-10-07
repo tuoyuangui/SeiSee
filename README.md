@@ -20,17 +20,36 @@
 </p>
 
 ## 界面
-<p align="center">
-  <a >
-    <img src="home.png" alt="界面展示截图" />    
-  </a>
-  主界面
 
-</p>
+![主界面](screenshots/home.png)
+主界面
+
+![截图功能](screenshots/capture.png)
+截图功能
+
+![difference](screenshots/difference.png)
+difference
+
+![axissetup](screenshots/axissetup.png)
+axis setup
+
+![process](screenshots/process.png)
+process
 
 ## 功能
 
-- ✅ 数据查看
+- 增加地震数据的右侧和底部坐标轴，形成四周对称式坐标，符合国人审美和行业通用标准
+- 增加地震数据截图功能，并使用带圆角提示框显示操作结果。
+- 增加打开文件入口。
+- 增加 Difference功能，用于计算两个地震数据的差值。
+- 增加文件目录浏览界面的右键菜单，可以获取文件名、文件路径、打开文件所在目录
+- 改进高 DPI、多显示器环境下的界面布局和显示效果。
+- 统一界面字体、字体大小及坐标轴等显示样式的设置方式。
+- 调整 Axis Setup 和多个控件的布局与间距。
+- 改进图标在不同 DPI 屏幕上的显示，并支持窗口在不同 DPI 屏幕间移动。
+- 补全道头字段（至240，兼容GeoEast）显示。
+- 实现 Save as 界面 apply process的实际功能
+- 精心设计的高DPI图标。
 
 ## 安装方法
 
