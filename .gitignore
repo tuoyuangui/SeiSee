@@ -59,6 +59,7 @@ obj/
 # QT
 .qmake.stash
 ui_*.h
+**/ui_*.h
 
 # 构建输出
 dist/
