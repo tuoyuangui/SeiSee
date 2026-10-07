@@ -1,16 +1,28 @@
 # Update these defaults if your Qt, MinGW, or Inno Setup installation uses
-# different directories. The values can also be overridden with command-line
-# parameters when running the script.
+# different directories. The package version is read from SeiSeeMp\mainwindow.h.
 param(
     [string]$QtBin = "C:\Qt\5.15.2\mingw81_64\bin",
     [string]$MinGWBin = "C:\Qt\Tools\mingw810_64\bin",
     [string]$InnoSetupCompiler = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
-    [string]$Version = "3.0-alpha.37",
     [int]$Jobs = [Environment]::ProcessorCount
 )
 
 $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$versionHeader = Join-Path $repoRoot "SeiSeeMp\mainwindow.h"
+if (-not (Test-Path -LiteralPath $versionHeader -PathType Leaf)) {
+    throw "Version header not found: $versionHeader"
+}
+
+$headerContent = Get-Content -LiteralPath $versionHeader -Raw
+$versionDefinitions = [regex]::Matches(
+    $headerContent,
+    '(?m)^[ \t]*#[ \t]*define[ \t]+VERSION[ \t]+"([^"]+)"[ \t\r]*$'
+)
+if ($versionDefinitions.Count -ne 1) {
+    throw "Expected exactly one #define VERSION `"value`" in $versionHeader; found $($versionDefinitions.Count)."
+}
+$Version = $versionDefinitions[0].Groups[1].Value
 
 $qmake = Join-Path $QtBin "qmake.exe"
 $windeployqt = Join-Path $QtBin "windeployqt.exe"

@@ -36,17 +36,17 @@
 
 ### Windows
 
-需要 Qt 5.15.2 MinGW 8.1、Inno Setup 6.3 或更高版本，并将项目使用的 Qt 和 MinGW `bin` 目录配置在默认路径或传入参数。脚本通过 `windeployqt` 扫描并打包应用所需的 Qt DLL、平台插件和运行库。默认安装包版本为 `3.0-alpha.37`：
+需要 Qt 5.15.2 MinGW 8.1、Inno Setup 6.3 或更高版本，并将项目使用的 Qt 和 MinGW `bin` 目录配置在默认路径或传入参数。脚本通过 `windeployqt` 扫描并打包应用所需的 Qt DLL、平台插件和运行库；安装包版本从 `SeiSeeMp/mainwindow.h` 中的 `#define VERSION` 自动读取：
 
 ```powershell
 .\scripts\package-windows.ps1
 ```
 
-可通过 `-QtBin`、`-MinGWBin`、`-InnoSetupCompiler`、`-Version` 和 `-Jobs` 覆盖工具路径及构建参数。安装程序输出到 `dist/windows`。
+可通过 `-QtBin`、`-MinGWBin`、`-InnoSetupCompiler` 和 `-Jobs` 覆盖工具路径及构建参数。安装程序输出到 `dist/windows`。
 
 ### Linux
 
-需要 Qt 5 开发环境、C++ 编译工具、`linuxdeploy`、`linuxdeploy-plugin-qt` 和 `appimagetool`，并在 x86_64 Linux 上运行。默认安装包版本为 `3.0-alpha.37`：
+需要 Qt 5 开发环境、C++ 编译工具、`linuxdeploy`、`linuxdeploy-plugin-qt` 和 `appimagetool`，并在 x86_64 Linux 上运行。默认安装包版本为 `4.0.0-alpha.1`：
 
 ```bash
 chmod +x scripts/package-linux.sh

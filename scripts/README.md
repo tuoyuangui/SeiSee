@@ -63,18 +63,17 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\scripts\package-windows.ps1
 ```
 
-也可以不改脚本文件，直接传入工具路径、版本和并行构建任务数：
+也可以不改脚本文件，直接传入工具路径和并行构建任务数。Windows 安装包版本始终从 `SeiSeeMp/mainwindow.h` 中的 `#define VERSION` 读取：
 
 ```powershell
 .\scripts\package-windows.ps1 `
   -QtBin "C:\Qt\5.15.2\mingw81_64\bin" `
   -MinGWBin "C:\Qt\Tools\mingw810_64\bin" `
   -InnoSetupCompiler "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
-  -Version "3.0-alpha.37" `
   -Jobs 8
 ```
 
-生成的安装程序位于 `dist\windows`，默认文件名为 `SeiSee-3.0-alpha.37-Setup.exe`。
+生成的安装程序位于 `dist\windows`，文件名中的版本号也取自 `SeiSeeMp/mainwindow.h`。
 
 ## Linux AppImage
 
@@ -104,12 +103,12 @@ QMAKE=/path/to/qmake \
 MAKE=/path/to/make \
 LINUXDEPLOY=/path/to/linuxdeploy \
 APPIMAGETOOL=/path/to/appimagetool \
-VERSION=3.0-alpha.37 \
+VERSION=4.0.0-alpha.1 \
 JOBS=8 \
 ./scripts/package-linux.sh
 ```
 
-默认使用 `qmake`、`make`、`linuxdeploy` 和 `appimagetool`。生成的文件位于 `dist/linux`，默认文件名为 `SeiSee-3.0-alpha.37-x86_64.AppImage`。
+默认使用 `qmake`、`make`、`linuxdeploy` 和 `appimagetool`。生成的文件位于 `dist/linux`，默认文件名为 `SeiSee-4.0.0-alpha.1-x86_64.AppImage`。
 
 ## 常见问题
 
