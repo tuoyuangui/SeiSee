@@ -160,7 +160,28 @@ JOBS=8 \
 .\scripts\publish-windows-release.ps1
 ```
 
-确认更新说明和待上传文件无误后，安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如需先在 GitHub 上复核，可创建草稿 Release 并上传文件：
+确认更新说明和待上传文件无误后，安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。Ubuntu 可按以下步骤安装：
+
+```bash
+(type -p wget >/dev/null || sudo apt install wget -y) \
+  && sudo mkdir -p -m 755 /etc/apt/keyrings \
+  && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null \
+  && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+  | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null \
+  && sudo apt update \
+  && sudo apt install gh -y
+```
+
+安装完成后登录并授权：
+
+```bash
+gh auth login
+```
+
+如需先在 GitHub 上复核，可创建草稿 Release 并上传文件：
 
 ```powershell
 .\scripts\publish-windows-release.ps1 -CreateDraft
@@ -190,7 +211,15 @@ bash ./scripts/publish-linux-release.sh
 bash ./scripts/publish-linux-release.sh --publish
 ```
 
-发布前需安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如果该版本的 Release 已存在（例如已发布 Windows 安装程序），脚本只上传 Linux AppImage；同名 Linux 文件会被替换，原有 Windows 附件、Release 说明和发布状态保持不变。如果 Release 尚不存在，则根据 `CHANGELOG.md` 创建 Release 并附上 Linux AppImage。默认不带 `--publish` 时只预览，不会连接 GitHub 或上传文件；如需发布到其他仓库，可传入 `--repo OWNER/REPO`。
+发布前需安装 [GitHub CLI](https://cli.github.com/) 并运行 `gh auth login`。如果该版本的 Release 已存在（例如已发布 Windows 安装程序），脚本只上传 Linux AppImage；同名 Linux 文件会被替换，原有 Windows 附件、Release 说明和发布状态保持不变。如果 Release 尚不存在，则根据 `CHANGELOG.md` 创建 Release 并附上 Linux AppImage。默认不带 `--publish` 时只预览，不会连接 GitHub 或上传文件；如需发布到其他仓库，可传入 `--repo OWNER/REPO`。查询 GitHub Release 时若遇到 `EOF`、超时或暂时性服务器错误，脚本会自动重试最多两次；持续失败时会报错退出，不会误判为 Release 不存在。
+
+如果上传时收到 `HTTP 403: Resource not accessible by personal access token`，检查 `gh auth status -h github.com` 确认实际使用的 GitHub 账号和认证方式，并确认当前 token 对目标仓库有写入 Release 所需的 Contents 权限：
+
+- Fine-grained PAT：将目标仓库加入 token 的 Repository access，并授予 `Contents: Read and write`。
+- Classic PAT：公开仓库至少需要 `public_repo` scope；私有仓库需要 `repo` scope。
+- 组织仓库还可能要求组织管理员批准 token，或单独完成 SSO 授权。
+
+更新 token 权限后，重新运行 `gh auth login` 使用有权限的认证方式登录，再重试发布。注意 `GH_TOKEN` 或 `GITHUB_TOKEN` 环境变量可能会覆盖 GitHub CLI 保存的登录凭据；如设置了这些变量，请确认它们对应的 token 也具备上述权限。不要将 token 粘贴到命令参数、脚本或日志中。
 
 ## 开发环境
 
