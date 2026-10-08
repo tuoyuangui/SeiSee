@@ -2,10 +2,11 @@
 
 // #include <vcl.h>
 
+#include "furlib.h"
+
 #include <math.h>
 #include <string.h>
 
-#include "furlib.h"
 #include "util2.h"
 
 //---------------------------------------------------------------------------
