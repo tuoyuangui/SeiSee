@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "dpiindicatorstyle.h"
 
 #include <QApplication>
 #include <QFontDatabase>
@@ -57,6 +58,7 @@ bool setDefaultFont(QApplication *app)
 int main(int argc, char *argv[])
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 
@@ -70,6 +72,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
+    installDpiIndicatorStyle(&a);
     a.setWindowIcon(QIcon(":/images/SeiSeeMp.png"));
     if (!setDefaultFont(&a))
         return 1;

@@ -1,8 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QAbstractButton>
 #include <QBoxLayout>
+#include <QActionGroup>
 #include <QComboBox>
 #include <QClipboard>
 #include <QDebug>
@@ -11,10 +11,9 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFontMetrics>
-#include <QDesktopWidget>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QImage>
-#include <QInputDialog>
 #include <QIcon>
 #include <QLabel>
 #include <QMessageBox>
@@ -23,17 +22,16 @@
 #include <QPalette>
 #include <QPixmap>
 #include <QScrollBar>
-#include <QScreen>
 #include <QSettings>
 #include <QSignalBlocker>
 #include <QStandardItemModel>
+#include <QTabBar>
 #include <QTextCodec>
 #include <QTimer>
 #include <QUrl>
 #include <QUuid>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QWindow>
 
 #include <functional>
 
@@ -56,15 +54,6 @@
 #include "util2qt.h"
 
 namespace {
-
-int currentScreenLogicalDpiY(const QWidget *widget)
-{
-    QScreen *currentScreen = widget->screen();
-    if (!currentScreen)
-        currentScreen = QApplication::primaryScreen();
-    return currentScreen ? GfxStyle::ScreenDpiY(currentScreen)
-                         : qMax(1, QApplication::desktop()->logicalDpiY());
-}
 
 void showScreenshotToast(QWidget *parent, const QString &title,
                          const QString &text, ToastPreset preset)
@@ -109,14 +98,6 @@ public:
         update();
     }
 
-    void setDisplayDpi(int dpiY)
-    {
-        m_displayDpiY = qMax(1, dpiY);
-        refreshFontSize();
-        refreshSize();
-        update();
-    }
-
     void refreshSize()
     {
         QFontMetrics metrics(m_font, this);
@@ -153,15 +134,7 @@ protected:
     }
 
 private:
-    void refreshFontSize()
-    {
-        const int widgetLogicalDpiY = qMax(1, logicalDpiY());
-        m_font.setPointSizeF(GfxStyle::LabelFontPointSize * m_displayDpiY /
-                             widgetLogicalDpiY);
-    }
-
     QFont m_font; // 存储当前使用的字体
-    int m_displayDpiY = GfxStyle::ReferenceDpi;
 };
 
 #ifdef _MSC_VER
@@ -195,6 +168,69 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setLibraryPaths(paths);
 
     ui->setupUi(this);
+    ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
+
+    QMenu *exportDpiMenu = ui->menuView->addMenu(tr("Export image DPI"));
+    QActionGroup *exportDpiGroup = new QActionGroup(this);
+    exportDpiGroup->setExclusive(true);
+    for (int dpi : {300, 400, 600}) {
+        QAction *dpiAction =
+            exportDpiMenu->addAction(tr("%1 DPI").arg(dpi));
+        dpiAction->setCheckable(true);
+        dpiAction->setData(dpi);
+        dpiAction->setChecked(dpi == m_exportDpi);
+        exportDpiGroup->addAction(dpiAction);
+    }
+    connect(exportDpiGroup, &QActionGroup::triggered, this,
+            [this](QAction *action) { m_exportDpi = action->data().toInt(); });
+    ui->dirGroup->setMinimumWidth(130);
+    ui->dirGroup->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+
+    ui->HdrBox->setMinimumWidth(
+        ui->InfoTab->tabBar()->sizeHint().width() +
+        ui->HdrBox->layout()->contentsMargins().left() +
+        ui->HdrBox->layout()->contentsMargins().right());
+    ui->HdrBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    ui->SeisTab->setMinimumWidth(0);
+    ui->SeisTab->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+
+    ui->frame_2->setMinimumWidth(0);
+    ui->HeBox->setMinimumWidth(0);
+    ui->groupBox_6->setMinimumWidth(0);
+
+    QGridLayout *scaleLayout =
+        qobject_cast<QGridLayout *>(ui->groupBox_3->layout());
+    const QList<QSlider *> scaleSliders = {
+        ui->TrSlider, ui->TmSlider, ui->GnSlider
+    };
+    for (QSlider *slider : scaleSliders) {
+        slider->setMinimumWidth(0);
+        slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
+    if (scaleLayout)
+        scaleLayout->setColumnStretch(1, 1);
+
+    const int numericEditWidth =
+        QFontMetrics(ui->edTr->font()).horizontalAdvance(
+            QStringLiteral("-123.4567")) +
+        16;
+    const QList<QLineEdit *> scaleEdits = {
+        ui->edTr, ui->edTm, ui->edGn
+    };
+    for (QLineEdit *edit : scaleEdits)
+        edit->setMinimumWidth(numericEditWidth);
+    ui->groupBox_3->setMinimumWidth(
+        ui->groupBox_3->minimumSizeHint().width());
+
+    for (QGroupBox *optionalGroup : {ui->groupBox_2, ui->groupBox_13}) {
+        optionalGroup->setMinimumWidth(0);
+    }
+    connect(ui->splitter, &QSplitter::splitterMoved, this,
+            [this](int, int) {
+                QTimer::singleShot(
+                    0, this, [this]() { updateCompactSeismicControls(); });
+            });
+
     ui->autoGainBtn->setIcon(QIcon(":/images/Autogain.png"));
     ui->autoGainBtn->setText(QString());
 
@@ -232,6 +268,7 @@ MainWindow::MainWindow(QWidget *parent)
                         ui->HdrsPg->layout()->activate();
                     if (ui->seisFrame->layout())
                         ui->seisFrame->layout()->activate();
+                    updateCompactSeismicControls();
                     ArrangeSections();
                     // seisView.update();
                     // hdrsView.update();
@@ -243,103 +280,11 @@ MainWindow::MainWindow(QWidget *parent)
             });
 
     resize(GfxStyle::MainWindowWidth, GfxStyle::MainWindowHeight);
+    QTimer::singleShot(0, this,
+                       [this]() { updateCompactSeismicControls(); });
     QFont directoryGridFont = QApplication::font();
     directoryGridFont.setPointSizeF(GfxStyle::DirectoryGridFontPointSize);
     ui->dirFrame->setFont(directoryGridFont);
-
-    QSettings appearanceSettings("PSI", "SeiSeeMp");
-    int appearanceDpi =
-        appearanceSettings.value("appearance/dpi", GfxStyle::UseScreenDpi)
-            .toInt();
-    m_interfaceDpi =
-        appearanceSettings.value("appearance/interfaceDpi",
-                                 GfxStyle::UseScreenDpi)
-            .toInt();
-    timeView.setDpiOverride(appearanceDpi);
-    timeRightView.setDpiOverride(appearanceDpi);
-    hdrsView.setDpiOverride(appearanceDpi);
-    hdrsBottomView.setDpiOverride(appearanceDpi);
-    seisView.setDpiOverride(appearanceDpi);
-    hlabView.setDpiOverride(appearanceDpi);
-
-    QMenu *appearanceMenu = ui->menuView->addMenu(tr("Appearance"));
-    QAction *dpiAction = appearanceMenu->addAction(tr("Seismic DPI..."));
-    connect(dpiAction, &QAction::triggered, this, [this]() {
-        const int screenDpi = currentScreenLogicalDpiY(this);
-        QStringList options;
-        QList<int> dpiValues;
-        options.append(tr("Screen default (%1 DPI)").arg(screenDpi));
-        dpiValues.append(GfxStyle::UseScreenDpi);
-        for (int i = 0; i < GfxStyle::CommonDisplayDpiCount; ++i) {
-            int dpi = GfxStyle::CommonDisplayDpis[i];
-            options.append(tr("%1 DPI").arg(dpi));
-            dpiValues.append(dpi);
-        }
-
-        int currentIndex = dpiValues.indexOf(timeView.dpiOverride());
-        if (currentIndex < 0)
-            currentIndex = 0;
-        bool accepted = false;
-        QString selected = QInputDialog::getItem(
-            this, tr("Seismic DPI"), tr("Select seismic DPI:"), options,
-            currentIndex, false, &accepted);
-        if (!accepted)
-            return;
-
-        int selectedIndex = options.indexOf(selected);
-        if (selectedIndex < 0 || selectedIndex >= dpiValues.size())
-            return;
-
-        int dpi = dpiValues.at(selectedIndex);
-        timeView.setDpiOverride(dpi);
-        timeRightView.setDpiOverride(dpi);
-        hdrsView.setDpiOverride(dpi);
-        hdrsBottomView.setDpiOverride(dpi);
-        seisView.setDpiOverride(dpi);
-        hlabView.setDpiOverride(dpi);
-        if (timeLabel)
-            timeLabel->setDisplayDpi(timeView.dpiY());
-
-        QSettings settings("PSI", "SeiSeeMp");
-        settings.setValue("appearance/dpi", dpi);
-        if (ui->seisFrame->isVisible())
-            ArrangeSections();
-    });
-
-    QAction *interfaceDpiAction =
-        appearanceMenu->addAction(tr("Interface DPI..."));
-    connect(interfaceDpiAction, &QAction::triggered, this, [this]() {
-        const int screenDpi = currentScreenLogicalDpiY(this);
-        QStringList options;
-        QList<int> dpiValues;
-        options.append(tr("Screen default (%1 DPI)").arg(screenDpi));
-        dpiValues.append(GfxStyle::UseScreenDpi);
-        for (int i = 0; i < GfxStyle::CommonDisplayDpiCount; ++i) {
-            const int dpi = GfxStyle::CommonDisplayDpis[i];
-            options.append(tr("%1 DPI").arg(dpi));
-            dpiValues.append(dpi);
-        }
-
-        int currentIndex = dpiValues.indexOf(m_interfaceDpi);
-        if (currentIndex < 0)
-            currentIndex = 0;
-        bool accepted = false;
-        const QString selected = QInputDialog::getItem(
-            this, tr("Interface DPI"), tr("Select interface DPI:"), options,
-            currentIndex, false, &accepted);
-        if (!accepted)
-            return;
-
-        const int selectedIndex = options.indexOf(selected);
-        if (selectedIndex < 0 || selectedIndex >= dpiValues.size())
-            return;
-
-        const int dpi = dpiValues.at(selectedIndex);
-        applyInterfaceDpi(dpi);
-
-        QSettings settings("PSI", "SeiSeeMp");
-        settings.setValue("appearance/interfaceDpi", dpi);
-    });
 
     eExpIdx = 0;
 
@@ -704,6 +649,14 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *axisScrollBarCorner = new QWidget(ui->seisFrame);
     applySystemPaletteBackground(axisScrollBarCorner, axisScrollBarTrackColor);
 
+    QWidget *plotViewport = seisScrl->viewport();
+    plotViewport->setAutoFillBackground(true);
+    plotViewport->setBackgroundRole(QPalette::Base);
+    QPalette plotPalette = plotViewport->palette();
+    plotPalette.setColor(QPalette::Base, Qt::white);
+    plotPalette.setColor(QPalette::Window, Qt::white);
+    plotViewport->setPalette(plotPalette);
+
     // 隐藏滚动条时保留其布局空间，由外层容器继续绘制灰色背景。
     // 目的是避免zoomALLBtn、zoomHallBtn、zoomVallBtn三个按钮执行时发生bug,在底部和右侧产生白条
     QSizePolicy horizontalScrollBarPolicy =
@@ -729,7 +682,6 @@ MainWindow::MainWindow(QWidget *parent)
             seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
     timeLabel = new VerticalTimeLabel(timeScrl->viewport());
-    timeLabel->setDisplayDpi(timeView.dpiY());
     auto arrangeOnDpiChange = [this]() {
         QTimer::singleShot(0, this, [this]() {
             if (ui && ui->seisFrame->isVisible())
@@ -899,196 +851,11 @@ MainWindow::MainWindow(QWidget *parent)
     SetSearchControls(true);
 
     ui->seisFrame->setVisible(false);
-    applyInterfaceDpi(m_interfaceDpi);
 
     //    exprList["CDP"] = SeisTrExpr("H(21,4)");
     //    exprList["SP" ] = SeisTrExpr("L-N+1");
 
     // CreatePalette24(c,v,-1,1,rgb,3); !!!
-}
-
-bool MainWindow::event(QEvent *event)
-{
-    const bool result = QMainWindow::event(event);
-    if (event->type() == QEvent::Show ||
-        event->type() == QEvent::WinIdChange) {
-        QWindow *nativeWindow = windowHandle();
-        if (nativeWindow && nativeWindow != m_dpiTrackedWindow) {
-            m_dpiTrackedWindow = nativeWindow;
-            connect(nativeWindow, &QWindow::screenChanged, this,
-                    [this](QScreen *) {
-                        QTimer::singleShot(
-                            0, this, [this]() {
-                                applyInterfaceDpi(m_interfaceDpi);
-                            });
-                    });
-        }
-    }
-
-    if (event->type() == QEvent::ScreenChangeInternal ||
-        event->type() == QEvent::Show) {
-        QTimer::singleShot(0, this,
-                           [this]() { applyInterfaceDpi(m_interfaceDpi); });
-    }
-    return result;
-}
-
-void MainWindow::applyInterfaceDpi(int dpi)
-{
-    m_interfaceDpi = qMax(GfxStyle::UseScreenDpi, dpi);
-    const int screenDpi = currentScreenLogicalDpiY(this);
-    const int targetDpi =
-        m_interfaceDpi > GfxStyle::UseScreenDpi ? m_interfaceDpi : screenDpi;
-    const qreal scale =
-        static_cast<qreal>(targetDpi) / GfxStyle::ReferenceDpi;
-    const qreal fontScale =
-        m_interfaceDpi > GfxStyle::UseScreenDpi
-            ? static_cast<qreal>(targetDpi) / screenDpi
-            : 1.0;
-    const int maxWidgetSize = QWIDGETSIZE_MAX;
-
-    auto scaleSize = [scale, maxWidgetSize](const QSize &size) {
-        const int width = size.width() >= maxWidgetSize
-                              ? maxWidgetSize
-                              : qMax(0, qRound(size.width() * scale));
-        const int height = size.height() >= maxWidgetSize
-                               ? maxWidgetSize
-                               : qMax(0, qRound(size.height() * scale));
-        return QSize(width, height);
-    };
-
-    const QList<QWidget *> widgets = QApplication::allWidgets();
-    for (QWidget *widget : widgets) {
-        if (!m_baseInterfaceMetrics.contains(widget)) {
-            InterfaceWidgetMetrics metrics;
-            if (QAbstractButton *button =
-                    qobject_cast<QAbstractButton *>(widget)) {
-                if (!button->icon().isNull()) {
-                    const QSize iconSize(GfxStyle::StandardIconSize,
-                                         GfxStyle::StandardIconSize);
-                    button->setIconSize(iconSize);
-
-                    const QSize buttonSize(GfxStyle::StandardIconButtonSize,
-                                           GfxStyle::StandardIconButtonSize);
-                    QSize minimumSize =
-                        button->minimumSize().expandedTo(buttonSize);
-                    QSize maximumSize = button->maximumSize();
-                    if (maximumSize.width() < buttonSize.width())
-                        maximumSize.setWidth(buttonSize.width());
-                    if (maximumSize.height() < buttonSize.height())
-                        maximumSize.setHeight(buttonSize.height());
-                    button->setMinimumSize(minimumSize);
-                    button->setMaximumSize(maximumSize);
-
-                    metrics.hasIcon = true;
-                    metrics.iconSize = iconSize;
-                }
-            }
-            metrics.font = widget->font();
-            metrics.minimumSize = widget->minimumSize();
-            metrics.maximumSize = widget->maximumSize();
-            metrics.windowSize = widget->size();
-            m_baseInterfaceMetrics.insert(widget, metrics);
-            connect(widget, &QObject::destroyed, this,
-                    [this, widget]() {
-                        m_baseInterfaceMetrics.remove(widget);
-                    });
-        }
-
-        const InterfaceWidgetMetrics metrics =
-            m_baseInterfaceMetrics.value(widget);
-        if (metrics.hasIcon) {
-            if (QAbstractButton *button =
-                    qobject_cast<QAbstractButton *>(widget)) {
-                button->setIconSize(scaleSize(metrics.iconSize));
-            }
-        }
-        const bool isPlot = qobject_cast<GfxView *>(widget) != nullptr;
-        QFont scaledFont = metrics.font;
-        if (metrics.font.pointSizeF() > 0)
-            scaledFont.setPointSizeF(metrics.font.pointSizeF() * fontScale);
-        else if (metrics.font.pixelSize() > 0)
-            scaledFont.setPixelSize(
-                qMax(1, qRound(metrics.font.pixelSize() * fontScale)));
-        widget->setFont(isPlot ? metrics.font : scaledFont);
-
-        if (isPlot)
-            continue;
-
-        widget->setMaximumSize(scaleSize(metrics.maximumSize));
-        widget->setMinimumSize(scaleSize(metrics.minimumSize));
-
-        if (widget == &AboutDlg || widget == &AxisDlg ||
-            widget == &EdHdrDlg || widget == &ProcParmDlg ||
-            widget == &SaveAsDlg) {
-            widget->resize(scaleSize(metrics.windowSize));
-        }
-    }
-
-    std::function<void(QLayout *)> scaleLayout = [&](QLayout *layout) {
-        if (!layout)
-            return;
-
-        if (!m_baseInterfaceLayouts.contains(layout)) {
-            InterfaceLayoutMetrics metrics;
-            metrics.margins = layout->contentsMargins();
-            metrics.spacing = layout->spacing();
-            m_baseInterfaceLayouts.insert(layout, metrics);
-            connect(layout, &QObject::destroyed, this,
-                    [this, layout]() {
-                        m_baseInterfaceLayouts.remove(layout);
-                    });
-        }
-
-        const InterfaceLayoutMetrics metrics =
-            m_baseInterfaceLayouts.value(layout);
-        layout->setContentsMargins(
-            qRound(metrics.margins.left() * scale),
-            qRound(metrics.margins.top() * scale),
-            qRound(metrics.margins.right() * scale),
-            qRound(metrics.margins.bottom() * scale));
-        if (metrics.spacing >= 0)
-            layout->setSpacing(qMax(0, qRound(metrics.spacing * scale)));
-
-        for (int i = 0; i < layout->count(); ++i)
-            scaleLayout(layout->itemAt(i)->layout());
-    };
-
-    for (QWidget *widget : widgets) {
-        if (widget->layout())
-            scaleLayout(widget->layout());
-    }
-
-    ui->gridLayout->setColumnMinimumWidth(
-        3, qRound(GfxStyle::StandardIconCellSize * scale));
-
-    if (QWidget *directoryButtons =
-            findChild<QWidget *>("dirButtonsWidget")) {
-        const int frameInset = qRound(scale);
-        directoryButtons->setGeometry(
-            frameInset, frameInset,
-            qRound(GfxStyle::DirectoryButtonsWidth * scale),
-            qRound(GfxStyle::DirectoryButtonsHeight * scale));
-    }
-
-    for (QWidget *widget : widgets) {
-        if (MyHugeTable *table = qobject_cast<MyHugeTable *>(widget))
-            table->setInterfaceScale(scale);
-        if (MyStringTable *table = qobject_cast<MyStringTable *>(widget))
-            table->setInterfaceScale(scale);
-    }
-
-    seisView.refreshScreenDpi();
-    hdrsView.refreshScreenDpi();
-    hdrsBottomView.refreshScreenDpi();
-    timeView.refreshScreenDpi();
-    timeRightView.refreshScreenDpi();
-    hlabView.refreshScreenDpi();
-
-    if (timeLabel)
-        timeLabel->setDisplayDpi(timeView.dpiY());
-    if (ui->seisFrame->isVisible())
-        ArrangeSections();
 }
 
 void MainWindow::hdrListDtGridDataEvent(int r, int c, QString &v)
@@ -1827,8 +1594,14 @@ int MainWindow::xprintf(QPlainTextEdit *edit, const char *fmt, ...)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    Q_UNUSED(event);
     SaveRegInfo();
+    AboutDlg.close();
+    AxisDlg.close();
+    DiffDlg.close();
+    EdHdrDlg.close();
+    ProcParmDlg.close();
+    SaveAsDlg.close();
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::ShowProgress(QString mes, int pers)
@@ -2172,7 +1945,8 @@ void MainWindow::ArrangeSections()
 
     int ht = timeView.getGfx()->GetTextHeight();
 
-    int rowGap = timeView.getGfx()->ScaleY(GfxStyle::HeaderLabelRowGap);
+    int rowGap =
+        timeView.getGfx()->ScaleY(GfxStyle::HeaderLabelRowGap);
     int verticalPadding =
         timeView.getGfx()->ScaleY(GfxStyle::HeaderRowsBottomPadding);
     int h = nh * (ht + rowGap) + verticalPadding;
@@ -2200,8 +1974,7 @@ void MainWindow::ArrangeSections()
     timeLabel->refreshSize();
     Gfx *timeGfx = timeView.getGfx();
     int headerTextStart = hdrsLab.TextStartX();
-    int timeLabelGap =
-        timeGfx->ScaleX(GfxStyle::TimeLabelToAxisGap); // Time 与刻度值的间隔
+    int timeLabelGap = timeGfx->ScaleX(GfxStyle::TimeLabelToAxisGap);
     int labelAndTicksWidth =
         qMax(timeAxis.RequiredWidth(), timeRightAxis.RequiredWidth());
     int timeAxisWidth = headerTextStart + timeLabel->rotatedTextWidth() +
@@ -2244,8 +2017,56 @@ void MainWindow::fitAxesToViewport()
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
+    QTimer::singleShot(0, this, [this]() { updateCompactSeismicControls(); });
     if (ui && ui->seisFrame->isVisible())
         ArrangeSections();
+}
+
+void MainWindow::updateCompactSeismicControls()
+{
+    if (!ui || ui->frame->width() <= 0)
+        return;
+
+    QHBoxLayout *layout = qobject_cast<QHBoxLayout *>(ui->frame->layout());
+    if (!layout)
+        return;
+
+    const int spacing = qMax(0, layout->spacing());
+    const QMargins margins = layout->contentsMargins();
+    const QList<QGroupBox *> allGroups = {
+        ui->groupBox, ui->groupBox_2, ui->groupBox_3, ui->groupBox_4,
+        ui->groupBox_13
+    };
+    for (QGroupBox *group : allGroups)
+        group->setVisible(true);
+
+    const int availableWidth = ui->frame->width();
+    const int fixedWidth = margins.left() + margins.right() +
+                           ui->frame->frameWidth() * 2;
+    const QList<QGroupBox *> collapseOrder = {
+        ui->groupBox_13, ui->groupBox_2, ui->groupBox_4, ui->groupBox
+    };
+
+    const auto requiredWidth = [&allGroups, fixedWidth, spacing]() {
+        int width = fixedWidth;
+        int visibleCount = 0;
+        for (QGroupBox *group : allGroups) {
+            if (group->isHidden())
+                continue;
+            width += qMax(group->minimumWidth(),
+                          group->minimumSizeHint().width());
+            ++visibleCount;
+        }
+        if (visibleCount > 1)
+            width += spacing * (visibleCount - 1);
+        return width;
+    };
+
+    for (QGroupBox *group : collapseOrder) {
+        if (requiredWidth() <= availableWidth)
+            break;
+        group->hide();
+    }
 }
 
 void MainWindow::syncHorizontalAxisScrollBar(int minimum, int maximum)
@@ -3099,6 +2920,16 @@ void MainWindow::on_axisBtn_pressed()
 
 void MainWindow::on_captureBtn_pressed()
 {
+    captureCurrentView(0);
+}
+
+void MainWindow::on_exportHiResBtn_pressed()
+{
+    captureCurrentView(m_exportDpi);
+}
+
+void MainWindow::captureCurrentView(int requestedDpi)
+{
     SeisFile *file = seisSrc.Sfile();
     if (!file || !file->Active()) {
         showScreenshotToast(
@@ -3108,13 +2939,23 @@ void MainWindow::on_captureBtn_pressed()
         return;
     }
 
-    const int captureDpi = qMax(1, timeView.dpiY());
+    const bool exportHighResolution = requestedDpi > 0;
     const qreal captureScaleX =
-        static_cast<qreal>(captureDpi) /
-        qMax(1, ui->seisFrame->logicalDpiX());
+        exportHighResolution
+            ? static_cast<qreal>(requestedDpi) / timeView.dpiX()
+            : timeView.devicePixelRatio();
     const qreal captureScaleY =
-        static_cast<qreal>(captureDpi) /
-        qMax(1, ui->seisFrame->logicalDpiY());
+        exportHighResolution
+            ? static_cast<qreal>(requestedDpi) / timeView.dpiY()
+            : timeView.devicePixelRatio();
+    const int captureDpiX =
+        exportHighResolution
+            ? requestedDpi
+            : qMax(1, qRound(timeView.dpiX() * captureScaleX));
+    const int captureDpiY =
+        exportHighResolution
+            ? requestedDpi
+            : qMax(1, qRound(timeView.dpiY() * captureScaleY));
     const QRect captureRect(
         QPoint(0, 0),
         QPoint(timeRightScrl->geometry().right() + 1,
@@ -3131,17 +2972,32 @@ void MainWindow::on_captureBtn_pressed()
         return;
     }
     capturedImage.fill(ui->seisFrame->palette().color(QPalette::Window));
-    const int dotsPerMeter =
-        qRound(captureDpi * GfxStyle::MillimetersPerMeter /
-               GfxStyle::MillimetersPerInch);
-    capturedImage.setDotsPerMeterX(dotsPerMeter);
-    capturedImage.setDotsPerMeterY(dotsPerMeter);
+    capturedImage.setDotsPerMeterX(
+        qRound(captureDpiX * GfxStyle::MillimetersPerMeter /
+               GfxStyle::MillimetersPerInch));
+    capturedImage.setDotsPerMeterY(
+        qRound(captureDpiY * GfxStyle::MillimetersPerMeter /
+               GfxStyle::MillimetersPerInch));
 
     QPainter capturePainter(&capturedImage);
     capturePainter.scale(captureScaleX, captureScaleY);
+    QList<GfxView *> captureViews = {
+        &timeView, &timeRightView, &hdrsView,
+        &hdrsBottomView, &seisView, &hlabView
+    };
+    if (exportHighResolution) {
+        for (GfxView *view : captureViews)
+            view->setCaptureScale(captureScaleY);
+    }
     ui->seisFrame->render(&capturePainter, -captureRect.topLeft(),
                           QRegion(captureRect));
     capturePainter.end();
+    if (exportHighResolution) {
+        for (GfxView *view : captureViews) {
+            view->setCaptureScale(0);
+            view->update();
+        }
+    }
 
     const int horizontalOffset = seisScrl->horizontalScrollBar()->value();
     const int verticalOffset = seisScrl->verticalScrollBar()->value();
@@ -3190,6 +3046,8 @@ void MainWindow::on_captureBtn_pressed()
         captureFileName += "_norm";
     if (ui->ckDly->isChecked())
         captureFileName += "_dly";
+    if (exportHighResolution)
+        captureFileName += QString("_%1").arg(requestedDpi);
     captureFileName += ".png";
 
     const QDir outputDirectory(fileInfo.absolutePath());
@@ -3210,11 +3068,16 @@ void MainWindow::on_captureBtn_pressed()
         return;
     }
 
-    showScreenshotToast(
-        this, tr("Screenshot saved"),
-        tr("Screenshot saved to %1")
-            .arg(QDir::toNativeSeparators(outputPath)),
-        ToastPreset::SUCCESS);
+    const QString successTitle =
+        exportHighResolution ? tr("Image exported") : tr("Screenshot saved");
+    const QString successText =
+        exportHighResolution
+            ? tr("Image exported to %1")
+                  .arg(QDir::toNativeSeparators(outputPath))
+            : tr("Screenshot saved to %1")
+                  .arg(QDir::toNativeSeparators(outputPath));
+    showScreenshotToast(this, successTitle, successText,
+                         ToastPreset::SUCCESS);
 }
 
 void MainWindow::on_actionAxes_Setup_triggered()

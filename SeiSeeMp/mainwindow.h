@@ -138,7 +138,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 protected:
-    bool event(QEvent *event) override;
     void resizeEvent(QResizeEvent *event);
 
 public:
@@ -262,6 +261,8 @@ private slots:
 
     void on_captureBtn_pressed();
 
+    void on_exportHiResBtn_pressed();
+
     void on_actionAxes_Setup_triggered();
 
     void on_actionParameters_triggered();
@@ -363,27 +364,11 @@ private slots:
     void on_ckDly_toggled(bool checked);
 
 private:
-    struct InterfaceWidgetMetrics {
-        QFont font;
-        QSize iconSize;
-        QSize minimumSize;
-        QSize maximumSize;
-        QSize windowSize;
-        bool hasIcon = false;
-    };
-
-    struct InterfaceLayoutMetrics {
-        QMargins margins;
-        int spacing;
-    };
-
-    void applyInterfaceDpi(int dpi);
-
     Ui::MainWindow *ui;
-    int m_interfaceDpi = 0;
-    QWindow *m_dpiTrackedWindow = nullptr;
-    QHash<QWidget *, InterfaceWidgetMetrics> m_baseInterfaceMetrics;
-    QHash<QLayout *, InterfaceLayoutMetrics> m_baseInterfaceLayouts;
+
+    void captureCurrentView(int dpi);
+
+    void updateCompactSeismicControls();
 
     //  ReadThread*    WorkThread;
 
@@ -443,6 +428,7 @@ private:
     QScrollBar *horizontalAxisScrollBar;
     QScrollBar *verticalAxisScrollBar;
     VerticalTimeLabel *timeLabel = nullptr;
+    int m_exportDpi = 300;
 
     GfxSrcFile seisSrc;
     GfxObjSeisSect seisSct;

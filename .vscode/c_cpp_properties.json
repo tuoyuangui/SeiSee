@@ -1,0 +1,63 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "compilerPath": "C:/Qt/Tools/mingw810_64/bin/g++.exe",
+            "intelliSenseMode": "windows-gcc-x64",
+            "includePath": [
+                "${workspaceFolder}/SeiSeeMp",
+                "${workspaceFolder}/SegDSeeMp",
+                "${workspaceFolder}/GxLib",
+                "${workspaceFolder}/libUtil2",
+                "${workspaceFolder}/libExprEval",
+                "${workspaceFolder}/libCwp",
+                "${workspaceFolder}/libSegD",
+                "${workspaceFolder}/third_party/qt-toast/src",
+                "C:/Qt/5.15.2/mingw81_64/include",
+                "C:/Qt/5.15.2/mingw81_64/include/QtCore",
+                "C:/Qt/5.15.2/mingw81_64/include/QtGui",
+                "C:/Qt/5.15.2/mingw81_64/include/QtWidgets",
+                "C:/Qt/5.15.2/mingw81_64/include/QtANGLE"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "WIN32",
+                "QT_WIDGETS_LIB",
+                "QT_GUI_LIB",
+                "QT_CORE_LIB"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11"
+        },
+        {
+            "name": "Linux",
+            "compilerPath": "/usr/bin/g++",
+            "intelliSenseMode": "linux-gcc-x64",
+            "includePath": [
+                "${workspaceFolder}/SeiSeeMp",
+                "${workspaceFolder}/SegDSeeMp",
+                "${workspaceFolder}/GxLib",
+                "${workspaceFolder}/libUtil2",
+                "${workspaceFolder}/libExprEval",
+                "${workspaceFolder}/libCwp",
+                "${workspaceFolder}/libSegD",
+                "${workspaceFolder}/third_party/qt-toast/src",
+                "${env:HOME}/Qt/5.15.2/gcc_64/include",
+                "${env:HOME}/Qt/5.15.2/gcc_64/include/QtCore",
+                "${env:HOME}/Qt/5.15.2/gcc_64/include/QtGui",
+                "${env:HOME}/Qt/5.15.2/gcc_64/include/QtWidgets"
+            ],
+            "defines": [
+                "_DEBUG",
+                "QT_WIDGETS_LIB",
+                "QT_GUI_LIB",
+                "QT_CORE_LIB"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11"
+        }
+    ],
+    "version": 4
+}

@@ -11,7 +11,11 @@ GfxView::GfxView(QWidget *parent)
     : QWidget(parent)
 {
     setFixedSize(5000, 5000);
-    m_dpiOverride = GfxStyle::UseScreenDpi;
+    setAutoFillBackground(true);
+    QPalette plotPalette = palette();
+    plotPalette.setColor(QPalette::Window, Qt::white);
+    plotPalette.setColor(QPalette::Base, Qt::white);
+    setPalette(plotPalette);
     m_trackedWindow = nullptr;
     m_trackedScreen = nullptr;
 
@@ -22,6 +26,8 @@ GfxView::GfxView(QWidget *parent)
     int dpiy = GfxStyle::ScreenDpiY(currentScreen);
     m_dpiX = dpix;
     m_dpiY = dpiy;
+    m_devicePixelRatio = 1.0;
+    m_captureScale = 0;
     m_Xpmm = dpix / GfxStyle::MillimetersPerInch;
     m_Ypmm = dpiy / GfxStyle::MillimetersPerInch;
     m_gfx.SetDpi(dpix, dpiy);
@@ -39,18 +45,6 @@ GfxView::~GfxView()
         m_links[n]->setView(NULL);
 }
 // ----------------------------------------------------------------------
-
-void GfxView::setDpiOverride(int dpi)
-{
-    if (dpi < GfxStyle::UseScreenDpi)
-        dpi = GfxStyle::UseScreenDpi;
-    if (m_dpiOverride == dpi)
-        return;
-
-    m_dpiOverride = dpi;
-    RefreshScreenDpi();
-    update();
-}
 
 void GfxView::refreshScreenDpi()
 {
@@ -118,26 +112,25 @@ void GfxView::RefreshScreenDpi()
 
     int dpiX = GfxStyle::ScreenDpiX(currentScreen);
     int dpiY = GfxStyle::ScreenDpiY(currentScreen);
-    if (m_dpiOverride > GfxStyle::UseScreenDpi) {
-        dpiX = m_dpiOverride;
-        dpiY = m_dpiOverride;
-    }
-
-    ApplyDpi(dpiX, dpiY);
+    ApplyDpi(dpiX, dpiY, devicePixelRatioF());
 }
 
-void GfxView::ApplyDpi(int dpiX, int dpiY)
+void GfxView::ApplyDpi(int dpiX, int dpiY, qreal devicePixelRatio)
 {
     if (dpiX <= 0)
         dpiX = GfxStyle::ReferenceDpi;
     if (dpiY <= 0)
         dpiY = GfxStyle::ReferenceDpi;
+    if (devicePixelRatio <= 0)
+        devicePixelRatio = 1.0;
 
-    if (m_dpiX == dpiX && m_dpiY == dpiY)
+    if (m_dpiX == dpiX && m_dpiY == dpiY &&
+        qFuzzyCompare(m_devicePixelRatio, devicePixelRatio))
         return;
 
     m_dpiX = dpiX;
     m_dpiY = dpiY;
+    m_devicePixelRatio = devicePixelRatio;
     m_Xpmm = dpiX / GfxStyle::MillimetersPerInch;
     m_Ypmm = dpiY / GfxStyle::MillimetersPerInch;
     m_gfx.SetDpi(dpiX, dpiY);
@@ -208,18 +201,21 @@ void GfxView::paintEvent(QPaintEvent *pe)
     int screenDpiY = currentScreen
                          ? GfxStyle::ScreenDpiY(currentScreen)
                          : engine->paintDevice()->logicalDpiY();
-    int dpix =
-        m_dpiOverride > GfxStyle::UseScreenDpi ? m_dpiOverride : screenDpiX;
-    int dpiy =
-        m_dpiOverride > GfxStyle::UseScreenDpi ? m_dpiOverride : screenDpiY;
+    int dpix = screenDpiX;
+    int dpiy = screenDpiY;
+    const qreal devicePixelRatio = this->devicePixelRatioF();
 
-    bool dpiWasChanged = dpix != m_dpiX || dpiy != m_dpiY;
+    bool dpiWasChanged =
+        dpix != m_dpiX || dpiy != m_dpiY ||
+        !qFuzzyCompare(m_devicePixelRatio, devicePixelRatio);
     if (dpiWasChanged)
-        ApplyDpi(dpix, dpiy);
+        ApplyDpi(dpix, dpiy, devicePixelRatio);
 
     //   qDebug() << "m_Ypmm:" << m_Ypmm;
 
-    m_gfx.SetViewPort(&painter, &r, dpix, dpiy);
+    const qreal renderScale =
+        m_captureScale > 0 ? m_captureScale : devicePixelRatio;
+    m_gfx.SetViewPort(&painter, &r, dpix, dpiy, renderScale);
 
     int rc = receivers(SIGNAL(OnPrevDraw(GfxView *)));
     if (rc > 0) {

@@ -76,6 +76,7 @@ protected:
 
     int m_dpiX;
     int m_dpiY;
+    qreal m_devicePixelRatio;
 
     int _cy[SZ];
     int _cv[SZ];
@@ -99,7 +100,8 @@ protected:
 public:
     explicit Gfx();
 
-    void SetViewPort(QPainter *p, QRect *r, int dpiX = 0, int dpiY = 0);
+    void SetViewPort(QPainter *p, QRect *r, int dpiX = 0, int dpiY = 0,
+                     qreal devicePixelRatio = 1.0);
     void SetDpi(int dpiX, int dpiY);
 
     void Paint();
@@ -180,6 +182,23 @@ public:
     int W()
     {
         return m_w;
+    }
+
+    int ClipX() const
+    {
+        return m_x;
+    }
+    int ClipY() const
+    {
+        return m_y;
+    }
+    int ClipWidth() const
+    {
+        return m_w;
+    }
+    int ClipHeight() const
+    {
+        return m_h;
     }
 
     void SetPixel(int v, int x, int y);

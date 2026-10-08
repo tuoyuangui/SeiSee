@@ -30,7 +30,8 @@ protected:
     double m_Ys;
     int m_dpiX;
     int m_dpiY;
-    int m_dpiOverride;
+    qreal m_devicePixelRatio;
+    qreal m_captureScale;
     QPointer<QWindow> m_trackedWindow;
     QPointer<QScreen> m_trackedScreen;
     QMetaObject::Connection m_screenDpiConnection;
@@ -49,7 +50,7 @@ protected:
     void TrackWindowScreen();
     void TrackScreen(QScreen *screen);
     void RefreshScreenDpi();
-    void ApplyDpi(int dpiX, int dpiY);
+    void ApplyDpi(int dpiX, int dpiY, qreal devicePixelRatio);
 
     //  GfxObj* ObjHit(int x, int y);
 
@@ -72,6 +73,21 @@ public:
         return m_dpiY;
     }
 
+    qreal devicePixelRatio() const
+    {
+        return m_devicePixelRatio;
+    }
+
+    int dpiX() const
+    {
+        return m_dpiX;
+    }
+
+    void setCaptureScale(qreal scale)
+    {
+        m_captureScale = scale > 0 ? scale : 0;
+    }
+
     double Xs()
     {
         return m_Xs;
@@ -81,12 +97,6 @@ public:
         return m_Ys;
     }
 
-    int dpiOverride() const
-    {
-        return m_dpiOverride;
-    }
-
-    void setDpiOverride(int dpi);
     void refreshScreenDpi();
 
     void setXs(double v)

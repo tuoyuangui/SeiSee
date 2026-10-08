@@ -15,6 +15,8 @@ protected:
     int *_sj;
     int _nj;
     int _ns;
+    int _presetClipY;
+    int _presetClipHeight;
 
     double m_Ti; // Increment for time lines
     bool m_Tl;   // Show Time Lines

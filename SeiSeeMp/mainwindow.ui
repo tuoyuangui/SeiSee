@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1193</width>
+    <width>1230</width>
     <height>874</height>
    </rect>
   </property>
@@ -42,7 +42,7 @@
       <widget class="QGroupBox" name="dirGroup">
        <property name="minimumSize">
         <size>
-         <width>250</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>
@@ -113,14 +113,14 @@
             <property name="leftMargin">
              <number>2</number>
             </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
             <property name="rightMargin">
              <number>2</number>
             </property>
             <property name="bottomMargin">
              <number>1</number>
-            </property>
-            <property name="topMargin">
-             <number>2</number>
             </property>
             <item>
              <widget class="QPushButton" name="selDirBtn">
@@ -257,7 +257,7 @@
       <widget class="QGroupBox" name="HdrBox">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -797,7 +797,7 @@
           <widget class="QFrame" name="frame_2">
            <property name="minimumSize">
             <size>
-             <width>565</width>
+             <width>0</width>
              <height>0</height>
             </size>
            </property>
@@ -921,7 +921,7 @@
                <item>
                 <widget class="QGroupBox" name="groupBox_2">
                  <property name="title">
-                  <string>Wggle Fill</string>
+                  <string>Wiggle Fill</string>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_7">
                   <property name="spacing">
@@ -1177,14 +1177,14 @@
                      <widget class="QPushButton" name="zoomHallBtn">
                       <property name="minimumSize">
                        <size>
-                        <width>18</width>
-                        <height>18</height>
+                        <width>25</width>
+                        <height>25</height>
                        </size>
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>18</width>
-                        <height>18</height>
+                        <width>25</width>
+                        <height>25</height>
                        </size>
                       </property>
                       <property name="text">
@@ -1273,13 +1273,13 @@
                     </item>
                     <item>
                      <widget class="QPushButton" name="procParmBtn">
-                       <property name="minimumSize">
-                        <size>
-                         <width>25</width>
-                         <height>25</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
+                      <property name="minimumSize">
+                       <size>
+                        <width>25</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
                        <size>
                         <width>25</width>
                         <height>25</height>
@@ -1652,6 +1652,35 @@
                   </widget>
                  </item>
                  <item>
+                  <widget class="QPushButton" name="exportHiResBtn">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>25</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>25</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="myrc.qrc">
+                     <normaloff>:/images/Export_image.png</normaloff>:/images/Export_image.png</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <spacer name="verticalSpacer_3">
                    <property name="orientation">
                     <enum>Qt::Vertical</enum>
@@ -1855,7 +1884,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>250</width>
+                  <width>0</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -2623,7 +2652,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>250</width>
+                  <width>0</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -3172,7 +3201,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1193</width>
+     <width>1230</width>
      <height>22</height>
     </rect>
    </property>

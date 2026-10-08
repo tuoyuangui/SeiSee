@@ -10,36 +10,27 @@ namespace GfxStyle {
     constexpr int ReferenceDpi = 96;
     constexpr int StandardIconSize = 18;
     constexpr int StandardIconButtonSize = 25;
+    // Checkbox/radio indicator dimensions and label spacing, in logical pixels.
+    constexpr int CheckBoxIndicatorSize = 16;
+    constexpr int RadioButtonIndicatorSize = 16;
+    constexpr int CheckIndicatorLabelSpacing = 6;
     constexpr int DirectoryButtonsWidth = 130;
     constexpr int DirectoryButtonsHeight = 30;
     constexpr int StandardIconCellSize = StandardIconButtonSize + 4;
     constexpr double MillimetersPerInch = 25.4;
     constexpr double MillimetersPerMeter = 1000.0;
-    // 0 表示使用当前屏幕 DPI，而不是固定 DPI。
-    constexpr int UseScreenDpi = 0;
-    // Qt normalizes logical DPI to 96 when high-DPI scaling is enabled.
-    // Include the screen scale factor to recover the effective screen DPI.
+    // AA_EnableHighDpiScaling 开启后，绘制与布局统一工作在 Qt 逻辑像素坐标系。
     inline int ScreenDpiX(const QScreen *screen)
     {
-        return screen
-                   ? qMax(1, qRound(screen->logicalDotsPerInchX() *
-                                    screen->devicePixelRatio()))
-                   : ReferenceDpi;
+        return screen ? qMax(1, qRound(screen->logicalDotsPerInchX()))
+                      : ReferenceDpi;
     }
 
     inline int ScreenDpiY(const QScreen *screen)
     {
-        return screen
-                   ? qMax(1, qRound(screen->logicalDotsPerInchY() *
-                                    screen->devicePixelRatio()))
-                   : ReferenceDpi;
+        return screen ? qMax(1, qRound(screen->logicalDotsPerInchY()))
+                      : ReferenceDpi;
     }
-
-    // Appearance 菜单提供给用户选择的常见固定 DPI。
-    static const int CommonDisplayDpis[] = {ReferenceDpi, 120, 144, 168,
-                                            192,          240, 288, 384};
-    constexpr int CommonDisplayDpiCount =
-        sizeof(CommonDisplayDpis) / sizeof(CommonDisplayDpis[0]);
 
     // 应用界面字体；Qt 资源路径对应 fonts/Roboto-Regular-14.ttf。
     static const char UiFontResource[] = ":/fonts/Roboto-Regular-14.ttf";

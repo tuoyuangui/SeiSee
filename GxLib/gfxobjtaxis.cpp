@@ -24,7 +24,6 @@ int GfxObjTAxis::RequiredWidth() const
         QString::fromLatin1(GfxStyle::TimeAxisWidthSample));
     int labelGap = axisGfx->ScaleX(GfxStyle::TimeAxisLabelGap);
 
-    // 刻度线位于 labelGap 预留的区间内；轴线本身占一个物理像素。
     return labelWidth + labelGap + GfxStyle::AxisLineWidthPixels;
 }
 
@@ -36,9 +35,8 @@ void GfxObjTAxis::DoDraw()
     double Y1 = min(m_Y1, m_Y2);
     double Y2 = max(m_Y1, m_Y2);
 
-    int x1 = 0;               // x2pix(X1);
-    int x2 = m_view->width(); // x2pix(X2);
-    int x3 = gfx->W();
+    int x1 = 0;
+    int x2 = m_view->width();
 
     int y1 = y2pix(Y1);
     int y2 = y2pix(Y2);

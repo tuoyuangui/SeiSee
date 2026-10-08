@@ -14,6 +14,7 @@ CONFIG += warn_off
 CONFIG += c++11
 
 SOURCES += main.cpp\
+    dpiindicatorstyle.cpp \
     edithdrdialog.cpp \
         mainwindow.cpp \
     procparmdialog.cpp \
@@ -24,6 +25,7 @@ SOURCES += main.cpp\
     diffdialog.cpp
 
 HEADERS  += mainwindow.h \
+    dpiindicatorstyle.h \
     edithdrdialog.h \
     procparmdialog.h \
     aboutdialog.h \

@@ -45,10 +45,9 @@ void GfxObjSeisHdrs::DoDraw()
         x2 = tmp;
     }
 
-    int y1 = 0;                //   y2pix(Y1);
-    int y2 = m_view->height(); //   y2pix(Y2);
+    int y1 = 0;
+    int y2 = m_view->height();
 
-    //  gfx->DrawRect(x1,y1,x2-1,y2-1,0);
     int axisY = m_bottomSide ? y1 : y2 - GfxStyle::AxisLineWidthPixels;
 
     gfx->DrawLine(x1, axisY, m_view->width() - GfxStyle::AxisLineWidthPixels,

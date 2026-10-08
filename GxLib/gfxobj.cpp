@@ -143,9 +143,6 @@ void GfxObj::Draw()
     if (!m_view)
         return;
 
-    //  xpmm = m_view->Xpmm();
-    //  ypmm = m_view->Ypmm();
-
     xpmm = m_view->Xpmm() * m_view->Xs();
     ypmm = m_view->Ypmm() * m_view->Ys();
 

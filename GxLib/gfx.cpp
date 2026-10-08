@@ -249,6 +249,7 @@ Gfx::Gfx()
     m_size = GfxStyle::LabelFontPointSize;
     m_dpiX = GfxStyle::ReferenceDpi;
     m_dpiY = GfxStyle::ReferenceDpi;
+    m_devicePixelRatio = 1.0;
     _img = QImage(1, 1, QImage::Format_RGB32);
     SetDpi(m_dpiX, m_dpiY);
 
@@ -266,12 +267,11 @@ Gfx::Gfx()
     }
 }
 
-void Gfx::SetViewPort(QPainter *p, QRect *r, int dpiX, int dpiY)
+void Gfx::SetViewPort(QPainter *p, QRect *r, int dpiX, int dpiY,
+                      qreal devicePixelRatio)
 {
-    int x = r->left();
-    int y = r->top();
-    int w = r->width();
-    int h = r->height();
+    if (devicePixelRatio <= 0)
+        devicePixelRatio = 1.0;
 
     _vpainter = p;
     if (dpiX <= 0)
@@ -280,22 +280,26 @@ void Gfx::SetViewPort(QPainter *p, QRect *r, int dpiX, int dpiY)
     if (dpiY <= 0)
         dpiY = p && p->device() ? p->device()->logicalDpiY()
                                 : GfxStyle::ReferenceDpi;
-
     if (_ipainter.isActive())
         _ipainter.end();
 
-    m_x = x;
-    m_y = y;
+    m_x = r->left();
+    m_y = r->top();
+    m_w = qMax(1, r->width());
+    m_h = qMax(1, r->height());
+    m_devicePixelRatio = devicePixelRatio;
 
-    if ((m_w != w) || (m_h != h)) {
-        m_w = w;
-        m_h = h;
-        _img = QImage(m_w, m_h, QImage::Format_RGB32);
+    const int imageWidth =
+        qMax(1, static_cast<int>(ceil(m_w * devicePixelRatio)));
+    const int imageHeight =
+        qMax(1, static_cast<int>(ceil(m_h * devicePixelRatio)));
+    if (_img.width() != imageWidth || _img.height() != imageHeight) {
+        _img = QImage(imageWidth, imageHeight, QImage::Format_RGB32);
     }
-
     SetDpi(dpiX, dpiY);
     _img.fill(QColor(255, 255, 255).rgb());
     _ipainter.begin(&_img);
+    _ipainter.scale(devicePixelRatio, devicePixelRatio);
 
     _ipainter.setFont(_font);
 }
@@ -347,25 +351,28 @@ void Gfx::ApplyFontPointSize(double pointSize)
 
 void Gfx::mSetPixel(int c, int x, int y)
 {
-    if (_trim) {
-        if (m_h > 0 && (x) >= 0 && (x) < m_w && (y) >= 0 && (y) < m_h &&
-            (x) >= m_tx1 && (x) <= m_tx2 && (y) >= m_ty1 && (y) <= m_ty2) {
-            _img.setPixel(x, y, c);
-            //{ int cc = (c); char* a = (m_Scn[(y)]+(((x)<<1)+(x)));
-            // memcpy(a,&cc,3);
-            //}
-        }
-    } else {
-        if (m_h > 0 && (x) >= 0 && (x) < m_w && (y) >= 0 && (y) < m_h) {
-            _img.setPixel(x, y, c);
-            //{ int cc = (c); char* a = (m_Scn[(y)]+(((x)<<1)+(x)));
-            // memcpy(a,&cc,3);
-            //}
-        }
-    }
+    const bool inBounds =
+        m_h > 0 && x >= 0 && x < m_w && y >= 0 && y < m_h;
+    const bool inTrim = !_trim ||
+                        (x >= m_tx1 && x <= m_tx2 && y >= m_ty1 &&
+                         y <= m_ty2);
+    if (!inBounds || !inTrim)
+        return;
 
-    //    if( m_h>0 && (x) >=0  && (x) <  m_w && (y) >=0 && (y) <  m_h )
-    //       _img.setPixel(x,y,c);
+    const int x1 = qMax(0, Round(x * m_devicePixelRatio));
+    const int x2 = qMin(
+        _img.width(),
+        qMax(x1 + 1, Round((x + 1) * m_devicePixelRatio)));
+    const int y1 = qMax(0, Round(y * m_devicePixelRatio));
+    const int y2 = qMin(
+        _img.height(),
+        qMax(y1 + 1, Round((y + 1) * m_devicePixelRatio)));
+
+    for (int py = y1; py < y2; ++py) {
+        QRgb *line = reinterpret_cast<QRgb *>(_img.scanLine(py));
+        for (int px = x1; px < x2; ++px)
+            line[px] = c;
+    }
 }
 
 void Gfx::Paint()
@@ -373,7 +380,7 @@ void Gfx::Paint()
     if (_vpainter == NULL)
         return;
 
-    _vpainter->drawImage(m_x, m_y, _img, 0, 0, m_w, m_h);
+    _vpainter->drawImage(QRect(m_x, m_y, m_w, m_h), _img);
 }
 
 void Gfx::DrawLine(int x0, int y0, int x1, int y1, int cidx)

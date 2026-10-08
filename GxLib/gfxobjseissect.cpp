@@ -11,11 +11,15 @@ GfxObjSeisSect::GfxObjSeisSect(QObject *parent)
 
     _si = NULL;
     _sj = NULL;
+    _nj = 0;
+    _ns = 0;
 
     m_Ti = 0.100;
     m_Tl = false;
 
     m_Mode = 0;
+    _presetClipY = -1;
+    _presetClipHeight = -1;
 }
 
 GfxObjSeisSect::~GfxObjSeisSect()
@@ -206,6 +210,10 @@ void   GfxObjSeisSect::DoDraw()
 
 void GfxObjSeisSect::DoDraw()
 {
+    if (_preset || _presetClipY != gfx->ClipY() ||
+        _presetClipHeight != gfx->ClipHeight())
+        DoPreset();
+
     double p;
 
     int xa = x2pix(m_X1);
@@ -235,8 +243,10 @@ void GfxObjSeisSect::DoDraw()
 
     xp = 0;
 
-    pl = pix2x(L);
-    pr = pix2x(R);
+    const int clipLeft = gfx->ClipX();
+    const int clipRight = clipLeft + gfx->ClipWidth() - 1;
+    pl = pix2x(clipLeft);
+    pr = pix2x(clipRight);
 
     nl = s_src->Tx(pl);
     nr = s_src->Tx(pr);
@@ -262,6 +272,8 @@ void GfxObjSeisSect::DoDraw()
         n1 = 0;
     if (n2 < 0)
         n2 = s_src->Nt() - 1;
+    nl = qBound(0, nl, s_src->Nt() - 1);
+    nr = qBound(0, nr, s_src->Nt() - 1);
 
     int lx = 0;
     int rx = R - L + 1;
@@ -282,7 +294,9 @@ void GfxObjSeisSect::DoDraw()
 
             // printf("nl=%d nr=%d\n",nl,nr); fflush(stdout);
 
-            for (o = 1, nc = nl - 2; nc < nr + 2; nc++) {
+            const int firstColorTrace = qMax(0, nl - 2);
+            const int lastColorTrace = qMin(s_src->Nt() - 1, nr + 1);
+            for (o = 1, nc = firstColorTrace; nc <= lastColorTrace; nc++) {
                 p = s_src->Tp(nc);
                 xc = x2pix(p);
 
@@ -328,23 +342,21 @@ void GfxObjSeisSect::DoDraw()
     int _wc = m_WLcolor;
 
     xp = x2fpix(s_src->Tp(n1));
-    xc = x2fpix(s_src->Tp(n1 + 1));
+    const int nextTrace = qMin(n1 + 1, s_src->Nt() - 1);
+    xc = x2fpix(s_src->Tp(nextTrace));
 
     int desiredTraceSpacing = gfx->ScaleX(GfxStyle::HeaderAxisMinTickSpacing);
-    int step = desiredTraceSpacing / fabs(xp - xc);
+    const double tracePixelSpacing = fabs(xp - xc);
+    int step = tracePixelSpacing > 0
+                   ? qMax(1, qRound(desiredTraceSpacing / tracePixelSpacing))
+                   : 1;
     if (step < 1)
         step = 1;
 
     if (m_DispWig) {
-        nc = nl - 10;
+        int na = (nl / step) * step;
 
-        int na = nl / step - 10;
-        int nb = nr / step + 10;
-
-        na = na * step;
-        nb = nb * step;
-
-        for (o = 1, nc = na; nc < nb; nc += step) {
+        for (o = 1, nc = na; nc <= nr; nc += step) {
             xc = x2pix(s_src->Tp(nc));
 
             Ttr trc = s_src->Tt(nc);
@@ -352,6 +364,8 @@ void GfxObjSeisSect::DoDraw()
             if (trc._buf && PointInRange(n1, n2, nc))
                 gfx->DrawWiggleTraceTB(xc, _si, _sj, _nj, trc, _fil, wg * step,
                                        clp * step, _fc, _wc);
+            if (step > nr - nc)
+                break;
         }
     }
 
@@ -370,10 +384,22 @@ void GfxObjSeisSect::DoDraw()
     if (!m_Tl || m_Ti <= 0)
         return;
 
-    double t;
+    const double clipTime1 = pix2y(gfx->ClipY());
+    const double clipTime2 =
+        pix2y(gfx->ClipY() + gfx->ClipHeight() - 1);
+    const double firstVisibleTime =
+        qMax(m_Y1, qMin(clipTime1, clipTime2));
+    const double lastVisibleTime =
+        qMin(m_Y2, qMax(clipTime1, clipTime2));
+    if (lastVisibleTime < firstVisibleTime)
+        return;
 
-    for (t = m_Y1; t <= m_Y2; t += m_Ti) {
-        int s = y2pix(t);
+    const int firstTick = qMax(
+        0, static_cast<int>(ceil((firstVisibleTime - m_Y1) / m_Ti)));
+    const int lastTick =
+        static_cast<int>(floor((lastVisibleTime - m_Y1) / m_Ti));
+    for (int tick = firstTick; tick <= lastTick; ++tick) {
+        int s = y2pix(m_Y1 + tick * m_Ti);
         gfx->DrawHLine(s, L, R, 0, 0);
     }
 }
@@ -382,33 +408,36 @@ void GfxObjSeisSect::DoDraw()
 
 void GfxObjSeisSect::DoPreset()
 {
-    int i, j, ns1, ns2, nso, nsn;
+    int nso, nsn;
 
-    if (!s_src)
+    if (!s_src || !gfx) {
+        _nj = 0;
+        _presetClipY = -1;
+        _presetClipHeight = -1;
+        _preset = false;
         return;
+    }
 
     double to = s_src->To();
     double si = s_src->Si();
     int ns = s_src->Ns();
 
     if (ns <= 0 || si <= 0) {
-        ns = 0;
         _nj = 0;
+        _presetClipY = gfx->ClipY();
+        _presetClipHeight = gfx->ClipHeight();
+        _preset = false;
         return;
     }
 
-    nso = ns1 = (m_Y1 - to) / si;
-    nsn = ns2 = (m_Y2 - to) / si;
-
-    if (nso < 0)
-        nso = 0;
-    if (nso > ns)
-        nso = ns;
-    //   if(nsn<0) nsn=0; if(nsn>ns) nsn=ns;
+    nso = qBound(0, static_cast<int>((m_Y1 - to) / si), ns - 1);
+    nsn = qBound(0, static_cast<int>((m_Y2 - to) / si), ns - 1);
 
     if (nso == nsn) {
-        _ns = 0;
         _nj = 0;
+        _presetClipY = gfx->ClipY();
+        _presetClipHeight = gfx->ClipHeight();
+        _preset = false;
         return;
     }
 
@@ -418,36 +447,51 @@ void GfxObjSeisSect::DoPreset()
     int so = y2pix(ta);
     int sn = y2pix(tb);
 
-    if (_si)
-        delete[] _si;
-    _si = NULL;
-    if (_sj)
-        delete[] _sj;
-    _sj = NULL;
-
-    _ns = abs(nsn - nso) + 1;
-
-    if (_ns <= 0)
+    const int clipTop = gfx->ClipY();
+    const int clipBottom = clipTop + gfx->ClipHeight() - 1;
+    if (clipBottom < clipTop) {
+        _nj = 0;
+        _presetClipY = clipTop;
+        _presetClipHeight = gfx->ClipHeight();
+        _preset = false;
         return;
-
-    _si = new int[_ns];
-    _sj = new int[_ns];
-
-    //  memset(_si,0,sizeof(int)*_ns);
-
-    Bresenham(nso, so, nsn, sn, _si, _sj);
-
-    int sjp;
-
-    for (i = j = 0; i < _ns; i++) {
-        if (i == 0 || _sj[i] != sjp) {
-            sjp = _sj[j] = _sj[i];
-            _si[j] = _si[i];
-            j++;
-        }
     }
 
-    _nj = j;
+    const int dataTop = qMin(so, sn);
+    const int dataBottom = qMax(so, sn);
+    const int firstY = qMax(dataTop, clipTop - 1);
+    const int lastY = qMin(dataBottom, clipBottom + 1);
+    if (lastY < firstY) {
+        _nj = 0;
+        _presetClipY = clipTop;
+        _presetClipHeight = gfx->ClipHeight();
+        _preset = false;
+        return;
+    }
+
+    const int visibleRows = lastY - firstY + 1;
+    if (visibleRows != _ns) {
+        delete[] _si;
+        delete[] _sj;
+        _si = new int[visibleRows];
+        _sj = new int[visibleRows];
+        _ns = visibleRows;
+    }
+
+    const int pixelSpan = sn - so;
+    const int sampleSpan = nsn - nso;
+    for (int row = 0; row < visibleRows; ++row) {
+        const int y = firstY + row;
+        const double fraction =
+            pixelSpan == 0 ? 0.0 : double(y - so) / pixelSpan;
+        _si[row] = qBound(
+            0, nso + qRound(fraction * sampleSpan), ns - 1);
+        _sj[row] = y;
+    }
+
+    _nj = visibleRows;
+    _presetClipY = clipTop;
+    _presetClipHeight = gfx->ClipHeight();
     _preset = false;
 }
 
