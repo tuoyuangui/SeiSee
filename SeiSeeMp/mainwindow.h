@@ -42,7 +42,7 @@
 
 #include "workthread.h"
 
-#define VERSION "4.0.0-alpha.2"
+#define VERSION "4.0.0-alpha.3"
 
 /*
 class zdata
@@ -402,6 +402,7 @@ private:
 
     double _f1, _f2, _f3, _f4;
     double _agcw;
+    int _agcType;
 
     double _dly_min;
     double _dly_max;
@@ -429,6 +430,7 @@ private:
     QScrollBar *verticalAxisScrollBar;
     VerticalTimeLabel *timeLabel = nullptr;
     int m_exportDpi = 300;
+    QMenu *m_exportDpiMenu = nullptr;
 
     GfxSrcFile seisSrc;
     GfxObjSeisSect seisSct;

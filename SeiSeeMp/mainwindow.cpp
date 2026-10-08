@@ -170,12 +170,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
 
-    QMenu *exportDpiMenu = ui->menuView->addMenu(tr("Export image DPI"));
+    m_exportDpiMenu = ui->menuView->addMenu(tr("Export image DPI"));
     QActionGroup *exportDpiGroup = new QActionGroup(this);
     exportDpiGroup->setExclusive(true);
     for (int dpi : {300, 400, 600}) {
         QAction *dpiAction =
-            exportDpiMenu->addAction(tr("%1 DPI").arg(dpi));
+            m_exportDpiMenu->addAction(tr("%1 DPI").arg(dpi));
         dpiAction->setCheckable(true);
         dpiAction->setData(dpi);
         dpiAction->setChecked(dpi == m_exportDpi);
@@ -339,6 +339,7 @@ MainWindow::MainWindow(QWidget *parent)
     _f4 = 1000;
 
     _agcw = 1000;
+    _agcType = 0;
 
     _dly_min = 0;
     _dly_max = 0;
@@ -993,7 +994,7 @@ void MainWindow::execProc(SeisFile *sf, int ns, double si, float *smp)
         if (n > 0) {
             maxa = MaxAmp(smp, ns);
             Normalize(smp, maxa, ns);
-            Agc(smp, n, ns);
+            Agc(smp, n, ns, _agcType);
             maxa = MaxAmp(smp, ns);
             Normalize(smp, maxa, ns);
         }
@@ -2286,6 +2287,18 @@ void MainWindow::GetRegInfo()
     _f4 = settings.value("F4", 1000).toInt();
 
     _agcw = settings.value("AgcW", 1000).toInt();
+    const int savedAgcType = settings.value("AgcType", 0).toInt();
+    _agcType = qBound(0, savedAgcType, 1);
+
+    const int savedSeismicDpi = settings.value("SeismicDpi", 300).toInt();
+    m_exportDpi =
+        savedSeismicDpi == 400 || savedSeismicDpi == 600
+            ? savedSeismicDpi
+            : 300;
+    if (m_exportDpiMenu) {
+        for (QAction *action : m_exportDpiMenu->actions())
+            action->setChecked(action->data().toInt() == m_exportDpi);
+    }
 
     double xs = settings.value("Xs", 1.0).toDouble();
     double ys = settings.value("Ys", 1.0).toDouble();
@@ -2424,6 +2437,8 @@ void MainWindow::SaveRegInfo()
     settings.setValue("F4", _f4);
 
     settings.setValue("AgcW", _agcw);
+    settings.setValue("AgcType", _agcType);
+    settings.setValue("SeismicDpi", m_exportDpi);
 
     settings.setValue("Xs", seisView.Xs());
     settings.setValue("Ys", seisView.Ys());
@@ -2728,6 +2743,7 @@ void MainWindow::on_procParmBtn_pressed()
     ProcParmDlg.f3 = _f3;
     ProcParmDlg.f4 = _f4;
     ProcParmDlg.agcw = _agcw;
+    ProcParmDlg.agcType = _agcType;
     ProcParmDlg.agc = ui->ckAgc->isChecked();
     ProcParmDlg.norm = ui->ckNorm->isChecked();
     ProcParmDlg.filt = ui->ckFilt->isChecked();
@@ -2742,6 +2758,7 @@ void MainWindow::procParmEvent()
     _f3 = ProcParmDlg.f3;
     _f4 = ProcParmDlg.f4;
     _agcw = ProcParmDlg.agcw;
+    _agcType = ProcParmDlg.agcType;
 
     ui->ckAgc->setChecked(ProcParmDlg.agc);
     ui->ckNorm->setChecked(ProcParmDlg.norm);

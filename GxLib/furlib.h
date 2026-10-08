@@ -26,7 +26,7 @@ void FastFourierTransformation(float *cxxr, float *cxxi, int lx, int isign);
 
 int HilbertTransformation(int nn, float inp[], float outr[], float outi[]);
 
-void Agc(float *data, int iwagc, int nt);
+void Agc(float *data, int iwagc, int nt, int typeagc = 1);
 float MaxAmp(float *data, int nt);
 void Normalize(float *data, float mx, int nt);
 
