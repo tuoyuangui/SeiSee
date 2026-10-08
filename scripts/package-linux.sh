@@ -3,7 +3,23 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
-VERSION="${VERSION:-4.0.0-alpha.1}"
+VERSION="${VERSION:-}"
+if [[ -z "$VERSION" ]]; then
+    VERSION_HEADER="$REPO_ROOT/SeiSeeMp/mainwindow.h"
+    [[ -f "$VERSION_HEADER" ]] || {
+        echo "Error: version header not found: $VERSION_HEADER" >&2
+        exit 1
+    }
+    mapfile -t versions < <(
+        sed -nE 's/^[[:space:]]*#[[:space:]]*define[[:space:]]+VERSION[[:space:]]+"([^"]+)"[[:space:]]*$/\1/p' \
+            "$VERSION_HEADER"
+    )
+    ((${#versions[@]} == 1)) || {
+        echo "Error: expected exactly one #define VERSION \"value\" in $VERSION_HEADER; found ${#versions[@]}." >&2
+        exit 1
+    }
+    VERSION="${versions[0]}"
+fi
 SAFE_VERSION="${VERSION//[^A-Za-z0-9._-]/-}"
 QMAKE="${QMAKE:-qmake}"
 MAKE="${MAKE:-make}"

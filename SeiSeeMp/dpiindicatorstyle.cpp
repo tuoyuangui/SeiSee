@@ -136,7 +136,16 @@ public:
         if (element == CE_MenuItem) {
             const QStyleOptionMenuItem *menuOption =
                 qstyleoption_cast<const QStyleOptionMenuItem *>(option);
-            QProxyStyle::drawControl(element, option, painter, widget);
+            if (menuOption &&
+                menuOption->checkType == QStyleOptionMenuItem::Exclusive &&
+                menuOption->checked) {
+                QStyleOptionMenuItem itemWithoutCheck(*menuOption);
+                itemWithoutCheck.checked = false;
+                QProxyStyle::drawControl(element, &itemWithoutCheck,
+                                         painter, widget);
+            } else {
+                QProxyStyle::drawControl(element, option, painter, widget);
+            }
             if (menuOption &&
                 menuOption->checkType == QStyleOptionMenuItem::Exclusive &&
                 menuOption->checked) {
@@ -154,17 +163,8 @@ public:
                         ? menuOption->palette.color(
                               QPalette::HighlightedText)
                         : menuOption->palette.color(QPalette::Text);
-                const QPalette::ColorRole backgroundRole =
-                    menuOption->state & State_Selected
-                        ? QPalette::Highlight
-                        : QPalette::Button;
-
                 painter->save();
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->setPen(Qt::NoPen);
-                painter->setBrush(menuOption->palette.color(
-                    QPalette::Active, backgroundRole));
-                painter->drawRect(markerRect);
 
                 const qreal markSize = qMin(
                     markerRect.height() * 0.52,
