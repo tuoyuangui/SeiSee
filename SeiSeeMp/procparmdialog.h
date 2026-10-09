@@ -22,6 +22,7 @@ public:
 
     double f1, f2, f3, f4;
     double agcw;
+    int agcType;
     bool filt;
     bool agc;
     bool norm;

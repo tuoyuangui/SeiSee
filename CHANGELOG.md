@@ -2,6 +2,17 @@
 
 本文件记录 SeiSee 独立维护版本的用户可见变更。版本号与 `SeiSeeMp/mainwindow.h` 中的 `VERSION` 保持一致。
 
+## [4.0.0-alpha.3] - 2026-10-09
+
+### 新增
+
+- 增加图件导出功能，提供300 400 600DPI图件导出。
+- 增加AGC的Statistical Type，包含ABS/RMS。
+  
+### 修复
+
+- Windows/Linux 显示效果统一优化
+
 ## [4.0.0-alpha.2] - 2026-10-07
 
 ### 改进

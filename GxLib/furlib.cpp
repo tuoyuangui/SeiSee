@@ -2,10 +2,11 @@
 
 // #include <vcl.h>
 
+#include "furlib.h"
+
 #include <math.h>
 #include <string.h>
 
-#include "furlib.h"
 #include "util2.h"
 
 //---------------------------------------------------------------------------
@@ -649,14 +650,37 @@ int BandPass(float *inp, float *out, int hz1, int hz2, int hz3, int hz4,
 }
 
 // Automatic Gain Control--standard box
-void Agc(float *data, int iwagc, int nt)
+/*
+Input Parameters
+----------------
+data    - input trace; the AGC result is written back to this array
+iwagc   - half-length of the sliding statistical window (samples)
+nt      - number of samples in the trace
+typeagc - statistical type: 0 for mean absolute amplitude, 1 for RMS
+
+For each sample, the gain is calculated from the selected statistic over its
+sliding window. At the trace boundaries, the statistic uses the available
+samples only.
+*/
+void Agc(float *data, int iwagc, int nt, int typeagc)
 {
-    static float *agcdata;
+    float *agcdata;
     register int i;
     register double val;
     register double sum;
     register int nwin;
-    register double rms;
+    register double statistic;
+    const bool useAbsoluteMean = typeagc == 0;
+
+    const auto sampleStatistic = [useAbsoluteMean](double sample) {
+        return useAbsoluteMean ? fabs(sample) : sample * sample;
+    };
+    const auto windowAmplitude = [useAbsoluteMean](double sum, int count) {
+        const double average = sum / count;
+        if (average <= 0.0)
+            return 0.0;
+        return useAbsoluteMean ? average : sqrt(average);
+    };
 
     if (nt < 2)
         return;
@@ -674,38 +698,40 @@ void Agc(float *data, int iwagc, int nt)
     sum = 0.0;
     for (i = 0; i < iwagc; ++i) {
         val = data[i];
-        sum += val * val;
+        sum += sampleStatistic(val);
     }
     nwin = iwagc;
-    rms = sum / nwin;
-    agcdata[0] = (!rms) ? 0.0 : data[0] / sqrt(rms);
+    statistic = windowAmplitude(sum, nwin);
+    agcdata[0] = (!statistic) ? 0.0 : data[0] / statistic;
 
     // ramping on
     for (i = 1; i < iwagc; ++i) {
         val = data[i + iwagc - 1];
-        sum += val * val;
+        sum += sampleStatistic(val);
         ++nwin;
-        rms = sum / nwin;
-        agcdata[i] = (!rms) ? 0.0 : data[i] / sqrt(rms);
+        statistic = windowAmplitude(sum, nwin);
+        agcdata[i] = (!statistic) ? 0.0 : data[i] / statistic;
     }
 
-    // middle range -- full rms window
+    // middle range -- full statistical window
     for (i = iwagc; i < nt - iwagc; ++i) {
         val = data[i + iwagc - 1];
-        sum += val * val;
+        sum += sampleStatistic(val);
         val = data[i - iwagc];
-        sum -= val * val; // rounding could make sum negative!
-        rms = sum / nwin;
-        agcdata[i] = (rms <= 0.0) ? 0.0 : data[i] / sqrt(rms);
+        sum -= sampleStatistic(val);
+        statistic = windowAmplitude(sum, nwin);
+        agcdata[i] =
+            (statistic <= 0.0) ? 0.0 : data[i] / statistic;
     }
 
     // ramping off
     for (i = nt - iwagc; i < nt; ++i) {
         val = data[i - iwagc];
-        sum -= val * val; // rounding could make sum negative!
+        sum -= sampleStatistic(val);
         --nwin;
-        rms = sum / nwin;
-        agcdata[i] = (rms <= 0.0) ? 0.0 : data[i] / sqrt(rms);
+        statistic = windowAmplitude(sum, nwin);
+        agcdata[i] =
+            (statistic <= 0.0) ? 0.0 : data[i] / statistic;
     }
 
     // copy data back into trace

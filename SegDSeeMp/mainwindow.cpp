@@ -1426,7 +1426,7 @@ void MainWindow::FillControls()
 
 void MainWindow::GetRegInfo()
 {
-    QSettings settings("PSI", "SegDSeeMp");
+    QSettings settings("WW", "SegDSeeMp");
 
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
     restoreState(settings.value("mainWindowState").toByteArray());
@@ -1509,7 +1509,7 @@ void MainWindow::GetRegInfo()
 
 void MainWindow::SaveRegInfo()
 {
-    QSettings settings("PSI", "SegDSeeMp");
+    QSettings settings("WW", "SegDSeeMp");
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
 

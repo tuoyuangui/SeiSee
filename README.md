@@ -40,8 +40,10 @@ process
 
 - 增加地震数据的右侧和底部坐标轴，形成四周对称式坐标，符合国人审美和行业通用标准
 - 增加地震数据截图功能，并使用带圆角提示框显示操作结果。
+- 增加图件导出功能，提供300 400 600DPI图件导出。
 - 增加打开文件入口。
 - 增加 Difference功能，用于计算两个地震数据的差值。
+- 增加AGC的Statistical Type，包含ABS/RMS。
 - 增加文件目录浏览界面的右键菜单，可以获取文件名、文件路径、打开文件所在目录
 - 改进高 DPI、多显示器环境下的界面布局和显示效果。
 - 统一界面字体、字体大小及坐标轴等显示样式的设置方式。
@@ -94,8 +96,8 @@ APPIMAGE_EXTRACT_AND_RUN=1 ./SeiSee-*.AppImage
 
 程序使用 Qt `QSettings` 保存窗口布局、数据目录和显示选项等用户设置：
 
-- **Windows：**注册表 `HKEY_CURRENT_USER\Software\PSI\SeiSeeMp`
-- **Linux：**配置文件 `~/.config/PSI/SeiSeeMp.conf`（`~` 表示当前用户的主目录）
+- **Windows：**注册表 `HKEY_CURRENT_USER\Software\WW\SeiSeeMp`
+- **Linux：**配置文件 `~/.config/WW/SeiSeeMp.conf`（`~` 表示当前用户的主目录）
 
 如果 Linux 设置了 `XDG_CONFIG_HOME` 环境变量，配置文件会位于 `$XDG_CONFIG_HOME/PSI/SeiSeeMp.conf`。
 

@@ -14,12 +14,14 @@ CONFIG += c++11
 
 
 SOURCES += main.cpp\
+    ../CustomWdgets/customcontrols.cpp \
         mainwindow.cpp \
     procparmdialog.cpp \
     readerthread.cpp \
     aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
+    ../CustomWdgets/customcontrols.h \
     compatx.h \
     procparmdialog.h \
     readerthread.h \
@@ -34,6 +36,9 @@ win32: RC_FILE += app.rc
 
 RESOURCES += \
     myrc.qrc
+
+INCLUDEPATH += $$PWD/../CustomWdgets
+DEPENDPATH += $$PWD/../CustomWdgets
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../GxLib/release/ -lGxLib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../GxLib/debug/ -lGxLib

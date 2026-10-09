@@ -591,7 +591,7 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QCheckBox" name="ckTrEd">
+                 <widget class="CustomCheckBox" name="ckTrEd">
                   <property name="text">
                    <string>Allow to edit all items (can be dangerous)</string>
                   </property>
@@ -883,14 +883,14 @@
                      <number>2</number>
                     </property>
                     <item>
-                     <widget class="QCheckBox" name="ckWiggle">
+                     <widget class="CustomCheckBox" name="ckWiggle">
                       <property name="text">
                        <string>Wiggle</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="ckGray">
+                     <widget class="CustomCheckBox" name="ckGray">
                       <property name="text">
                        <string>Gray</string>
                       </property>
@@ -900,14 +900,14 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="ckColor">
+                     <widget class="CustomCheckBox" name="ckColor">
                       <property name="text">
                        <string>Color</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="ckTimLines">
+                     <widget class="CustomCheckBox" name="ckTimLines">
                       <property name="text">
                        <string>Timelines</string>
                       </property>
@@ -948,14 +948,14 @@
                      <number>2</number>
                     </property>
                     <item>
-                     <widget class="QRadioButton" name="rbNon">
+                     <widget class="CustomRadioButton" name="rbNon">
                       <property name="text">
                        <string>None</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QRadioButton" name="rbPos">
+                     <widget class="CustomRadioButton" name="rbPos">
                       <property name="text">
                        <string>Positive</string>
                       </property>
@@ -965,7 +965,7 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QRadioButton" name="rbNeg">
+                     <widget class="CustomRadioButton" name="rbNeg">
                       <property name="text">
                        <string>Negative</string>
                       </property>
@@ -1239,21 +1239,21 @@
                        <number>3</number>
                       </property>
                       <item>
-                       <widget class="QCheckBox" name="ckFilt">
+                       <widget class="CustomCheckBox" name="ckFilt">
                         <property name="text">
                          <string>Filter</string>
                         </property>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QCheckBox" name="ckAgc">
+                       <widget class="CustomCheckBox" name="ckAgc">
                         <property name="text">
                          <string>Agc</string>
                         </property>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QCheckBox" name="ckNorm">
+                       <widget class="CustomCheckBox" name="ckNorm">
                         <property name="text">
                          <string>Norm</string>
                         </property>
@@ -1263,7 +1263,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QCheckBox" name="ckDly">
+                       <widget class="CustomCheckBox" name="ckDly">
                         <property name="text">
                          <string>Use delay</string>
                         </property>
@@ -1329,7 +1329,7 @@
                      <number>2</number>
                     </property>
                     <item>
-                     <widget class="QRadioButton" name="rbDirNorm">
+                     <widget class="CustomRadioButton" name="rbDirNorm">
                       <property name="text">
                        <string>Normal</string>
                       </property>
@@ -1339,7 +1339,7 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QRadioButton" name="rbDirRev">
+                     <widget class="CustomRadioButton" name="rbDirRev">
                       <property name="text">
                        <string>Reversed</string>
                       </property>
@@ -3334,4 +3334,16 @@
  <slots>
   <slot>changeDir()</slot>
  </slots>
+ <customwidgets>
+  <customwidget>
+   <class>CustomCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+ </customwidgets>
 </ui>

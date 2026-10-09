@@ -61,6 +61,8 @@ void ProcParmDialog::FillForm()
     ui->edF4->setText(Tprintf("%g", f4));
 
     ui->edAgcw->setText(Tprintf("%g", agcw));
+    ui->cbAgcType->setCurrentIndex(
+        qBound(0, agcType, ui->cbAgcType->count() - 1));
 }
 
 bool ProcParmDialog::ReadForm()
@@ -85,6 +87,7 @@ bool ProcParmDialog::ReadForm()
     if (!ok)
         rc = false;
 
+    agcType = ui->cbAgcType->currentIndex();
     agc = ui->ckAgc->isChecked();
     norm = ui->ckNorm->isChecked();
     filt = ui->ckFilt->isChecked();

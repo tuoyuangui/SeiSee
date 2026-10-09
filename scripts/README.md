@@ -89,19 +89,15 @@ mkdir -p dist/linux
 之后每次打包，在项目根目录运行：
 
 ```bash
-VERSION="$(sed -nE 's/^[[:space:]]*#[[:space:]]*define[[:space:]]+VERSION[[:space:]]+"([^"]+)".*/\1/p' SeiSeeMp/mainwindow.h)"
-test -n "$VERSION" || { echo "无法从 SeiSeeMp/mainwindow.h 读取 VERSION" >&2; exit 1; }
-
 docker run --rm \
   --user "$(id -u):$(id -g)" \
-  -e VERSION="$VERSION" \
   -e JOBS="$(nproc)" \
   -v /home/ww/Qt:/home/ww/Qt:ro \
   -v "$PWD:/workspace" \
   seisee-linux-builder
 ```
 
-脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION`，并将其传给容器作为安装包版本。打包脚本先通过 qmake `distclean` 清除生成型构建输出，再在容器中完整重建，避免复用宿主机上使用其他 glibc 版本编译的目标文件。清理会移除 `.o`、`.a`、可执行文件和 qmake Makefile 等生成文件，不会删除源码。`docker build` 只需首次运行，或修改 Dockerfile/容器工具后重新运行。打包时会将当前项目目录挂载到容器，使用最新源码并把产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
+打包脚本会从 `SeiSeeMp/mainwindow.h` 中读取 `#define VERSION`。为兼容旧命令，也可以继续通过 `-e VERSION="$VERSION"` 显式传入版本；本机直接运行脚本时同样可用 `VERSION=...` 覆盖头文件中的版本。打包脚本先通过 qmake `distclean` 清除生成型构建输出，再在容器中完整重建，避免复用宿主机上使用其他 glibc 版本编译的目标文件。清理会移除 `.o`、`.a`、可执行文件和 qmake Makefile 等生成文件，不会删除源码。`docker build` 只需首次运行，或修改 Dockerfile/容器工具后重新运行。打包时会将当前项目目录挂载到容器，使用最新源码并把产物写入宿主机的 `dist/linux`。镜像构建需要网络访问 AppImage 工具的下载地址；Qt SDK 从宿主机只读挂载，不会在镜像中重新下载。此 Docker 配置仅构建 x86_64 Linux AppImage，不提供图形桌面容器。
 
 ### 前置条件
 
@@ -148,7 +144,7 @@ JOBS=8 \
 ./scripts/package-linux.sh
 ```
 
-默认使用 `qmake`、`make`、`linuxdeploy` 和 `appimagetool`。生成的文件位于 `dist/linux`，默认文件名为 `SeiSee-4.0.0-alpha.1-x86_64.AppImage`。
+默认使用 `qmake`、`make`、`linuxdeploy` 和 `appimagetool`。生成的文件位于 `dist/linux`，文件名中的版本号默认取自 `SeiSeeMp/mainwindow.h` 中的 `VERSION` 定义，也可通过 `VERSION` 环境变量覆盖。
 
 ## GitHub Release
 
