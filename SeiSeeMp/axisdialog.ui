@@ -361,7 +361,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QCheckBox" name="ckTimLines">
+           <widget class="CustomCheckBox" name="ckTimLines">
             <property name="text">
              <string>Show time lines</string>
             </property>
@@ -455,4 +455,16 @@
   <include location="myrc.qrc"/>
  </resources>
  <connections/>
+ <customwidgets>
+  <customwidget>
+   <class>CustomCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+ </customwidgets>
 </ui>

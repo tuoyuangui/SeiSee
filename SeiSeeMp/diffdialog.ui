@@ -149,7 +149,7 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QCheckBox" name="ckTrAll">
+             <widget class="CustomCheckBox" name="ckTrAll">
               <property name="text">
                <string>All Traces</string>
               </property>
@@ -465,7 +465,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QCheckBox" name="ckTmAll">
+         <widget class="CustomCheckBox" name="ckTmAll">
           <property name="text">
            <string>Whole trace</string>
           </property>
@@ -670,4 +670,16 @@
   <include location="myrc.qrc"/>
  </resources>
  <connections/>
+ <customwidgets>
+  <customwidget>
+   <class>CustomCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+ </customwidgets>
 </ui>

@@ -14,7 +14,7 @@ CONFIG += warn_off
 CONFIG += c++11
 
 SOURCES += main.cpp\
-    dpiindicatorstyle.cpp \
+    ../CustomWdgets/customcontrols.cpp \
     edithdrdialog.cpp \
         mainwindow.cpp \
     procparmdialog.cpp \
@@ -25,7 +25,7 @@ SOURCES += main.cpp\
     diffdialog.cpp
 
 HEADERS  += mainwindow.h \
-    dpiindicatorstyle.h \
+    ../CustomWdgets/customcontrols.h \
     edithdrdialog.h \
     procparmdialog.h \
     aboutdialog.h \
@@ -78,6 +78,8 @@ else:unix: LIBS += -L$$OUT_PWD/../GxLib/ -lGxLib
 
 INCLUDEPATH += $$PWD/../GxLib
 DEPENDPATH += $$PWD/../GxLib
+INCLUDEPATH += $$PWD/../CustomWdgets
+DEPENDPATH += $$PWD/../CustomWdgets
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../GxLib/release/libGxLib.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../GxLib/debug/libGxLib.a
