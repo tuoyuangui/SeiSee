@@ -69,7 +69,6 @@ namespace GfxStyle {
     constexpr int EditHeaderDialogHeight = 618;
     constexpr int ProcParmDialogWidth = 340;
     constexpr int ProcParmDialogHeight = 414;
-    constexpr int ProcParmDialogMaxWidth = 360;
     constexpr int SaveAsDialogWidth = 661;
     constexpr int SaveAsDialogHeight = 550;
 

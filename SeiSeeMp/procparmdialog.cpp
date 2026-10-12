@@ -21,8 +21,6 @@ ProcParmDialog::ProcParmDialog(QWidget *parent)
     diagram->renderer()->setAspectRatioMode(Qt::KeepAspectRatio);
     ui->horizontalLayout_14->insertWidget(diagramIndex, diagram);
     resize(GfxStyle::ProcParmDialogWidth, GfxStyle::ProcParmDialogHeight);
-    setMaximumSize(GfxStyle::ProcParmDialogMaxWidth,
-                   GfxStyle::ProcParmDialogHeight);
 }
 
 ProcParmDialog::~ProcParmDialog()
