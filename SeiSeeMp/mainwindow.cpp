@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include <QBoxLayout>
-#include <QActionGroup>
 #include <QComboBox>
 #include <QClipboard>
 #include <QDebug>
@@ -106,6 +105,9 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setLibraryPaths(paths);
 
     ui->setupUi(this);
+    QSettings settings("WW", "SeiSeeMp");
+    m_recentDirectories = settings.value("RecentDirectories").toStringList();
+
     ui->edSwingRange->setValidator(
         new QIntValidator(1, 20, ui->edSwingRange));
     ui->edTraceThinning->setValidator(
@@ -115,21 +117,10 @@ MainWindow::MainWindow(QWidget *parent)
         tr("Clear selected trace highlight"));
     ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
 
+    ui->menu_File->setStyle(new ExportDpiMenuStyle(this));
+    ui->menu_Recent_Folders->setStyle(new ExportDpiMenuStyle(this));
     ui->menuView->setStyle(new ExportDpiMenuStyle(this));
-    m_exportDpiMenu = ui->menuView->addMenu(tr("Export image DPI"));
-    m_exportDpiMenu->setStyle(new ExportDpiMenuStyle(this));
-    QActionGroup *exportDpiGroup = new QActionGroup(this);
-    exportDpiGroup->setExclusive(true);
-    for (int dpi : {300, 400, 600}) {
-        QAction *dpiAction =
-            m_exportDpiMenu->addAction(tr("%1 DPI").arg(dpi));
-        dpiAction->setCheckable(true);
-        dpiAction->setData(dpi);
-        dpiAction->setChecked(dpi == m_exportDpi);
-        exportDpiGroup->addAction(dpiAction);
-    }
-    connect(exportDpiGroup, &QActionGroup::triggered, this,
-            [this](QAction *action) { m_exportDpi = action->data().toInt(); });
+    ui->menu_Export_DPI->setStyle(new ExportDpiMenuStyle(this));
     ui->dirGroup->setMinimumWidth(130);
     ui->dirGroup->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 
@@ -1066,6 +1057,7 @@ void MainWindow::ChangeDataDir(QString Dname, QString Find)
 {
     emit stop_dirs();
 
+    addRecentDirectory(Dname);
     curDir = Dname;
 
     find = Find;
@@ -1086,6 +1078,72 @@ void MainWindow::ChangeDataDir(QString Dname, QString Find)
             Qt::DirectConnection);
 
     thread->start();
+}
+
+void MainWindow::on_menu_Recent_Folders_aboutToShow()
+{
+    ui->menu_Recent_Folders->clear();
+    QStringList validDirectories;
+    for (const QString &directory : m_recentDirectories) {
+        const QFileInfo info(directory);
+        if (!info.exists() || !info.isDir())
+            continue;
+
+        const QString normalized =
+            QDir::cleanPath(info.absoluteFilePath());
+        if (validDirectories.contains(normalized) ||
+            validDirectories.size() >= 10)
+            continue;
+
+        validDirectories.append(normalized);
+    }
+
+    if (validDirectories != m_recentDirectories) {
+        m_recentDirectories = validDirectories;
+        QSettings settings("WW", "SeiSeeMp");
+        settings.setValue("RecentDirectories", m_recentDirectories);
+    }
+
+    if (m_recentDirectories.isEmpty()) {
+        QAction *emptyAction =
+            ui->menu_Recent_Folders->addAction(tr("No Recent Folders"));
+        emptyAction->setEnabled(false);
+        return;
+    }
+
+    for (const QString &directory : m_recentDirectories) {
+        QAction *action = ui->menu_Recent_Folders->addAction(
+            QDir::toNativeSeparators(directory));
+        action->setData(directory);
+    }
+}
+
+void MainWindow::on_menu_Recent_Folders_triggered(QAction *action)
+{
+    const QString directory = action->data().toString();
+    if (!directory.isEmpty())
+        ChangeDataDir(directory);
+}
+
+void MainWindow::on_menu_Export_DPI_triggered(QAction *action)
+{
+    m_exportDpi = action->data().toInt();
+}
+
+void MainWindow::addRecentDirectory(const QString &directory)
+{
+    const QFileInfo info(directory);
+    if (!info.exists() || !info.isDir())
+        return;
+
+    const QString normalized = QDir::cleanPath(info.absoluteFilePath());
+    m_recentDirectories.removeAll(normalized);
+    m_recentDirectories.prepend(normalized);
+    while (m_recentDirectories.size() > 10)
+        m_recentDirectories.removeLast();
+
+    QSettings settings("WW", "SeiSeeMp");
+    settings.setValue("RecentDirectories", m_recentDirectories);
 }
 
 void MainWindow::x_dir(DirList dlist)
@@ -2324,10 +2382,8 @@ void MainWindow::GetRegInfo()
         savedSeismicDpi == 400 || savedSeismicDpi == 600
             ? savedSeismicDpi
             : 300;
-    if (m_exportDpiMenu) {
-        for (QAction *action : m_exportDpiMenu->actions())
-            action->setChecked(action->data().toInt() == m_exportDpi);
-    }
+    for (QAction *action : ui->menu_Export_DPI->actions())
+        action->setChecked(action->data().toInt() == m_exportDpi);
 
     double xs = settings.value("Xs", 1.0).toDouble();
     double ys = settings.value("Ys", 1.0).toDouble();
@@ -2742,7 +2798,7 @@ void MainWindow::on_zoomInBtn_pressed()
 void MainWindow::on_selDirBtn_pressed()
 {
     QString dir = QFileDialog::getExistingDirectory(
-        this, "Open Directory", curDir,
+        this, "Open Folder", curDir,
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     if (dir == "")

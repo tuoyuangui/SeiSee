@@ -13,6 +13,7 @@
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QStack>
+#include <QStringList>
 #include <QThread>
 #include <QWidget>
 
@@ -64,6 +65,8 @@ public:
 namespace Ui {
     class MainWindow;
 }
+
+class QAction;
 
 class myEventCatcher : public QObject
 {
@@ -238,6 +241,10 @@ private slots:
 
     void on_actionOpen_Directory_triggered();
 
+    void on_menu_Recent_Folders_aboutToShow();
+
+    void on_menu_Recent_Folders_triggered(QAction *action);
+
     void on_actionAbout_triggered();
 
     void on_TrSlider_valueChanged(int p);
@@ -269,6 +276,8 @@ private slots:
     void on_exportHiResBtn_pressed();
 
     void on_actionAxes_Setup_triggered();
+
+    void on_menu_Export_DPI_triggered(QAction *action);
 
     void on_actionParameters_triggered();
 
@@ -379,6 +388,7 @@ private:
     void applyTimeAxisLabel();
 
     void updateCompactSeismicControls();
+    void addRecentDirectory(const QString &directory);
 
     //  ReadThread*    WorkThread;
 
@@ -441,7 +451,7 @@ private:
     QScrollBar *verticalAxisScrollBar;
     GfxTimeLabel *timeLabel = nullptr;
     int m_exportDpi = 300;
-    QMenu *m_exportDpiMenu = nullptr;
+    QStringList m_recentDirectories;
     QThread *m_exportThread = nullptr;
     ImageExportWorker *m_exportWorker = nullptr;
     bool m_exportInProgress = false;
