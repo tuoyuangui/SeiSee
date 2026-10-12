@@ -12,6 +12,7 @@ GfxObjTAxis::GfxObjTAxis(QObject *parent)
 {
     m_Ti = 0.1;
     m_rightSide = false;
+    m_seconds = false;
 }
 
 int GfxObjTAxis::RequiredWidth() const
@@ -53,7 +54,7 @@ void GfxObjTAxis::DoDraw()
 
     double t, i;
 
-    char lab[128];
+    char label[128];
 
     int hto = gfx->GetTextHeight();
     int ht2 = hto >> 1;
@@ -78,13 +79,17 @@ void GfxObjTAxis::DoDraw()
     for (t = m_Y1; t < m_Y2; t += (m_Ti * i)) {
         int s = y2pix(t);
 
-        int tt = round(t * 1000);
+        if (m_seconds) {
+            sprintf(label, "%.1f", t);
+        } else {
+            int tt = round(t * 1000);
+            sprintf(label, "%d", tt);
+        }
 
-        sprintf(lab, "%d", tt);
-        int wt = gfx->GetTextWidth(lab);
+        int wt = gfx->GetTextWidth(label);
 
         int labelX = m_rightSide ? x + labelGap : x - wt - labelGap;
-        gfx->DrawText(labelX, s + ht2 - labelYOffset, lab);
+        gfx->DrawText(labelX, s + ht2 - labelYOffset, label);
         gfx->DrawHLine(s, x, x + tickDir * tickLength, 0, 0);
     }
 }

@@ -268,104 +268,103 @@
           <property name="rightMargin">
            <number>10</number>
           </property>
+          <property name="bottomMargin">
+           <number>10</number>
+          </property>
           <item>
-           <layout class="QHBoxLayout" name="axisStepLayout">
-            <property name="spacing">
+           <layout class="QGridLayout" name="timeAxisOptionsLayout">
+            <property name="horizontalSpacing">
              <number>6</number>
             </property>
-            <item>
-             <widget class="QLabel" name="label">
+            <property name="verticalSpacing">
+             <number>6</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="timeUnitLabel">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Unit</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="timeUnitCbx">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <item>
+               <property name="text">
+                <string>ms</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>s</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="axisStepLabel">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
                <string>Axis Step</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="1" column="1">
              <widget class="QComboBox" name="dTCbx">
-          <property name="editable">
-           <bool>true</bool>
-          </property>
-          <property name="currentIndex">
-           <number>4</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>10</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>20</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>25</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>50</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>200</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>500</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1000</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2000</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>5000</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>New Item</string>
-           </property>
-          </item>
+              <property name="editable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
-            <item>
-             <spacer name="axisStepSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+            <item row="2" column="0" colspan="2">
+             <widget class="CustomCheckBox" name="showTimeUnitCk">
+              <property name="text">
+               <string>Show unit</string>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="CustomCheckBox" name="ckTimLines">
+              <property name="text">
+               <string>Show time lines</string>
               </property>
-             </spacer>
+             </widget>
             </item>
            </layout>
-          </item>
-          <item>
-           <widget class="CustomCheckBox" name="ckTimLines">
-            <property name="text">
-             <string>Show time lines</string>
-            </property>
-           </widget>
           </item>
           <item>
            <spacer name="timeAxisBottomSpacer">
@@ -418,9 +417,21 @@
            </property>
            <item>
             <widget class="QLabel" name="fontSizeLabel">
-            <property name="toolTip">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="toolTip">
               <string>Default: 8</string>
-            </property>
+             </property>
              <property name="text">
               <string>Font size (pt)</string>
              </property>
@@ -428,6 +439,18 @@
            </item>
            <item>
             <widget class="QSpinBox" name="fontSizeSpinBox">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="minimum">
               <number>1</number>
              </property>

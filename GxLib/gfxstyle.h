@@ -55,7 +55,7 @@ namespace GfxStyle {
     // Qt 资源路径对应 SeiSeeMp/fonts/TIMES.TTF。
     static const char LabelFontResource[] = ":/fonts/TIMES.TTF";
     constexpr QFont::StyleHint LabelFontStyleHint = QFont::Serif;
-    static const char TimeLabelText[] = "Time";
+    static const char TimeLabelText[] = "Time (ms)";
     static const char TimeAxisWidthSample[] = "0000";
 
     // SeiSeeMp 初始窗口尺寸，单位为 Qt 逻辑像素。

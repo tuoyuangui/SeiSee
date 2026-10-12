@@ -733,6 +733,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&ProcParmDlg, SIGNAL(changedEvent()), this, SLOT(procParmEvent()));
 
     connect(&AxisDlg, SIGNAL(changedEvent()), this, SLOT(axesDlgEvent()));
+    connect(&AxisDlg, &AxisDialog::showTimeUnitChanged, this,
+            [this](bool showUnit) {
+                AxisDlg.showTimeUnit = showUnit;
+                applyTimeAxisLabel();
+            });
 
     connect(&EdHdrDlg, SIGNAL(changedEvent()), this, SLOT(hdreDlgEvent()));
 
@@ -2410,10 +2415,14 @@ void MainWindow::GetRegInfo()
 
     double ti = settings.value("Ti", "0.1").toDouble();
     bool tl = settings.value("Tl", "false").toBool();
+    AxisDlg.timeUnit = qBound(0, settings.value("TimeUnit", 0).toInt(), 1);
+    AxisDlg.showTimeUnit = settings.value("ShowTimeUnit", false).toBool();
 
     timeAxis.setTi(ti);
+    timeRightAxis.setTi(ti);
     seisSct.setTi(ti);
     seisSct.setTl(tl);
+    applyTimeAxisDisplaySettings();
 
     ArrangeSections();
 
@@ -2537,6 +2546,8 @@ void MainWindow::SaveRegInfo()
 
     settings.setValue("Ti", timeAxis.Ti());
     settings.setValue("Tl", seisSct.Tl());
+    settings.setValue("TimeUnit", AxisDlg.timeUnit);
+    settings.setValue("ShowTimeUnit", AxisDlg.showTimeUnit);
 }
 
 void MainWindow::on_zoomAllBtn_pressed()
@@ -2956,7 +2967,7 @@ void MainWindow::on_TxtHdrEdit_cursorPositionChanged()
 void MainWindow::on_axisBtn_pressed()
 {
     AxisDlg.ckList = &hdrAxisCk;
-    AxisDlg.dT = timeAxis.Ti() * 1000;
+    AxisDlg.dT = timeAxis.Ti();
     AxisDlg.tL = seisSct.Tl();
 
     AxisDlg.show();
@@ -3303,16 +3314,39 @@ void MainWindow::axesDlgEvent()
     hdrsBottomAxis.setHdrList(hdrAxisCk.List());
     hdrsLab.setHdrList(hdrAxisCk.List());
 
-    double ti = AxisDlg.dT / 1000.;
+    double ti = AxisDlg.dT;
     bool tl = AxisDlg.tL;
 
     timeAxis.setTi(ti);
     timeRightAxis.setTi(ti);
     seisSct.setTi(ti);
     seisSct.setTl(tl);
+    applyTimeAxisDisplaySettings();
 
     ui->ckTimLines->setChecked(tl);
     ArrangeSections();
+}
+
+void MainWindow::applyTimeAxisDisplaySettings()
+{
+    const bool seconds = AxisDlg.timeUnit == 1;
+    timeAxis.setTimeUnitSeconds(seconds);
+    timeRightAxis.setTimeUnitSeconds(seconds);
+
+    applyTimeAxisLabel();
+}
+
+void MainWindow::applyTimeAxisLabel()
+{
+    if (!timeLabel)
+        return;
+
+    const QString unit = timeAxis.timeUnitSeconds()
+                             ? QStringLiteral("s")
+                             : QStringLiteral("ms");
+    timeLabel->SetText(AxisDlg.showTimeUnit
+                           ? QStringLiteral("Time (%1)").arg(unit)
+                           : QStringLiteral("Time"));
 }
 
 void MainWindow::applyAxisFontSize(int size)

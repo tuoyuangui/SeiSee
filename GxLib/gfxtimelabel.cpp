@@ -10,6 +10,7 @@
 
 GfxTimeLabel::GfxTimeLabel(QWidget *parent)
     : QWidget(parent)
+    , m_text(QString::fromLatin1(GfxStyle::TimeLabelText))
 {
     m_font.setFamily(GfxStyle::LabelFontFamily);
     m_font.setStyleHint(GfxStyle::LabelFontStyleHint);
@@ -26,14 +27,23 @@ void GfxTimeLabel::SetFontSize(int size)
     update();
 }
 
+void GfxTimeLabel::SetText(const QString &text)
+{
+    if (m_text == text)
+        return;
+
+    m_text = text;
+    m_rotatedTextPixmap = QPixmap();
+    refreshSize();
+    update();
+}
+
 void GfxTimeLabel::refreshSize()
 {
     QFontMetrics metrics(m_font, this);
     const int padding = GfxStyle::TimeLabelPadding;
     setFixedSize(metrics.height() + padding,
-                 metrics.horizontalAdvance(
-                     QString::fromLatin1(GfxStyle::TimeLabelText)) +
-                     padding);
+                 metrics.horizontalAdvance(m_text) + padding);
 }
 
 int GfxTimeLabel::rotatedTextWidth() const
@@ -60,7 +70,7 @@ void GfxTimeLabel::paintEvent(QPaintEvent *)
 
 void GfxTimeLabel::updateTextPixmap()
 {
-    const QString text = QString::fromLatin1(GfxStyle::TimeLabelText);
+    const QString text = m_text;
     QFontMetrics metrics(m_font, this);
     const int padding = GfxStyle::TimeLabelPadding;
     const QSize textSize(metrics.horizontalAdvance(text) + padding,

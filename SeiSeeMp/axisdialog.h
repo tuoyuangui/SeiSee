@@ -27,7 +27,9 @@ public:
 
     TrHdrDefList *hdrDefList;
     CkListSet *ckList;
-    int dT;
+    double dT;
+    int timeUnit;
+    bool showTimeUnit;
     bool tL;
     int fontSize;
 
@@ -52,6 +54,8 @@ private slots:
 
     void on_dTCbx_editTextChanged(const QString &arg1);
 
+    void on_timeUnitCbx_currentIndexChanged(int index);
+    void on_showTimeUnitCk_toggled(bool checked);
     void on_ckTimLines_toggled(bool checked);
     void on_fontSizeSpinBox_valueChanged(int value);
 
@@ -60,9 +64,11 @@ private:
 
     void FillAviGrid();
     void FillForm();
+    void FillTimeStepChoices();
 
 signals:
     void changedEvent();
+    void showTimeUnitChanged(bool checked);
 };
 
 #endif // AXISDIALOG_H

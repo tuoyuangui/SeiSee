@@ -375,6 +375,8 @@ private:
     void finishHighResolutionExport();
 
     void applyAxisFontSize(int size);
+    void applyTimeAxisDisplaySettings();
+    void applyTimeAxisLabel();
 
     void updateCompactSeismicControls();
 

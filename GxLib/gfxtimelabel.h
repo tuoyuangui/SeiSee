@@ -12,6 +12,7 @@ public:
     explicit GfxTimeLabel(QWidget *parent = nullptr);
 
     void SetFontSize(int size);
+    void SetText(const QString &text);
     void refreshSize();
     int rotatedTextWidth() const;
     void setCaptureScale(qreal scale);
@@ -23,6 +24,7 @@ private:
     void updateTextPixmap();
 
     QFont m_font;
+    QString m_text;
     QPixmap m_rotatedTextPixmap;
     QFont m_cachedFont;
     QColor m_cachedColor;

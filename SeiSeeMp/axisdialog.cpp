@@ -5,12 +5,22 @@
 #include "ui_axisdialog.h"
 
 #include <QDebug>
+#include <QSignalBlocker>
 
 AxisDialog::AxisDialog(QWidget *parent)
     : QDialog(parent)
+    , changed(false)
+    , hdrDefList(nullptr)
+    , ckList(nullptr)
+    , dT(0.1)
+    , timeUnit(0)
+    , showTimeUnit(false)
+    , tL(false)
+    , fontSize(GfxStyle::LabelFontPointSize)
     , ui(new Ui::AxisDialog)
 {
     ui->setupUi(this);
+    ui->timeAxisOptionsLayout->setColumnStretch(2, 1);
     resize(GfxStyle::AxisDialogWidth, GfxStyle::AxisDialogHeight);
 
     selHdrGrid.setRowCount(0);
@@ -86,8 +96,6 @@ void AxisDialog::FillAviGrid()
 
 void AxisDialog::FillForm()
 {
-    changed = false;
-
     hdrList = ckList->List();
 
     hdrDefList = TraceHdrsSet.List();
@@ -103,10 +111,13 @@ void AxisDialog::FillForm()
         selHdrGrid.setCell(n, 0, hdrList[n]);
     }
 
-    ui->dTCbx->setEditText(QString::number(dT));
+    ui->timeUnitCbx->setCurrentIndex(timeUnit);
+    FillTimeStepChoices();
 
+    ui->showTimeUnitCk->setChecked(showTimeUnit);
     ui->ckTimLines->setChecked(tL);
     ui->fontSizeSpinBox->setValue(fontSize);
+    changed = false;
 }
 
 void AxisDialog::show()
@@ -215,14 +226,32 @@ void AxisDialog::on_dTCbx_editTextChanged(const QString &arg1)
     QString txt = ui->dTCbx->currentText();
     bool ok;
 
-    int dt = txt.toInt(&ok);
-    if (!ok)
+    const double displayStep = txt.toDouble(&ok);
+    if (!ok || displayStep <= 0)
         return;
 
-    if (dT != dt) {
-        dT = dt;
+    const double stepInSeconds =
+        displayStep / (timeUnit == 0 ? 1000.0 : 1.0);
+    if (!qFuzzyCompare(dT, stepInSeconds)) {
+        dT = stepInSeconds;
         changed = true;
     }
+}
+
+void AxisDialog::on_timeUnitCbx_currentIndexChanged(int index)
+{
+    if (timeUnit == index)
+        return;
+
+    timeUnit = index;
+    FillTimeStepChoices();
+    changed = true;
+}
+
+void AxisDialog::on_showTimeUnitCk_toggled(bool checked)
+{
+    showTimeUnit = checked;
+    emit showTimeUnitChanged(checked);
 }
 
 void AxisDialog::on_ckTimLines_toggled(bool checked)
@@ -238,4 +267,24 @@ void AxisDialog::on_fontSizeSpinBox_valueChanged(int value)
 
     fontSize = value;
     changed = true;
+}
+
+void AxisDialog::FillTimeStepChoices()
+{
+    static const int stepsInMilliseconds[] = {
+        10, 20, 25, 50, 100, 200, 500, 1000, 2000, 5000
+    };
+
+    const QSignalBlocker blocker(ui->dTCbx);
+    ui->dTCbx->clear();
+    for (int stepMs : stepsInMilliseconds) {
+        const double step =
+            timeUnit == 0 ? stepMs : stepMs / 1000.0;
+        ui->dTCbx->addItem(
+            QString::number(step, 'g', timeUnit == 0 ? 6 : 3));
+    }
+
+    const double displayStep = dT * (timeUnit == 0 ? 1000.0 : 1.0);
+    ui->dTCbx->setEditText(
+        QString::number(displayStep, 'g', timeUnit == 0 ? 6 : 6));
 }
