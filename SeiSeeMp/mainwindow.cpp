@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
+#include <QEventLoop>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFontMetrics>
@@ -22,14 +23,11 @@
 #include <QPainter>
 #include <QPalette>
 #include <QPixmap>
-#include <QPainterPath>
 #include <QPen>
-#include <QProxyStyle>
 #include <QScrollBar>
 #include <QSettings>
 #include <QSignalBlocker>
 #include <QStandardItemModel>
-#include <QStyleOptionMenuItem>
 #include <QTabBar>
 #include <QTextCodec>
 #include <QTimer>
@@ -42,6 +40,7 @@
 #include <limits>
 
 #include "Toast.h"
+#include "exportdpimenustyle.h"
 
 #include <fcntl.h>
 #include <math.h>
@@ -74,185 +73,7 @@ void showScreenshotToast(QWidget *parent, const QString &title,
     toast->show();
 }
 
-class ExportDpiMenuStyle final : public QProxyStyle
-{
-public:
-    explicit ExportDpiMenuStyle(QObject *parent)
-        : QProxyStyle()
-    {
-        setParent(parent);
-    }
-
-    void drawControl(ControlElement element, const QStyleOption *option,
-                     QPainter *painter,
-                     const QWidget *widget = nullptr) const override
-    {
-        const auto *menuOption =
-            element == CE_MenuItem
-                ? qstyleoption_cast<const QStyleOptionMenuItem *>(option)
-                : nullptr;
-        if (!menuOption ||
-            menuOption->checkType != QStyleOptionMenuItem::Exclusive ||
-            !menuOption->checked) {
-            QProxyStyle::drawControl(element, option, painter, widget);
-            return;
-        }
-
-        QStyleOptionMenuItem itemWithoutCheck(*menuOption);
-        itemWithoutCheck.checked = false;
-        QProxyStyle::drawControl(element, &itemWithoutCheck, painter, widget);
-
-        const int horizontalMargin =
-            pixelMetric(PM_MenuHMargin, menuOption, widget);
-        const int indicatorColumn =
-            qMax(menuOption->maxIconWidth, menuOption->rect.height()) +
-            2 * horizontalMargin;
-        const QRect markerRect(menuOption->rect.left(), menuOption->rect.top(),
-                               indicatorColumn, menuOption->rect.height());
-        const qreal markSize = qMin(
-            markerRect.height() * 0.52,
-            qMax(12.0, menuOption->fontMetrics.height() * 0.7));
-        const QPointF center = markerRect.center();
-        QPainterPath checkMark;
-        checkMark.moveTo(center.x() - markSize * 0.34,
-                         center.y() + markSize * 0.01);
-        checkMark.lineTo(center.x() - markSize * 0.1,
-                         center.y() + markSize * 0.25);
-        checkMark.lineTo(center.x() + markSize * 0.36,
-                         center.y() - markSize * 0.27);
-
-        const QColor color =
-            menuOption->state & State_Selected
-                ? menuOption->palette.color(QPalette::HighlightedText)
-                : menuOption->palette.color(QPalette::Text);
-        painter->save();
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->setPen(QPen(color, qMax(2.0, markSize * 0.13),
-                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawPath(checkMark);
-        painter->restore();
-    }
-
-    void drawPrimitive(PrimitiveElement element, const QStyleOption *option,
-                       QPainter *painter,
-                       const QWidget *widget = nullptr) const override
-    {
-        if ((element != PE_IndicatorArrowRight &&
-             element != PE_IndicatorArrowLeft) ||
-            !qobject_cast<const QMenu *>(widget)) {
-            QProxyStyle::drawPrimitive(element, option, painter, widget);
-            return;
-        }
-
-        const qreal arrowHeight = qMin(
-            qMax<qreal>(10, option->rect.height() - 8),
-            qMax<qreal>(10, option->fontMetrics.height() * 0.55));
-        const qreal arrowWidth = arrowHeight * 0.55;
-        const bool pointsRight = element == PE_IndicatorArrowRight;
-        const qreal tipX = pointsRight ? option->rect.right()
-                                       : option->rect.left();
-        const qreal baseX = pointsRight ? tipX - arrowWidth
-                                        : tipX + arrowWidth;
-        const QRectF bounds(qMin(tipX, baseX),
-                            option->rect.center().y() - arrowHeight / 2,
-                            arrowWidth, arrowHeight);
-        QPainterPath arrow;
-        if (pointsRight) {
-            arrow.moveTo(bounds.left(), bounds.top());
-            arrow.lineTo(bounds.right(), bounds.center().y());
-            arrow.lineTo(bounds.left(), bounds.bottom());
-        } else {
-            arrow.moveTo(bounds.right(), bounds.top());
-            arrow.lineTo(bounds.left(), bounds.center().y());
-            arrow.lineTo(bounds.right(), bounds.bottom());
-        }
-        arrow.closeSubpath();
-
-        const QColor color =
-            option->state & State_Enabled
-                ? option->palette.color(
-                      (option->state & State_Selected)
-                          ? QPalette::HighlightedText
-                          : QPalette::Text)
-                : option->palette.color(QPalette::Disabled, QPalette::Text);
-        painter->save();
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(color);
-        painter->drawPath(arrow);
-        painter->restore();
-    }
-};
-
 } // namespace
-
-class VerticalTimeLabel : public QWidget
-{
-public:
-    explicit VerticalTimeLabel(QWidget *parent = nullptr)
-        : QWidget(parent)
-    {
-        m_font.setFamily(GfxStyle::LabelFontFamily);
-        m_font.setStyleHint(GfxStyle::LabelFontStyleHint);
-        m_font.setPointSizeF(GfxStyle::LabelFontPointSize);
-        refreshSize();
-    }
-
-    // 设置完整字体（自动触发重绘）
-    void setFont(const QFont &font)
-    {
-        m_font = font;
-        refreshSize();
-        update(); // 刷新界面
-    }
-
-    // 设置字体点大小（自动触发重绘）
-    void SetFontSize(int size)
-    {
-        m_font.setPointSizeF(size);
-        refreshSize();
-        update();
-    }
-
-    void refreshSize()
-    {
-        QFontMetrics metrics(m_font, this);
-        const int padding = GfxStyle::TimeLabelPadding;
-        setFixedSize(metrics.height() + padding,
-                     metrics.horizontalAdvance(
-                         QString::fromLatin1(GfxStyle::TimeLabelText)) +
-                         padding);
-    }
-
-    int rotatedTextWidth() const
-    {
-        return QFontMetrics(m_font, this).height();
-    }
-
-protected:
-    void paintEvent(QPaintEvent *) override
-    {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::TextAntialiasing);
-
-        // 使用成员字体 m_font
-        painter.setFont(m_font);
-
-        QFontMetrics metrics(m_font, this);
-        painter.translate(
-            metrics.ascent(),
-            (height() + metrics.horizontalAdvance(
-                            QString::fromLatin1(GfxStyle::TimeLabelText))) /
-                2.0);
-        painter.rotate(-90);
-        painter.drawText(QPointF(0, 0),
-                         QString::fromLatin1(GfxStyle::TimeLabelText));
-    }
-
-private:
-    QFont m_font; // 存储当前使用的字体
-};
 
 #ifdef _MSC_VER
 // #include <vld.h>
@@ -438,6 +259,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_statusRight = new QLabel(VERSION, this);
     m_statusRight->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_exportStatus = new QLabel("", this);
+    m_exportStatus->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     statusBar()->addPermanentWidget(m_statMess, 1);
     statusBar()->addPermanentWidget(m_statTrcn, 1);
     statusBar()->addPermanentWidget(m_statTime, 1);
@@ -445,13 +268,15 @@ MainWindow::MainWindow(QWidget *parent)
     statusBar()->addPermanentWidget(m_statFfid, 1);
     statusBar()->addPermanentWidget(m_statSp, 1);
     statusBar()->addPermanentWidget(m_statusRight, 2);
+    statusBar()->addPermanentWidget(m_exportStatus, 2);
 
     progressBar = new QProgressBar;
     progressBar->setAlignment(Qt::AlignCenter);
     progressBar->setTextVisible(true);
     progressBar->setFormat("xxxx%p%");
     progressBar->setTextVisible(false);
-    this->statusBar()->addPermanentWidget(progressBar, 1);
+    progressBar->setMinimumWidth(120);
+    statusBar()->addPermanentWidget(progressBar, 1);
 
     progressBar->setValue(0);
     progressBar->setMinimum(0);
@@ -803,7 +628,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(verticalAxisScrollBar, SIGNAL(valueChanged(int)),
             seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
-    timeLabel = new VerticalTimeLabel(timeScrl->viewport());
+    timeLabel = new GfxTimeLabel(timeScrl->viewport());
     auto arrangeOnDpiChange = [this]() {
         QTimer::singleShot(0, this, [this]() {
             if (ui && ui->seisFrame->isVisible())
@@ -818,6 +643,7 @@ MainWindow::MainWindow(QWidget *parent)
             arrangeOnDpiChange);
     connect(&hlabView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
     timeLabel->show();
+    timeLabel->raise();
 
     // 创建 QFont 对象
     QFont monoFont(GfxStyle::TextEditorFontFamily);
@@ -1129,6 +955,11 @@ void MainWindow::execProc(SeisFile *sf, int ns, double si, float *smp)
 
 MainWindow::~MainWindow()
 {
+    if (m_exportThread && m_exportThread->isRunning()) {
+        if (m_exportWorker)
+            m_exportWorker->requestCancel();
+        m_exportThread->wait();
+    }
     /*
         if(WorkThread)
         {
@@ -1716,6 +1547,16 @@ int MainWindow::xprintf(QPlainTextEdit *edit, const char *fmt, ...)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (m_exportInProgress) {
+        m_closeAfterExport = true;
+        m_exportCancellationRequested = true;
+        if (m_exportWorker)
+            m_exportWorker->requestCancel();
+        m_exportStatus->setText(tr("Cancelling export before closing..."));
+        event->ignore();
+        return;
+    }
+
     SaveRegInfo();
     AboutDlg.close();
     AxisDlg.close();
@@ -2108,6 +1949,7 @@ void MainWindow::ArrangeSections()
     timeRightView.setFixedWidth(timeAxisWidth);
     timeLabel->move(headerTextStart,
                     timeGfx->ScaleY(GfxStyle::TimeLabelTopOffset));
+    timeLabel->raise();
 
     syncHorizontalAxisScrollBar(seisScrl->horizontalScrollBar()->minimum(),
                                 seisScrl->horizontalScrollBar()->maximum());
@@ -2408,6 +2250,11 @@ void MainWindow::GetRegInfo()
 {
     QSettings settings("WW", "SeiSeeMp");
 
+    AxisDlg.fontSize = qBound(
+        1, settings.value("AxisFontSize", GfxStyle::LabelFontPointSize).toInt(),
+        72);
+    applyAxisFontSize(AxisDlg.fontSize);
+
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
     restoreState(settings.value("mainWindowState").toByteArray());
 
@@ -2579,6 +2426,7 @@ void MainWindow::SaveRegInfo()
     QSettings settings("WW", "SeiSeeMp");
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
+    settings.setValue("AxisFontSize", AxisDlg.fontSize);
 
     settings.setValue("DataDir", curDir);
     settings.setValue("SaveDir", savDir);
@@ -3126,13 +2974,68 @@ void MainWindow::on_captureBtn_pressed()
 
 void MainWindow::on_exportHiResBtn_pressed()
 {
-    captureCurrentView(m_exportDpi);
+    if (m_exportInProgress) {
+        m_exportCancellationRequested = true;
+        if (m_exportWorker)
+            m_exportWorker->requestCancel();
+        m_exportStatus->setText(tr("Cancelling export..."));
+        return;
+    }
+
+    SeisFile *file = seisSrc.Sfile();
+    if (!file || !file->Active()) {
+        captureCurrentView(m_exportDpi);
+        return;
+    }
+
+    m_exportInProgress = true;
+    m_exportCancellationRequested = false;
+    ui->exportHiResBtn->setToolTip(tr("Cancel high-resolution image export"));
+    m_exportStatus->setText(tr("Rendering %1 DPI image...").arg(m_exportDpi));
+    progressBar->setRange(0, 0);
+    progressBar->show();
+    statusBar()->repaint();
+
+    const int requestedDpi = m_exportDpi;
+    QTimer::singleShot(0, this, [this, requestedDpi]() {
+        if (m_exportCancellationRequested) {
+            finishHighResolutionExport();
+            if (!m_closeAfterExport) {
+                showScreenshotToast(this, tr("Export cancelled"),
+                                    tr("The image was not saved."),
+                                    ToastPreset::INFORMATION);
+            }
+            return;
+        }
+        statusBar()->repaint();
+        QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+        captureCurrentView(requestedDpi);
+    });
+}
+
+void MainWindow::finishHighResolutionExport()
+{
+    m_exportInProgress = false;
+    m_exportCancellationRequested = false;
+    m_exportStatus->clear();
+    progressBar->setRange(0, 100);
+    progressBar->setValue(0);
+    ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
+    if (m_closeAfterExport) {
+        QTimer::singleShot(0, this, [this]() {
+            m_closeAfterExport = false;
+            close();
+        });
+    }
 }
 
 void MainWindow::captureCurrentView(int requestedDpi)
 {
+    const bool exportHighResolution = requestedDpi > 0;
     SeisFile *file = seisSrc.Sfile();
     if (!file || !file->Active()) {
+        if (exportHighResolution)
+            finishHighResolutionExport();
         showScreenshotToast(
             this, tr("Screenshot unavailable"),
             tr("Open a seismic data file before capturing."),
@@ -3140,7 +3043,6 @@ void MainWindow::captureCurrentView(int requestedDpi)
         return;
     }
 
-    const bool exportHighResolution = requestedDpi > 0;
     const qreal captureScaleX =
         exportHighResolution
             ? static_cast<qreal>(requestedDpi) / timeView.dpiX()
@@ -3166,6 +3068,8 @@ void MainWindow::captureCurrentView(int requestedDpi)
         qMax(1, qRound(captureRect.height() * captureScaleY)));
     QImage capturedImage(captureSize, QImage::Format_RGB32);
     if (capturedImage.isNull()) {
+        if (exportHighResolution)
+            finishHighResolutionExport();
         showScreenshotToast(
             this, tr("Screenshot failed"),
             tr("Could not capture the visible seismic area."),
@@ -3180,20 +3084,48 @@ void MainWindow::captureCurrentView(int requestedDpi)
         qRound(captureDpiY * GfxStyle::MillimetersPerMeter /
                GfxStyle::MillimetersPerInch));
 
+    SeisSectionCaptureSnapshot seismicSnapshot;
+    if (exportHighResolution) {
+        m_exportStatus->setText(tr("Preparing seismic data for rendering..."));
+        const QPoint scrollOffset(
+            seisScrl->horizontalScrollBar()->value(),
+            seisScrl->verticalScrollBar()->value());
+        const QRect visibleSeismicRect =
+            QRect(scrollOffset, seisScrl->viewport()->size())
+                .intersected(seisView.rect());
+        const QPoint targetPosition =
+            seisView.mapTo(ui->seisFrame, visibleSeismicRect.topLeft());
+        if (!seisSct.createCaptureSnapshot(
+                visibleSeismicRect, targetPosition, captureScaleX,
+                captureScaleY,
+                &seismicSnapshot)) {
+            finishHighResolutionExport();
+            showScreenshotToast(
+                this, tr("Screenshot failed"),
+                tr("Could not prepare the seismic data for export."),
+                ToastPreset::ERROR_NOTIFICATION);
+            return;
+        }
+    }
+
     QPainter capturePainter(&capturedImage);
     capturePainter.scale(captureScaleX, captureScaleY);
     QList<GfxView *> captureViews = {
         &timeView, &timeRightView, &hdrsView,
-        &hdrsBottomView, &seisView, &hlabView
+        &hdrsBottomView, &hlabView
     };
     if (exportHighResolution) {
         for (GfxView *view : captureViews)
             view->setCaptureScale(captureScaleY);
+        timeLabel->setCaptureScale(captureScaleY);
+        seisView.setCapturePaintSuppressed(true);
     }
     ui->seisFrame->render(&capturePainter, -captureRect.topLeft(),
                           QRegion(captureRect));
     capturePainter.end();
     if (exportHighResolution) {
+        seisView.setCapturePaintSuppressed(false);
+        timeLabel->setCaptureScale(0);
         for (GfxView *view : captureViews) {
             view->setCaptureScale(0);
             view->update();
@@ -3261,6 +3193,83 @@ void MainWindow::captureCurrentView(int requestedDpi)
             QString("%1_%2.%3").arg(baseName).arg(number).arg(suffix));
     }
 
+    if (exportHighResolution) {
+        if (m_exportCancellationRequested) {
+            finishHighResolutionExport();
+            if (!m_closeAfterExport) {
+                showScreenshotToast(this, tr("Export cancelled"),
+                                    tr("The image was not saved."),
+                                    ToastPreset::INFORMATION);
+            }
+            return;
+        }
+
+        m_exportStatus->setText(
+            tr("Starting high-resolution image worker..."));
+        m_exportThread = new QThread(this);
+        m_exportWorker = new ImageExportWorker(
+            capturedImage, seismicSnapshot, outputPath);
+        m_exportWorker->moveToThread(m_exportThread);
+
+        connect(m_exportThread, SIGNAL(started()), m_exportWorker,
+                SLOT(process()));
+        connect(m_exportWorker, SIGNAL(finished()), m_exportThread,
+                SLOT(quit()));
+        connect(m_exportWorker, SIGNAL(finished()), m_exportWorker,
+                SLOT(deleteLater()));
+        connect(m_exportThread, SIGNAL(finished()), m_exportThread,
+                SLOT(deleteLater()));
+        connect(m_exportWorker, &ImageExportWorker::exportProgress, this,
+                [this](const QString &message) {
+                    m_exportStatus->setText(message);
+                });
+        connect(m_exportWorker, &ImageExportWorker::exportFinished, this,
+                [this](bool canceled, bool succeeded, const QString &error) {
+                    m_exportWorkerCanceled = canceled;
+                    m_exportWorkerSucceeded = succeeded;
+                    m_exportWorkerError = error;
+                    m_exportWorker = nullptr;
+                });
+        connect(m_exportThread, &QThread::finished, this,
+                [this, outputPath]() {
+                    const bool canceled = m_exportWorkerCanceled;
+                    const bool succeeded = m_exportWorkerSucceeded;
+                    const QString error = m_exportWorkerError;
+                    m_exportThread = nullptr;
+                    m_exportWorker = nullptr;
+                    finishHighResolutionExport();
+
+                    if (m_closeAfterExport)
+                        return;
+                    if (canceled) {
+                        showScreenshotToast(
+                            this, tr("Export cancelled"),
+                            tr("The image was not saved."),
+                            ToastPreset::INFORMATION);
+                        return;
+                    }
+                    if (!succeeded) {
+                        showScreenshotToast(
+                            this, tr("Screenshot failed"),
+                            tr("Could not save the screenshot to %1: %2")
+                                .arg(outputPath, error),
+                            ToastPreset::ERROR_NOTIFICATION);
+                        return;
+                    }
+
+                    showScreenshotToast(
+                        this, tr("Image exported"),
+                        tr("Image exported to %1")
+                            .arg(QDir::toNativeSeparators(outputPath)),
+                        ToastPreset::SUCCESS);
+                });
+        m_exportWorkerCanceled = false;
+        m_exportWorkerSucceeded = false;
+        m_exportWorkerError.clear();
+        m_exportThread->start();
+        return;
+    }
+
     if (!capturedImage.save(outputPath, "PNG")) {
         showScreenshotToast(
             this, tr("Screenshot failed"),
@@ -3288,6 +3297,8 @@ void MainWindow::on_actionAxes_Setup_triggered()
 
 void MainWindow::axesDlgEvent()
 {
+    applyAxisFontSize(AxisDlg.fontSize);
+
     hdrsAxis.setHdrList(hdrAxisCk.List());
     hdrsBottomAxis.setHdrList(hdrAxisCk.List());
     hdrsLab.setHdrList(hdrAxisCk.List());
@@ -3302,6 +3313,20 @@ void MainWindow::axesDlgEvent()
 
     ui->ckTimLines->setChecked(tl);
     ArrangeSections();
+}
+
+void MainWindow::applyAxisFontSize(int size)
+{
+    if (timeLabel)
+        timeLabel->SetFontSize(size);
+
+    const QList<GfxView *> axisViews = {
+        &timeView, &timeRightView, &hdrsView, &hdrsBottomView, &hlabView
+    };
+    for (GfxView *view : axisViews) {
+        view->getGfx()->SetFontSize(size);
+        view->update();
+    }
 }
 
 void MainWindow::FillHdrListGrids()

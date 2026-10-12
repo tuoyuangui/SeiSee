@@ -106,6 +106,7 @@ void AxisDialog::FillForm()
     ui->dTCbx->setEditText(QString::number(dT));
 
     ui->ckTimLines->setChecked(tL);
+    ui->fontSizeSpinBox->setValue(fontSize);
 }
 
 void AxisDialog::show()
@@ -227,5 +228,14 @@ void AxisDialog::on_dTCbx_editTextChanged(const QString &arg1)
 void AxisDialog::on_ckTimLines_toggled(bool checked)
 {
     tL = checked;
+    changed = true;
+}
+
+void AxisDialog::on_fontSizeSpinBox_valueChanged(int value)
+{
+    if (fontSize == value)
+        return;
+
+    fontSize = value;
     changed = true;
 }

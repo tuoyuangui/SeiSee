@@ -29,6 +29,7 @@ public:
     CkListSet *ckList;
     int dT;
     bool tL;
+    int fontSize;
 
     void show();
 
@@ -52,6 +53,7 @@ private slots:
     void on_dTCbx_editTextChanged(const QString &arg1);
 
     void on_ckTimLines_toggled(bool checked);
+    void on_fontSizeSpinBox_valueChanged(int value);
 
 private:
     Ui::AxisDialog *ui;

@@ -22,6 +22,7 @@ SOURCES += \
     gfxobjseishdrs.cpp \
     gfxobjseissect.cpp \
     gfxobjtaxis.cpp \
+    gfxtimelabel.cpp \
     gfxsctlist.cpp \
     gfxsrc.cpp \
     gfxsrcseis.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
     gfxobjseishdrs.h \
     gfxobjseissect.h \
     gfxobjtaxis.h \
+    gfxtimelabel.h \
     gfxsctlist.h \
     gfxsrc.h \
     gfxsrcseis.h \

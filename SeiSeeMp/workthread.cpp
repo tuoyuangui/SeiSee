@@ -5,7 +5,10 @@
 #include <QDir>
 #include <QEvent>
 #include <QFileInfoList>
+#include <QImageWriter>
 #include <QObject>
+#include <QPainter>
+#include <QSaveFile>
 #include <QSettings>
 
 #include <fcntl.h>
@@ -769,4 +772,95 @@ void DiffWorker::DiffTrcByIdx(int outf)
             delete[] trbuf;
         }
     //    xpers(1.,"Saving...");
+}
+
+ImageExportWorker::ImageExportWorker(const QImage &image,
+                                     const SeisSectionCaptureSnapshot &snapshot,
+                                     const QString &outputPath,
+                                     QObject *parent)
+    : Worker(parent)
+    , m_image(image)
+    , m_snapshot(snapshot)
+    , m_outputPath(outputPath)
+    , m_cancelRequested(false)
+    , m_wasCanceled(false)
+    , m_succeeded(false)
+{
+}
+
+void ImageExportWorker::requestCancel()
+{
+    m_cancelRequested.store(true);
+}
+
+void ImageExportWorker::process()
+{
+    const auto finish = [this]() {
+        emit exportFinished(m_wasCanceled, m_succeeded, m_errorString);
+        emit finished();
+    };
+
+    if (m_cancelRequested.load()) {
+        m_wasCanceled = true;
+        finish();
+        return;
+    }
+
+    emit exportProgress(tr("Rendering high-resolution seismic section..."));
+    QImage sectionImage =
+        GfxObjSeisSect::renderCaptureSnapshot(m_snapshot);
+    if (sectionImage.isNull()) {
+        m_errorString = tr("Could not render the seismic section.");
+        finish();
+        return;
+    }
+    if (m_cancelRequested.load()) {
+        m_wasCanceled = true;
+        finish();
+        return;
+    }
+
+    QPainter imagePainter(&m_image);
+    const QPoint sectionPosition(
+        qRound(m_snapshot.targetPosition.x() *
+               m_snapshot.captureScaleX),
+        qRound(m_snapshot.targetPosition.y() *
+               m_snapshot.captureScaleY));
+    imagePainter.drawImage(sectionPosition, sectionImage);
+    imagePainter.end();
+
+    emit exportProgress(tr("Encoding and saving PNG..."));
+    QSaveFile outputFile(m_outputPath);
+    if (!outputFile.open(QIODevice::WriteOnly)) {
+        m_errorString = outputFile.errorString();
+        finish();
+        return;
+    }
+
+    QImageWriter writer(&outputFile, "png");
+    if (!writer.write(m_image)) {
+        if (m_cancelRequested.load())
+            m_wasCanceled = true;
+        else
+            m_errorString = writer.errorString();
+        outputFile.cancelWriting();
+        finish();
+        return;
+    }
+
+    if (m_cancelRequested.load()) {
+        m_wasCanceled = true;
+        outputFile.cancelWriting();
+        finish();
+        return;
+    }
+
+    if (!outputFile.commit()) {
+        m_errorString = outputFile.errorString();
+        finish();
+        return;
+    }
+
+    m_succeeded = true;
+    finish();
 }

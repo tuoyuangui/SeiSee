@@ -20,6 +20,7 @@
 #include "gfxobjseishdrs.h"
 #include "gfxobjseissect.h"
 #include "gfxobjtaxis.h"
+#include "gfxtimelabel.h"
 #include "gfxsctlist.h"
 #include "gfxsrcfile.h"
 #include "gfxsrcseismemsegd.h"
@@ -130,8 +131,6 @@ signals:
 
 public slots:
 };
-
-class VerticalTimeLabel;
 
 class MainWindow : public QMainWindow
 {
@@ -373,6 +372,9 @@ private:
     Ui::MainWindow *ui;
 
     void captureCurrentView(int dpi);
+    void finishHighResolutionExport();
+
+    void applyAxisFontSize(int size);
 
     void updateCompactSeismicControls();
 
@@ -389,6 +391,7 @@ private:
     QLabel *m_statFfid;
     QLabel *m_statSp;
     QLabel *m_statusRight;
+    QLabel *m_exportStatus;
 
     ProcParmDialog ProcParmDlg;
     AboutDialog AboutDlg;
@@ -434,9 +437,17 @@ private:
     MyScrollArea *seisScrl;
     QScrollBar *horizontalAxisScrollBar;
     QScrollBar *verticalAxisScrollBar;
-    VerticalTimeLabel *timeLabel = nullptr;
+    GfxTimeLabel *timeLabel = nullptr;
     int m_exportDpi = 300;
     QMenu *m_exportDpiMenu = nullptr;
+    QThread *m_exportThread = nullptr;
+    ImageExportWorker *m_exportWorker = nullptr;
+    bool m_exportInProgress = false;
+    bool m_exportCancellationRequested = false;
+    bool m_closeAfterExport = false;
+    bool m_exportWorkerCanceled = false;
+    bool m_exportWorkerSucceeded = false;
+    QString m_exportWorkerError;
 
     GfxSrcFile seisSrc;
     GfxObjSeisSect seisSct;

@@ -20,6 +20,7 @@ SOURCES += main.cpp\
     procparmdialog.cpp \
     aboutdialog.cpp \
     axisdialog.cpp \
+    exportdpimenustyle.cpp \
     workthread.cpp \
     saveasdialog.cpp \
     diffdialog.cpp
@@ -30,6 +31,7 @@ HEADERS  += mainwindow.h \
     procparmdialog.h \
     aboutdialog.h \
     axisdialog.h \
+    exportdpimenustyle.h \
     workthread.h \
     saveasdialog.h \
     diffdialog.h

@@ -7,6 +7,8 @@
 #include <QDebug>
 #include <QFont>
 #include <QFontMetrics>
+#include <QPainterPath>
+#include <QPen>
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -760,6 +762,152 @@ void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil,
 
     delete[] v;
     delete[] y;
+}
+
+void Gfx::DrawWiggleTraceHiRes(double x, Ttr tr, int firstSample,
+                               int lastSample, double firstSampleY,
+                               double sampleYStep, int fil, double g,
+                               int clp, int fc, int wc)
+{
+    if (lastSample <= firstSample || !tr._buf)
+        return;
+
+    const double clip = qMax(1, qAbs(clp));
+    QPainterPath tracePath;
+    QPainterPath fillPath;
+    const double firstY = firstSampleY + firstSample * sampleYStep;
+    tracePath.moveTo(x - m_x, firstY - m_y);
+
+    for (int sample = firstSample; sample < lastSample; ++sample) {
+        const double y0 = firstSampleY + sample * sampleYStep;
+        const double y1 = y0 + sampleYStep;
+        const double value0 = qBound(-clip, tr[sample] * g, clip);
+        const double value1 =
+            qBound(-clip, tr[sample + 1] * g, clip);
+        const double x1 = x + value1;
+
+        tracePath.lineTo(x1 - m_x, y1 - m_y);
+
+        if (fil == 0)
+            continue;
+
+        const auto addFillSegment = [this, &fillPath, x, y0, y1, value0,
+                                     value1, fil](double t0, double t1) {
+            const double midValue =
+                value0 + (value1 - value0) * ((t0 + t1) / 2.0);
+            if ((fil > 0 && midValue <= 0) || (fil < 0 && midValue >= 0))
+                return;
+
+            const double segmentY0 = y0 + (y1 - y0) * t0;
+            const double segmentY1 = y0 + (y1 - y0) * t1;
+            const double segmentValue0 =
+                value0 + (value1 - value0) * t0;
+            const double segmentValue1 =
+                value0 + (value1 - value0) * t1;
+            QPainterPath segment;
+            segment.moveTo(x - m_x, segmentY0 - m_y);
+            segment.lineTo(x + segmentValue0 - m_x, segmentY0 - m_y);
+            segment.lineTo(x + segmentValue1 - m_x, segmentY1 - m_y);
+            segment.lineTo(x - m_x, segmentY1 - m_y);
+            segment.closeSubpath();
+            fillPath.addPath(segment);
+        };
+
+        if ((value0 < 0 && value1 > 0) ||
+            (value0 > 0 && value1 < 0)) {
+            const double crossing = -value0 / (value1 - value0);
+            addFillSegment(0, crossing);
+            addFillSegment(crossing, 1);
+        } else {
+            addFillSegment(0, 1);
+        }
+    }
+
+    _ipainter.save();
+    _ipainter.setRenderHint(QPainter::Antialiasing, true);
+    if (!fillPath.isEmpty()) {
+        _ipainter.setPen(Qt::NoPen);
+        _ipainter.setBrush(QColor::fromRgb(fc));
+        _ipainter.drawPath(fillPath);
+    }
+    _ipainter.setBrush(Qt::NoBrush);
+    _ipainter.setPen(QPen(QColor::fromRgb(wc), 1.0,
+                          Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    _ipainter.drawPath(tracePath);
+    _ipainter.restore();
+}
+
+void Gfx::DrawColorTraceHiRes(double x1, double x2, Ttr tr1, Ttr tr2,
+                              int firstSample, int lastSample,
+                              double firstSampleY, double sampleYStep,
+                              double g)
+{
+    if (!tr1._buf || !tr2._buf || lastSample < firstSample ||
+        sampleYStep == 0 || qFuzzyCompare(x1, x2) || m_devicePixelRatio <= 0)
+        return;
+
+    const double xLeft = qMax(qMin(x1, x2), static_cast<double>(m_x));
+    const double xRight =
+        qMin(qMax(x1, x2), static_cast<double>(m_x + m_w));
+    const double sampleY1 = firstSampleY + firstSample * sampleYStep;
+    const double sampleY2 =
+        firstSampleY + (lastSample + 1) * sampleYStep;
+    const double yTop = qMax(qMin(sampleY1, sampleY2),
+                             static_cast<double>(m_y));
+    const double yBottom =
+        qMin(qMax(sampleY1, sampleY2), static_cast<double>(m_y + m_h));
+    if (xRight <= xLeft || yBottom <= yTop)
+        return;
+
+    const int imageWidth = qMax(
+        1, static_cast<int>(ceil((xRight - xLeft) * m_devicePixelRatio)));
+    const int imageHeight = qMax(
+        1, static_cast<int>(ceil((yBottom - yTop) * m_devicePixelRatio)));
+    QImage colorImage(imageWidth, imageHeight, QImage::Format_RGB32);
+    if (colorImage.isNull())
+        return;
+
+    const auto colorIndexAt = [g](Ttr &trace, double samplePosition) {
+        const int lowerSample = static_cast<int>(floor(samplePosition));
+        const int upperSample = lowerSample + 1;
+        const double sampleFraction = samplePosition - lowerSample;
+        const int lowerColor = qBound(
+            Va, Round(trace[lowerSample] * g) + Vo, Vb);
+        const int upperColor = qBound(
+            Va, Round(trace[upperSample] * g) + Vo, Vb);
+        return lowerColor + (upperColor - lowerColor) * sampleFraction;
+    };
+
+    for (int row = 0; row < imageHeight; ++row) {
+        const double y =
+            yTop + (row + 0.5) / m_devicePixelRatio;
+        const double samplePosition = qBound(
+            static_cast<double>(firstSample),
+            (y - firstSampleY) / sampleYStep,
+            static_cast<double>(lastSample));
+        QRgb *line = reinterpret_cast<QRgb *>(colorImage.scanLine(row));
+        for (int column = 0; column < imageWidth; ++column) {
+            const double x =
+                xLeft + (column + 0.5) / m_devicePixelRatio;
+            const double traceFraction =
+                qBound(0.0, (x - x1) / (x2 - x1), 1.0);
+            const double colorIndex =
+                colorIndexAt(tr1, samplePosition) +
+                (colorIndexAt(tr2, samplePosition) -
+                 colorIndexAt(tr1, samplePosition)) *
+                    traceFraction;
+            const int paletteIndex =
+                qBound(Va, Round(colorIndex), Vb);
+            line[column] = GetPalColor(paletteIndex);
+        }
+    }
+
+    _ipainter.save();
+    _ipainter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+    _ipainter.drawImage(
+        QRectF(xLeft - m_x, yTop - m_y, xRight - xLeft, yBottom - yTop),
+        colorImage);
+    _ipainter.restore();
 }
 
 void Gfx::DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, float *s, int fil,

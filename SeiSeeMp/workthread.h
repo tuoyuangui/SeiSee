@@ -1,6 +1,8 @@
 #ifndef WORKTHREAD_H
 #define WORKTHREAD_H
 
+#include <atomic>
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(                                                               \
@@ -13,11 +15,13 @@
 
 #include <QDir>
 #include <QFile>
+#include <QImage>
 #include <QObject>
 #include <QTextStream>
 
 #include "seisfile.h"
 #include "sgyfile.h"
+#include "gfxobjseissect.h"
 
 //---------------------------------------------------------------------------------------------
 
@@ -237,6 +241,35 @@ protected:
 
 public slots:
     virtual void process();
+};
+//---------------------------------------------------------------------------------------------
+
+class ImageExportWorker : public Worker
+{
+    Q_OBJECT
+
+public:
+    explicit ImageExportWorker(const QImage &image,
+                               const SeisSectionCaptureSnapshot &snapshot,
+                               const QString &outputPath, QObject *parent = 0);
+
+    void requestCancel();
+
+signals:
+    void exportProgress(QString message);
+    void exportFinished(bool canceled, bool succeeded, QString error);
+
+protected:
+    QImage m_image;
+    SeisSectionCaptureSnapshot m_snapshot;
+    QString m_outputPath;
+    std::atomic<bool> m_cancelRequested;
+    bool m_wasCanceled;
+    bool m_succeeded;
+    QString m_errorString;
+
+public slots:
+    void process() override;
 };
 //---------------------------------------------------------------------------------------------
 
