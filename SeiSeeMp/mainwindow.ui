@@ -3318,7 +3318,7 @@
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
-     <string>&amp;File</string>
+     <string>File</string>
     </property>
     <addaction name="actionOpen_Directory"/>
     <addaction name="menu_Recent_Folders"/>
@@ -3338,7 +3338,7 @@
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
-     <string>&amp;Help</string>
+     <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
@@ -3377,12 +3377,12 @@
      <normaloff>:/images/OpenDir.png</normaloff>:/images/OpenDir.png</iconset>
    </property>
    <property name="text">
-    <string>Open &amp;Folder</string>
+    <string>Open Folder</string>
    </property>
   </action>
   <action name="actionE_xit">
    <property name="text">
-    <string>E&amp;xit</string>
+    <string>Exit</string>
    </property>
   </action>
   <action name="actionAbout">
