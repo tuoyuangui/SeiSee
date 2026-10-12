@@ -8,6 +8,8 @@ GfxObjSeis::GfxObjSeis(QObject *parent)
     m_Gc = 1;
     m_Gw = 1;
     m_Tw = 1;
+    m_WiggleRange = 10;
+    m_TraceThinning = 1;
     m_DispWig = true;
     m_DispCol = false;
 

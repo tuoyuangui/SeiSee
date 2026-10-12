@@ -217,6 +217,10 @@ private slots:
 
     void on_edGn_editingFinished();
 
+    void on_edSwingRange_editingFinished();
+
+    void on_edTraceThinning_editingFinished();
+
     void on_zoomPreBtn_pressed();
 
     void on_zoomOutBtn_pressed();

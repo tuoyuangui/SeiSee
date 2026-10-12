@@ -334,7 +334,8 @@ void GfxObjSeisSect::DoDraw()
     //    Drawing Wiggle
 
     double wg = m_Gw * m_Tw * m_Xs * xpmm;
-    clp = m_Tw * m_Xs * xpmm * 10;
+    m_WiggleRange = qMin(20, qMax(1, m_WiggleRange));
+    clp = m_Tw * m_Xs * xpmm * m_WiggleRange;
 
     int _fil = m_WFill;
 
@@ -350,8 +351,13 @@ void GfxObjSeisSect::DoDraw()
     int step = tracePixelSpacing > 0
                    ? qMax(1, qRound(desiredTraceSpacing / tracePixelSpacing))
                    : 1;
-    if (step < 1)
-        step = 1;
+    step = qMax(1, step);
+    if (m_TraceThinning > 1) {
+        const qint64 thinnedStep =
+            static_cast<qint64>(step) * m_TraceThinning;
+        step = static_cast<int>(
+            qMin<qint64>(s_src->Nt(), thinnedStep));
+    }
 
     if (m_DispWig) {
         int na = (nl / step) * step;

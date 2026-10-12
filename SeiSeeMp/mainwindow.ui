@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1230</width>
+    <width>2148</width>
     <height>874</height>
    </rect>
   </property>
@@ -977,25 +977,107 @@
                 </widget>
                </item>
                <item>
+                <widget class="QGroupBox" name="groupBox_15">
+                 <property name="title">
+                  <string>Wiggle Control</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_wiggleControl">
+                  <property name="leftMargin">
+                   <number>2</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>2</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>2</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>2</number>
+                  </property>
+                  <property name="spacing">
+                   <number>2</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="labSwingRange">
+                    <property name="minimumSize">
+                     <size>
+                      <width>48</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Swing Range: 1-20, default 10</string>
+                    </property>
+                    <property name="text">
+                     <string>Swing</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="edSwingRange">
+                    <property name="maximumSize">
+                     <size>
+                      <width>32</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>10</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="labTraceThinning">
+                    <property name="minimumSize">
+                     <size>
+                      <width>48</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Trace Thinning: 1-N, default 1</string>
+                    </property>
+                    <property name="text">
+                     <string>Thinning</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="edTraceThinning">
+                    <property name="maximumSize">
+                     <size>
+                      <width>32</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QGroupBox" name="groupBox_3">
                  <property name="title">
                   <string>Scale</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_2">
                   <property name="spacing">
-                   <number>0</number>
+                   <number>2</number>
                   </property>
                   <property name="leftMargin">
-                   <number>0</number>
+                   <number>2</number>
                   </property>
                   <property name="topMargin">
-                   <number>0</number>
+                   <number>2</number>
                   </property>
                   <property name="rightMargin">
-                   <number>0</number>
+                   <number>2</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>0</number>
+                   <number>2</number>
                   </property>
                   <item>
                    <layout class="QGridLayout" name="gridLayout">
@@ -1623,36 +1705,36 @@
                   </widget>
                  </item>
                  <item>
-                   <widget class="QPushButton" name="clearTraceHighlightBtn">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>25</width>
-                      <height>25</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>25</width>
-                      <height>25</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="myrc.qrc">
-                      <normaloff>:/images/Clear.png</normaloff>:/images/Clear.png</iconset>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="captureBtn">
+                  <widget class="QPushButton" name="clearTraceHighlightBtn">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>25</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>25</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="myrc.qrc">
+                     <normaloff>:/images/Clear.png</normaloff>:/images/Clear.png</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="captureBtn">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -3230,7 +3312,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1230</width>
+     <width>2148</width>
      <height>22</height>
     </rect>
    </property>
@@ -3339,6 +3421,18 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>CustomCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>customcontrols.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="myrc.qrc"/>
  </resources>
@@ -3363,16 +3457,4 @@
  <slots>
   <slot>changeDir()</slot>
  </slots>
- <customwidgets>
-  <customwidget>
-   <class>CustomCheckBox</class>
-   <extends>QCheckBox</extends>
-   <header>customcontrols.h</header>
-  </customwidget>
-  <customwidget>
-   <class>CustomRadioButton</class>
-   <extends>QRadioButton</extends>
-   <header>customcontrols.h</header>
-  </customwidget>
- </customwidgets>
 </ui>

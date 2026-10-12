@@ -15,6 +15,7 @@
 #include <QHBoxLayout>
 #include <QImage>
 #include <QIcon>
+#include <QIntValidator>
 #include <QLabel>
 #include <QMessageBox>
 #include <QMenu>
@@ -38,6 +39,7 @@
 #include <QWidget>
 
 #include <functional>
+#include <limits>
 
 #include "Toast.h"
 
@@ -283,6 +285,11 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setLibraryPaths(paths);
 
     ui->setupUi(this);
+    ui->edSwingRange->setValidator(
+        new QIntValidator(1, 20, ui->edSwingRange));
+    ui->edTraceThinning->setValidator(
+        new QIntValidator(1, std::numeric_limits<int>::max(),
+                          ui->edTraceThinning));
     ui->clearTraceHighlightBtn->setToolTip(
         tr("Clear selected trace highlight"));
     ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
@@ -332,7 +339,7 @@ MainWindow::MainWindow(QWidget *parent)
     const int numericEditWidth =
         QFontMetrics(ui->edTr->font()).horizontalAdvance(
             QStringLiteral("-123.4567")) +
-        16;
+        8;
     const QList<QLineEdit *> scaleEdits = {
         ui->edTr, ui->edTm, ui->edGn
     };
@@ -341,7 +348,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->groupBox_3->setMinimumWidth(
         ui->groupBox_3->minimumSizeHint().width());
 
-    for (QGroupBox *optionalGroup : {ui->groupBox_2, ui->groupBox_13}) {
+    for (QGroupBox *optionalGroup :
+         {ui->groupBox_2, ui->groupBox_13, ui->groupBox_15}) {
         optionalGroup->setMinimumWidth(0);
     }
     connect(ui->splitter, &QSplitter::splitterMoved, this,
@@ -2149,16 +2157,23 @@ void MainWindow::updateCompactSeismicControls()
     const QMargins margins = layout->contentsMargins();
     const QList<QGroupBox *> allGroups = {
         ui->groupBox, ui->groupBox_2, ui->groupBox_3, ui->groupBox_4,
-        ui->groupBox_13
+        ui->groupBox_13, ui->groupBox_15
     };
-    for (QGroupBox *group : allGroups)
-        group->setVisible(true);
+    for (QGroupBox *group : allGroups) {
+        const bool wiggleControlsEnabled =
+            ui->ckWiggle->isChecked() &&
+            (group == ui->groupBox_2 || group == ui->groupBox_15);
+        group->setVisible(
+            wiggleControlsEnabled || (group != ui->groupBox_2 &&
+                                      group != ui->groupBox_15));
+    }
 
     const int availableWidth = ui->frame->width();
     const int fixedWidth = margins.left() + margins.right() +
                            ui->frame->frameWidth() * 2;
     const QList<QGroupBox *> collapseOrder = {
-        ui->groupBox_13, ui->groupBox_2, ui->groupBox_4, ui->groupBox
+        ui->groupBox_13, ui->groupBox_2, ui->groupBox_4, ui->groupBox_15,
+        ui->groupBox
     };
 
     const auto requiredWidth = [&allGroups, fixedWidth, spacing]() {
@@ -2248,6 +2263,9 @@ void MainWindow::on_ckFilt_toggled(bool)
 void MainWindow::on_ckWiggle_toggled(bool checked)
 {
     seisSct.setDispWig(checked);
+    ui->groupBox_2->setVisible(checked);
+    ui->groupBox_15->setVisible(checked);
+    updateCompactSeismicControls();
 }
 
 void MainWindow::on_ckGray_toggled(bool checked)
@@ -2308,6 +2326,45 @@ void MainWindow::on_rbNeg_toggled(bool checked)
         seisSct.setWFill(-1);
 }
 
+void MainWindow::on_edSwingRange_editingFinished()
+{
+    bool ok = false;
+    const int range = ui->edSwingRange->text().toInt(&ok);
+    if (!ok || range < 1 || range > 20) {
+        QMessageBox::warning(
+            this, tr("Invalid Swing Range"),
+            tr("Enter an integer from 1 to 20."));
+        ui->edSwingRange->setText(
+            QString::number(seisSct.WiggleRange()));
+        ui->edSwingRange->setFocus();
+        ui->edSwingRange->selectAll();
+        return;
+    }
+
+    seisSct.setWiggleRange(range);
+    ui->edSwingRange->setText(QString::number(range));
+}
+
+void MainWindow::on_edTraceThinning_editingFinished()
+{
+    bool ok = false;
+    const int thinning = ui->edTraceThinning->text().toInt(&ok);
+    if (!ok || thinning < 1) {
+        QMessageBox::warning(
+            this, tr("Invalid Trace Thinning"),
+            tr("Enter an integer greater than or equal to 1."));
+        ui->edTraceThinning->setText(
+            seisSct.TraceThinning() >= 1
+                ? QString::number(seisSct.TraceThinning())
+                : QStringLiteral("1"));
+        ui->edTraceThinning->setFocus();
+        ui->edTraceThinning->selectAll();
+        return;
+    }
+
+    seisSct.setTraceThinning(thinning);
+}
+
 void MainWindow::FillEdits()
 {
     ui->edTr->setText(Tprintf("%g", 10 / seisView.Xs()));
@@ -2338,6 +2395,11 @@ void MainWindow::FillControls()
     ui->rbNeg->setChecked((v == -1));
     ui->rbNon->setChecked((v == 0));
     ui->rbPos->setChecked((v == 1));
+
+    ui->edSwingRange->setText(
+        QString::number(seisSct.WiggleRange()));
+    ui->edTraceThinning->setText(
+        QString::number(qMax(1, seisSct.TraceThinning())));
 
     ui->ckTimLines->setChecked(seisSct.Tl());
 }
@@ -2382,6 +2444,8 @@ void MainWindow::GetRegInfo()
 
     seisSct.setGc(settings.value("Gc", 1).toDouble());
     seisSct.setGw(settings.value("Gw", 1).toDouble());
+    seisSct.setWiggleRange(settings.value("WiggleRange", 10).toInt());
+    seisSct.setTraceThinning(settings.value("TraceThinning", 1).toInt());
 
     ui->ckFilt->setChecked(settings.value("Filt", false).toBool());
     ui->ckAgc->setChecked(settings.value("Agc", false).toBool());
@@ -2535,6 +2599,8 @@ void MainWindow::SaveRegInfo()
 
     settings.setValue("Gc", seisSct.Gc());
     settings.setValue("Gw", seisSct.Gw());
+    settings.setValue("WiggleRange", seisSct.WiggleRange());
+    settings.setValue("TraceThinning", seisSct.TraceThinning());
 
     settings.setValue("Filt", ui->ckFilt->isChecked());
     settings.setValue("Agc", ui->ckAgc->isChecked());
