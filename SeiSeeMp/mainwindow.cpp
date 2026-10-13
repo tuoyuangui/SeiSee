@@ -2154,65 +2154,60 @@ void MainWindow::on_ckFilt_toggled(bool)
 
 void MainWindow::on_ckWiggle_toggled(bool checked)
 {
-    if (!checked && !ui->ckGray->isChecked() && !ui->ckColor->isChecked()) {
-        ui->ckWiggle->setChecked(true);
-        return;
-    }
-
-    seisSct.setDispWig(checked);
-    ui->groupBox_2->setVisible(checked);
-    ui->groupBox_15->setVisible(checked);
-    updateCompactSeismicControls();
+    updateDisplayMode();
 }
 
 void MainWindow::on_ckGray_toggled(bool checked)
 {
-    if (!checked && !ui->ckColor->isChecked() && !ui->ckWiggle->isChecked()) {
-        ui->ckGray->setChecked(true);
-        return;
-    }
-
-    if (checked && ui->ckColor->isChecked())
-        ui->ckColor->setChecked(false);
-
-    seisSct.setDispCol(checked);
-
-    QList<QRgb> grpal;
-
-    if (ui->ckColor->isChecked())
-        seisSct.setPal(rgb);
-    else
-        seisSct.setPal(grpal);
+    updateDisplayMode();
 }
 
 void MainWindow::on_ckColor_toggled(bool checked)
 {
-    if (!checked && !ui->ckGray->isChecked() && !ui->ckWiggle->isChecked()) {
-        ui->ckColor->setChecked(true);
-        return;
+    updateDisplayMode();
+}
+
+void MainWindow::updateDisplayMode()
+{
+    if (ui->ckGray->isChecked() && ui->ckColor->isChecked()) {
+        CustomCheckBox *otherCheck = sender() == ui->ckGray ? ui->ckColor
+                                                            : ui->ckGray;
+        QSignalBlocker blocker(otherCheck);
+        otherCheck->setChecked(false);
     }
 
-    if (checked && ui->ckGray->isChecked())
-        ui->ckGray->setChecked(false);
+    if (!ui->ckWiggle->isChecked() && !ui->ckGray->isChecked() &&
+        !ui->ckColor->isChecked()) {
+        CustomCheckBox *changedCheck = qobject_cast<CustomCheckBox *>(sender());
+        if (changedCheck == ui->ckWiggle || changedCheck == ui->ckGray ||
+            changedCheck == ui->ckColor) {
+            QSignalBlocker blocker(changedCheck);
+            changedCheck->setChecked(true);
+        }
+    }
 
-    seisSct.setDispCol(checked);
+    const bool showWiggle = ui->ckWiggle->isChecked();
+    const bool showGray = ui->ckGray->isChecked();
+    const bool showColor = ui->ckColor->isChecked();
 
-    QList<QRgb> grpal;
+    seisSct.setDispWig(showWiggle);
+    ui->groupBox_2->setVisible(showWiggle);
+    ui->groupBox_15->setVisible(showWiggle);
+    updateCompactSeismicControls();
 
-    double v[3] = {-1, 0, 1};
-    QRgb c[3];
-    QList<QRgb> pal;
+    seisSct.setDispCol(showGray || showColor);
 
-    c[0] = QColor(255, 0, 0).rgb();
-    c[1] = QColor(255, 255, 255).rgb();
-    c[2] = QColor(0, 0, 255).rgb();
-
-    pal = CreatePalette24(c, v, -1, 1, 3);
-
-    if (ui->ckColor->isChecked())
-        seisSct.setPal(pal);
-    else
-        seisSct.setPal(grpal);
+    if (showColor) {
+        double v[3] = {-1, 0, 1};
+        QRgb c[3] = {
+            QColor(255, 0, 0).rgb(),
+            QColor(255, 255, 255).rgb(),
+            QColor(0, 0, 255).rgb()
+        };
+        seisSct.setPal(CreatePalette24(c, v, -1, 1, 3));
+    } else {
+        seisSct.setPal(QList<QRgb>());
+    }
 }
 
 void MainWindow::on_rbNon_toggled(bool checked)

@@ -201,6 +201,8 @@ private slots:
 
     void on_ckColor_toggled(bool checked);
 
+    void updateDisplayMode();
+
     void on_rbNon_toggled(bool checked);
 
     void on_rbPos_toggled(bool checked);
