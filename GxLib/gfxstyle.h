@@ -55,7 +55,7 @@ namespace GfxStyle {
     // Qt 资源路径对应 SeiSeeMp/fonts/TIMES.TTF。
     static const char LabelFontResource[] = ":/fonts/TIMES.TTF";
     constexpr QFont::StyleHint LabelFontStyleHint = QFont::Serif;
-    static const char TimeLabelText[] = "Time";
+    static const char TimeLabelText[] = "Time (ms)";
     static const char TimeAxisWidthSample[] = "0000";
 
     // SeiSeeMp 初始窗口尺寸，单位为 Qt 逻辑像素。
@@ -69,7 +69,6 @@ namespace GfxStyle {
     constexpr int EditHeaderDialogHeight = 618;
     constexpr int ProcParmDialogWidth = 340;
     constexpr int ProcParmDialogHeight = 414;
-    constexpr int ProcParmDialogMaxWidth = 360;
     constexpr int SaveAsDialogWidth = 661;
     constexpr int SaveAsDialogHeight = 550;
 
@@ -79,6 +78,7 @@ namespace GfxStyle {
 
     // MyStringTable 列宽，按当前字体中的字符宽度或内容自适应，单位为字符所占的个数。
     constexpr int TableColumnHorizontalPadding = 8;
+    constexpr int CheckIndicatorColumnExtraPadding = 4;
     constexpr int DirectoryTypeCharacterCount = 7;
     constexpr int BinaryHeaderValueCharacterCount = 6;
     constexpr int HeaderBytesCharacterCount = 7;

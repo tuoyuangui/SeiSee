@@ -190,6 +190,8 @@ public:
     void setTrim(bool v);
 
     void Draw();
+    void DrawTo(Gfx *target, double xPixelsPerMillimeter,
+                double yPixelsPerMillimeter);
 
     virtual void Update();
     void Preset();

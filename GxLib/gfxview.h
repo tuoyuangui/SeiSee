@@ -32,6 +32,7 @@ protected:
     int m_dpiY;
     qreal m_devicePixelRatio;
     qreal m_captureScale;
+    bool m_suppressCapturePaint;
     QPointer<QWindow> m_trackedWindow;
     QPointer<QScreen> m_trackedScreen;
     QMetaObject::Connection m_screenDpiConnection;
@@ -86,6 +87,16 @@ public:
     void setCaptureScale(qreal scale)
     {
         m_captureScale = scale > 0 ? scale : 0;
+    }
+
+    bool isHighResolutionCapture() const
+    {
+        return m_captureScale > 0;
+    }
+
+    void setCapturePaintSuppressed(bool suppressed)
+    {
+        m_suppressCapturePaint = suppressed;
     }
 
     double Xs()

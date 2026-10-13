@@ -143,10 +143,19 @@ void GfxObj::Draw()
     if (!m_view)
         return;
 
-    xpmm = m_view->Xpmm() * m_view->Xs();
-    ypmm = m_view->Ypmm() * m_view->Ys();
+    DrawTo(m_view->getGfx(), m_view->Xpmm() * m_view->Xs(),
+           m_view->Ypmm() * m_view->Ys());
+}
 
-    gfx = m_view->getGfx();
+void GfxObj::DrawTo(Gfx *target, double xPixelsPerMillimeter,
+                    double yPixelsPerMillimeter)
+{
+    if (!target)
+        return;
+
+    xpmm = xPixelsPerMillimeter;
+    ypmm = yPixelsPerMillimeter;
+    gfx = target;
 
     L = gfx->Xo();
     T = gfx->Yo();

@@ -20,9 +20,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="pixmap">
-         <pixmap resource="myrc.qrc">:/images/Filt.png</pixmap>
-        </property>
        </widget>
       </item>
       <item>

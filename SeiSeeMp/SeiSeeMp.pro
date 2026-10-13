@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,6 +20,7 @@ SOURCES += main.cpp\
     procparmdialog.cpp \
     aboutdialog.cpp \
     axisdialog.cpp \
+    exportdpimenustyle.cpp \
     workthread.cpp \
     saveasdialog.cpp \
     diffdialog.cpp
@@ -30,6 +31,7 @@ HEADERS  += mainwindow.h \
     procparmdialog.h \
     aboutdialog.h \
     axisdialog.h \
+    exportdpimenustyle.h \
     workthread.h \
     saveasdialog.h \
     diffdialog.h
@@ -48,12 +50,12 @@ win32: RC_FILE += app.rc
 win32:CONFIG(release, debug|release) {
     QMAKE_EXTRA_TARGETS += releaseAppIconResourceDependency
     releaseAppIconResourceDependency.target = release/app_res.o
-    releaseAppIconResourceDependency.depends = $$PWD/images/SeiSeeMp.ico
+    releaseAppIconResourceDependency.depends = $$PWD/images/SeiSeeMp.ico $$PWD/images/segyfile.ico
 }
 win32:CONFIG(debug, debug|release) {
     QMAKE_EXTRA_TARGETS += debugAppIconResourceDependency
     debugAppIconResourceDependency.target = debug/app_res.o
-    debugAppIconResourceDependency.depends = $$PWD/images/SeiSeeMp.ico
+    debugAppIconResourceDependency.depends = $$PWD/images/SeiSeeMp.ico $$PWD/images/segyfile.ico
 }
 
 RESOURCES += \

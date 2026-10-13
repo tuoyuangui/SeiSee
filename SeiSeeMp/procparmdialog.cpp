@@ -2,6 +2,9 @@
 #include "gfxstyle.h"
 #include "ui_procparmdialog.h"
 
+#include <QSvgRenderer>
+#include <QSvgWidget>
+
 #include "util2.h"
 
 ProcParmDialog::ProcParmDialog(QWidget *parent)
@@ -9,9 +12,15 @@ ProcParmDialog::ProcParmDialog(QWidget *parent)
     , ui(new Ui::ProcParmDialog)
 {
     ui->setupUi(this);
+    const int diagramIndex = ui->horizontalLayout_14->indexOf(ui->label);
+    ui->horizontalLayout_14->removeWidget(ui->label);
+    delete ui->label;
+    ui->label = nullptr;
+    QSvgWidget *diagram =
+        new QSvgWidget(QStringLiteral(":/images/Filt.svg"), ui->groupBox);
+    diagram->renderer()->setAspectRatioMode(Qt::KeepAspectRatio);
+    ui->horizontalLayout_14->insertWidget(diagramIndex, diagram);
     resize(GfxStyle::ProcParmDialogWidth, GfxStyle::ProcParmDialogHeight);
-    setMaximumSize(GfxStyle::ProcParmDialogMaxWidth,
-                   GfxStyle::ProcParmDialogHeight);
 }
 
 ProcParmDialog::~ProcParmDialog()

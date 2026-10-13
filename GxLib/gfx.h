@@ -137,6 +137,16 @@ public:
     void DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, Ttr tr, int fil,
                            double g, int clp, int fc, int wc);
 
+    void DrawWiggleTraceHiRes(double x, Ttr tr, int firstSample,
+                              int lastSample, double firstSampleY,
+                              double sampleYStep, int fil, double g,
+                              int clp, int fc, int wc);
+
+    void DrawColorTraceHiRes(double x1, double x2, Ttr tr1, Ttr tr2,
+                             int firstSample, int lastSample,
+                             double firstSampleY, double sampleYStep,
+                             double g);
+
     void DrawWiggleTraceTB(int x, int *yi, int *yj, int nny, float *s, int fil,
                            double g, int clp, int fc, int wc);
 

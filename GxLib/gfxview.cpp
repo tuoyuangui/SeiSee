@@ -28,6 +28,7 @@ GfxView::GfxView(QWidget *parent)
     m_dpiY = dpiy;
     m_devicePixelRatio = 1.0;
     m_captureScale = 0;
+    m_suppressCapturePaint = false;
     m_Xpmm = dpix / GfxStyle::MillimetersPerInch;
     m_Ypmm = dpiy / GfxStyle::MillimetersPerInch;
     m_gfx.SetDpi(dpix, dpiy);
@@ -173,6 +174,13 @@ static bool myLessThan(GfxObj *a, GfxObj *b)
 
 void GfxView::paintEvent(QPaintEvent *pe)
 {
+    if (m_suppressCapturePaint) {
+        QPainter backgroundPainter(this);
+        backgroundPainter.fillRect(pe->rect(),
+                                   palette().color(QPalette::Window));
+        return;
+    }
+
     int n, nobj;
 
     QPainter painter;

@@ -8,6 +8,7 @@ class GfxObjTAxis : public GfxObj
 protected:
     double m_Ti;
     bool m_rightSide;
+    bool m_seconds;
 
     virtual void DoDraw();
 
@@ -24,6 +25,20 @@ public:
     {
         m_Ti = v;
         Update();
+    }
+
+    void setTimeUnitSeconds(bool seconds)
+    {
+        if (m_seconds == seconds)
+            return;
+
+        m_seconds = seconds;
+        Update();
+    }
+
+    bool timeUnitSeconds() const
+    {
+        return m_seconds;
     }
 
     double Ti()

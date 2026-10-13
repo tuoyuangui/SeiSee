@@ -24,6 +24,8 @@ public:
         items[n]->m_Gc = m_Gc;
         items[n]->m_Gw = m_Gw;
         items[n]->m_Tw = m_Tw;
+        items[n]->m_WiggleRange = m_WiggleRange;
+        items[n]->m_TraceThinning = m_TraceThinning;
 
         items[n]->m_DispCol = m_DispCol;
         items[n]->m_DispWig = m_DispWig;

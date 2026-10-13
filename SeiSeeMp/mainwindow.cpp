@@ -2,12 +2,12 @@
 #include "ui_mainwindow.h"
 
 #include <QBoxLayout>
-#include <QActionGroup>
 #include <QComboBox>
 #include <QClipboard>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
+#include <QEventLoop>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFontMetrics>
@@ -18,17 +18,15 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QMenu>
+#include <QMimeData>
 #include <QPainter>
 #include <QPalette>
 #include <QPixmap>
-#include <QPainterPath>
 #include <QPen>
-#include <QProxyStyle>
 #include <QScrollBar>
 #include <QSettings>
 #include <QSignalBlocker>
 #include <QStandardItemModel>
-#include <QStyleOptionMenuItem>
 #include <QTabBar>
 #include <QTextCodec>
 #include <QTimer>
@@ -38,8 +36,8 @@
 #include <QWidget>
 
 #include <functional>
-
 #include "Toast.h"
+#include "exportdpimenustyle.h"
 
 #include <fcntl.h>
 #include <math.h>
@@ -72,185 +70,7 @@ void showScreenshotToast(QWidget *parent, const QString &title,
     toast->show();
 }
 
-class ExportDpiMenuStyle final : public QProxyStyle
-{
-public:
-    explicit ExportDpiMenuStyle(QObject *parent)
-        : QProxyStyle()
-    {
-        setParent(parent);
-    }
-
-    void drawControl(ControlElement element, const QStyleOption *option,
-                     QPainter *painter,
-                     const QWidget *widget = nullptr) const override
-    {
-        const auto *menuOption =
-            element == CE_MenuItem
-                ? qstyleoption_cast<const QStyleOptionMenuItem *>(option)
-                : nullptr;
-        if (!menuOption ||
-            menuOption->checkType != QStyleOptionMenuItem::Exclusive ||
-            !menuOption->checked) {
-            QProxyStyle::drawControl(element, option, painter, widget);
-            return;
-        }
-
-        QStyleOptionMenuItem itemWithoutCheck(*menuOption);
-        itemWithoutCheck.checked = false;
-        QProxyStyle::drawControl(element, &itemWithoutCheck, painter, widget);
-
-        const int horizontalMargin =
-            pixelMetric(PM_MenuHMargin, menuOption, widget);
-        const int indicatorColumn =
-            qMax(menuOption->maxIconWidth, menuOption->rect.height()) +
-            2 * horizontalMargin;
-        const QRect markerRect(menuOption->rect.left(), menuOption->rect.top(),
-                               indicatorColumn, menuOption->rect.height());
-        const qreal markSize = qMin(
-            markerRect.height() * 0.52,
-            qMax(12.0, menuOption->fontMetrics.height() * 0.7));
-        const QPointF center = markerRect.center();
-        QPainterPath checkMark;
-        checkMark.moveTo(center.x() - markSize * 0.34,
-                         center.y() + markSize * 0.01);
-        checkMark.lineTo(center.x() - markSize * 0.1,
-                         center.y() + markSize * 0.25);
-        checkMark.lineTo(center.x() + markSize * 0.36,
-                         center.y() - markSize * 0.27);
-
-        const QColor color =
-            menuOption->state & State_Selected
-                ? menuOption->palette.color(QPalette::HighlightedText)
-                : menuOption->palette.color(QPalette::Text);
-        painter->save();
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->setPen(QPen(color, qMax(2.0, markSize * 0.13),
-                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawPath(checkMark);
-        painter->restore();
-    }
-
-    void drawPrimitive(PrimitiveElement element, const QStyleOption *option,
-                       QPainter *painter,
-                       const QWidget *widget = nullptr) const override
-    {
-        if ((element != PE_IndicatorArrowRight &&
-             element != PE_IndicatorArrowLeft) ||
-            !qobject_cast<const QMenu *>(widget)) {
-            QProxyStyle::drawPrimitive(element, option, painter, widget);
-            return;
-        }
-
-        const qreal arrowHeight = qMin(
-            qMax<qreal>(10, option->rect.height() - 8),
-            qMax<qreal>(10, option->fontMetrics.height() * 0.55));
-        const qreal arrowWidth = arrowHeight * 0.55;
-        const bool pointsRight = element == PE_IndicatorArrowRight;
-        const qreal tipX = pointsRight ? option->rect.right()
-                                       : option->rect.left();
-        const qreal baseX = pointsRight ? tipX - arrowWidth
-                                        : tipX + arrowWidth;
-        const QRectF bounds(qMin(tipX, baseX),
-                            option->rect.center().y() - arrowHeight / 2,
-                            arrowWidth, arrowHeight);
-        QPainterPath arrow;
-        if (pointsRight) {
-            arrow.moveTo(bounds.left(), bounds.top());
-            arrow.lineTo(bounds.right(), bounds.center().y());
-            arrow.lineTo(bounds.left(), bounds.bottom());
-        } else {
-            arrow.moveTo(bounds.right(), bounds.top());
-            arrow.lineTo(bounds.left(), bounds.center().y());
-            arrow.lineTo(bounds.right(), bounds.bottom());
-        }
-        arrow.closeSubpath();
-
-        const QColor color =
-            option->state & State_Enabled
-                ? option->palette.color(
-                      (option->state & State_Selected)
-                          ? QPalette::HighlightedText
-                          : QPalette::Text)
-                : option->palette.color(QPalette::Disabled, QPalette::Text);
-        painter->save();
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(color);
-        painter->drawPath(arrow);
-        painter->restore();
-    }
-};
-
 } // namespace
-
-class VerticalTimeLabel : public QWidget
-{
-public:
-    explicit VerticalTimeLabel(QWidget *parent = nullptr)
-        : QWidget(parent)
-    {
-        m_font.setFamily(GfxStyle::LabelFontFamily);
-        m_font.setStyleHint(GfxStyle::LabelFontStyleHint);
-        m_font.setPointSizeF(GfxStyle::LabelFontPointSize);
-        refreshSize();
-    }
-
-    // 设置完整字体（自动触发重绘）
-    void setFont(const QFont &font)
-    {
-        m_font = font;
-        refreshSize();
-        update(); // 刷新界面
-    }
-
-    // 设置字体点大小（自动触发重绘）
-    void SetFontSize(int size)
-    {
-        m_font.setPointSizeF(size);
-        refreshSize();
-        update();
-    }
-
-    void refreshSize()
-    {
-        QFontMetrics metrics(m_font, this);
-        const int padding = GfxStyle::TimeLabelPadding;
-        setFixedSize(metrics.height() + padding,
-                     metrics.horizontalAdvance(
-                         QString::fromLatin1(GfxStyle::TimeLabelText)) +
-                         padding);
-    }
-
-    int rotatedTextWidth() const
-    {
-        return QFontMetrics(m_font, this).height();
-    }
-
-protected:
-    void paintEvent(QPaintEvent *) override
-    {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::TextAntialiasing);
-
-        // 使用成员字体 m_font
-        painter.setFont(m_font);
-
-        QFontMetrics metrics(m_font, this);
-        painter.translate(
-            metrics.ascent(),
-            (height() + metrics.horizontalAdvance(
-                            QString::fromLatin1(GfxStyle::TimeLabelText))) /
-                2.0);
-        painter.rotate(-90);
-        painter.drawText(QPointF(0, 0),
-                         QString::fromLatin1(GfxStyle::TimeLabelText));
-    }
-
-private:
-    QFont m_font; // 存储当前使用的字体
-};
 
 #ifdef _MSC_VER
 // #include <vld.h>
@@ -283,23 +103,17 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setLibraryPaths(paths);
 
     ui->setupUi(this);
+    QSettings settings("WW", "SeiSeeMp");
+    m_recentDirectories = settings.value("RecentDirectories").toStringList();
+
+    ui->clearTraceHighlightBtn->setToolTip(
+        tr("Clear selected trace highlight"));
     ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
 
+    ui->menu_File->setStyle(new ExportDpiMenuStyle(this));
+    ui->menu_Recent_Folders->setStyle(new ExportDpiMenuStyle(this));
     ui->menuView->setStyle(new ExportDpiMenuStyle(this));
-    m_exportDpiMenu = ui->menuView->addMenu(tr("Export image DPI"));
-    m_exportDpiMenu->setStyle(new ExportDpiMenuStyle(this));
-    QActionGroup *exportDpiGroup = new QActionGroup(this);
-    exportDpiGroup->setExclusive(true);
-    for (int dpi : {300, 400, 600}) {
-        QAction *dpiAction =
-            m_exportDpiMenu->addAction(tr("%1 DPI").arg(dpi));
-        dpiAction->setCheckable(true);
-        dpiAction->setData(dpi);
-        dpiAction->setChecked(dpi == m_exportDpi);
-        exportDpiGroup->addAction(dpiAction);
-    }
-    connect(exportDpiGroup, &QActionGroup::triggered, this,
-            [this](QAction *action) { m_exportDpi = action->data().toInt(); });
+    ui->menu_Export_DPI->setStyle(new ExportDpiMenuStyle(this));
     ui->dirGroup->setMinimumWidth(130);
     ui->dirGroup->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 
@@ -330,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent)
     const int numericEditWidth =
         QFontMetrics(ui->edTr->font()).horizontalAdvance(
             QStringLiteral("-123.4567")) +
-        16;
+        8;
     const QList<QLineEdit *> scaleEdits = {
         ui->edTr, ui->edTm, ui->edGn
     };
@@ -339,7 +153,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->groupBox_3->setMinimumWidth(
         ui->groupBox_3->minimumSizeHint().width());
 
-    for (QGroupBox *optionalGroup : {ui->groupBox_2, ui->groupBox_13}) {
+    for (QGroupBox *optionalGroup :
+         {ui->groupBox_2, ui->groupBox_13, ui->groupBox_15}) {
         optionalGroup->setMinimumWidth(0);
     }
     connect(ui->splitter, &QSplitter::splitterMoved, this,
@@ -428,6 +243,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_statusRight = new QLabel(VERSION, this);
     m_statusRight->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_exportStatus = new QLabel("", this);
+    m_exportStatus->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     statusBar()->addPermanentWidget(m_statMess, 1);
     statusBar()->addPermanentWidget(m_statTrcn, 1);
     statusBar()->addPermanentWidget(m_statTime, 1);
@@ -435,13 +252,15 @@ MainWindow::MainWindow(QWidget *parent)
     statusBar()->addPermanentWidget(m_statFfid, 1);
     statusBar()->addPermanentWidget(m_statSp, 1);
     statusBar()->addPermanentWidget(m_statusRight, 2);
+    statusBar()->addPermanentWidget(m_exportStatus, 2);
 
     progressBar = new QProgressBar;
     progressBar->setAlignment(Qt::AlignCenter);
     progressBar->setTextVisible(true);
     progressBar->setFormat("xxxx%p%");
     progressBar->setTextVisible(false);
-    this->statusBar()->addPermanentWidget(progressBar, 1);
+    progressBar->setMinimumWidth(120);
+    statusBar()->addPermanentWidget(progressBar, 1);
 
     progressBar->setValue(0);
     progressBar->setMinimum(0);
@@ -608,7 +427,8 @@ MainWindow::MainWindow(QWidget *parent)
     hdrListCkGrid.setColLabel(2, "Name");
     hdrListCkGrid.setColLabel(3, "Description");
     hdrListCkGrid.setColWidthToCheckIndicator(
-        0, GfxStyle::TableColumnHorizontalPadding);
+        0, GfxStyle::TableColumnHorizontalPadding +
+               GfxStyle::CheckIndicatorColumnExtraPadding);
     hdrListCkGrid.setColWidthInCharacters(
         1, GfxStyle::HeaderBytesCharacterCount,
         GfxStyle::TableColumnHorizontalPadding);
@@ -633,7 +453,8 @@ MainWindow::MainWindow(QWidget *parent)
     hdrElstCkGrid.setColLabel(2, "Name");
     hdrElstCkGrid.setColLabel(3, "Description");
     hdrElstCkGrid.setColWidthToCheckIndicator(
-        0, GfxStyle::TableColumnHorizontalPadding);
+        0, GfxStyle::TableColumnHorizontalPadding +
+               GfxStyle::CheckIndicatorColumnExtraPadding);
     hdrElstCkGrid.setColWidthInCharacters(
         1, GfxStyle::HeaderBytesCharacterCount,
         GfxStyle::TableColumnHorizontalPadding);
@@ -767,14 +588,6 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *axisScrollBarCorner = new QWidget(ui->seisFrame);
     applySystemPaletteBackground(axisScrollBarCorner, axisScrollBarTrackColor);
 
-    QWidget *plotViewport = seisScrl->viewport();
-    plotViewport->setAutoFillBackground(true);
-    plotViewport->setBackgroundRole(QPalette::Base);
-    QPalette plotPalette = plotViewport->palette();
-    plotPalette.setColor(QPalette::Base, Qt::white);
-    plotPalette.setColor(QPalette::Window, Qt::white);
-    plotViewport->setPalette(plotPalette);
-
     // 隐藏滚动条时保留其布局空间，由外层容器继续绘制灰色背景。
     // 目的是避免zoomALLBtn、zoomHallBtn、zoomVallBtn三个按钮执行时发生bug,在底部和右侧产生白条
     QSizePolicy horizontalScrollBarPolicy =
@@ -799,7 +612,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(verticalAxisScrollBar, SIGNAL(valueChanged(int)),
             seisScrl->verticalScrollBar(), SLOT(setValue(int)));
 
-    timeLabel = new VerticalTimeLabel(timeScrl->viewport());
+    timeLabel = new GfxTimeLabel(timeScrl->viewport());
     auto arrangeOnDpiChange = [this]() {
         QTimer::singleShot(0, this, [this]() {
             if (ui && ui->seisFrame->isVisible())
@@ -814,6 +627,7 @@ MainWindow::MainWindow(QWidget *parent)
             arrangeOnDpiChange);
     connect(&hlabView, &GfxView::dpiChanged, this, arrangeOnDpiChange);
     timeLabel->show();
+    timeLabel->raise();
 
     // 创建 QFont 对象
     QFont monoFont(GfxStyle::TextEditorFontFamily);
@@ -970,6 +784,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->seisFrame->setVisible(false);
 
+    setAcceptDrops(true);
+    qApp->installEventFilter(this);
+
     //    exprList["CDP"] = SeisTrExpr("H(21,4)");
     //    exprList["SP" ] = SeisTrExpr("L-N+1");
 
@@ -1125,6 +942,11 @@ void MainWindow::execProc(SeisFile *sf, int ns, double si, float *smp)
 
 MainWindow::~MainWindow()
 {
+    if (m_exportThread && m_exportThread->isRunning()) {
+        if (m_exportWorker)
+            m_exportWorker->requestCancel();
+        m_exportThread->wait();
+    }
     /*
         if(WorkThread)
         {
@@ -1226,6 +1048,7 @@ void MainWindow::ChangeDataDir(QString Dname, QString Find)
 {
     emit stop_dirs();
 
+    addRecentDirectory(Dname);
     curDir = Dname;
 
     find = Find;
@@ -1246,6 +1069,72 @@ void MainWindow::ChangeDataDir(QString Dname, QString Find)
             Qt::DirectConnection);
 
     thread->start();
+}
+
+void MainWindow::on_menu_Recent_Folders_aboutToShow()
+{
+    ui->menu_Recent_Folders->clear();
+    QStringList validDirectories;
+    for (const QString &directory : m_recentDirectories) {
+        const QFileInfo info(directory);
+        if (!info.exists() || !info.isDir())
+            continue;
+
+        const QString normalized =
+            QDir::cleanPath(info.absoluteFilePath());
+        if (validDirectories.contains(normalized) ||
+            validDirectories.size() >= 10)
+            continue;
+
+        validDirectories.append(normalized);
+    }
+
+    if (validDirectories != m_recentDirectories) {
+        m_recentDirectories = validDirectories;
+        QSettings settings("WW", "SeiSeeMp");
+        settings.setValue("RecentDirectories", m_recentDirectories);
+    }
+
+    if (m_recentDirectories.isEmpty()) {
+        QAction *emptyAction =
+            ui->menu_Recent_Folders->addAction(tr("No Recent Folders"));
+        emptyAction->setEnabled(false);
+        return;
+    }
+
+    for (const QString &directory : m_recentDirectories) {
+        QAction *action = ui->menu_Recent_Folders->addAction(
+            QDir::toNativeSeparators(directory));
+        action->setData(directory);
+    }
+}
+
+void MainWindow::on_menu_Recent_Folders_triggered(QAction *action)
+{
+    const QString directory = action->data().toString();
+    if (!directory.isEmpty())
+        ChangeDataDir(directory);
+}
+
+void MainWindow::on_menu_Export_DPI_triggered(QAction *action)
+{
+    m_exportDpi = action->data().toInt();
+}
+
+void MainWindow::addRecentDirectory(const QString &directory)
+{
+    const QFileInfo info(directory);
+    if (!info.exists() || !info.isDir())
+        return;
+
+    const QString normalized = QDir::cleanPath(info.absoluteFilePath());
+    m_recentDirectories.removeAll(normalized);
+    m_recentDirectories.prepend(normalized);
+    while (m_recentDirectories.size() > 10)
+        m_recentDirectories.removeLast();
+
+    QSettings settings("WW", "SeiSeeMp");
+    settings.setValue("RecentDirectories", m_recentDirectories);
 }
 
 void MainWindow::x_dir(DirList dlist)
@@ -1332,13 +1221,13 @@ void MainWindow::FillDirGrid(QList<DirItem> list)
                 // dirGrid.setCell(nr, 1, "");
 
                 if (type == 1) {
-                    dirGrid.setImgName(nr, 0, ":/images/SeisFile.png");
+                    dirGrid.setImgName(nr, 0, ":/images/segyfile_inner.png");
                     dirGrid.setCell(nr, 1, "SEG-Y");
                 } else if (type == 2) {
-                    dirGrid.setImgName(nr, 0, ":/images/sufile.png");
+                    dirGrid.setImgName(nr, 0, ":/images/sufile_inner.png");
                     dirGrid.setCell(nr, 1, "SU");
                 } else if (type == 3) {
-                    dirGrid.setImgName(nr, 0, ":/images/cstfile.png");
+                    dirGrid.setImgName(nr, 0, ":/images/cstfile_inner.png");
                     dirGrid.setCell(nr, 1, "CST");
                 }
             }
@@ -1712,6 +1601,16 @@ int MainWindow::xprintf(QPlainTextEdit *edit, const char *fmt, ...)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (m_exportInProgress) {
+        m_closeAfterExport = true;
+        m_exportCancellationRequested = true;
+        if (m_exportWorker)
+            m_exportWorker->requestCancel();
+        m_exportStatus->setText(tr("Cancelling export before closing..."));
+        event->ignore();
+        return;
+    }
+
     SaveRegInfo();
     AboutDlg.close();
     AxisDlg.close();
@@ -2104,6 +2003,7 @@ void MainWindow::ArrangeSections()
     timeRightView.setFixedWidth(timeAxisWidth);
     timeLabel->move(headerTextStart,
                     timeGfx->ScaleY(GfxStyle::TimeLabelTopOffset));
+    timeLabel->raise();
 
     syncHorizontalAxisScrollBar(seisScrl->horizontalScrollBar()->minimum(),
                                 seisScrl->horizontalScrollBar()->maximum());
@@ -2153,16 +2053,23 @@ void MainWindow::updateCompactSeismicControls()
     const QMargins margins = layout->contentsMargins();
     const QList<QGroupBox *> allGroups = {
         ui->groupBox, ui->groupBox_2, ui->groupBox_3, ui->groupBox_4,
-        ui->groupBox_13
+        ui->groupBox_13, ui->groupBox_15
     };
-    for (QGroupBox *group : allGroups)
-        group->setVisible(true);
+    for (QGroupBox *group : allGroups) {
+        const bool wiggleControlsEnabled =
+            ui->ckWiggle->isChecked() &&
+            (group == ui->groupBox_2 || group == ui->groupBox_15);
+        group->setVisible(
+            wiggleControlsEnabled || (group != ui->groupBox_2 &&
+                                      group != ui->groupBox_15));
+    }
 
     const int availableWidth = ui->frame->width();
     const int fixedWidth = margins.left() + margins.right() +
                            ui->frame->frameWidth() * 2;
     const QList<QGroupBox *> collapseOrder = {
-        ui->groupBox_13, ui->groupBox_2, ui->groupBox_4, ui->groupBox
+        ui->groupBox_13, ui->groupBox_2, ui->groupBox_4, ui->groupBox_15,
+        ui->groupBox
     };
 
     const auto requiredWidth = [&allGroups, fixedWidth, spacing]() {
@@ -2251,47 +2158,60 @@ void MainWindow::on_ckFilt_toggled(bool)
 
 void MainWindow::on_ckWiggle_toggled(bool checked)
 {
-    seisSct.setDispWig(checked);
+    updateDisplayMode();
 }
 
 void MainWindow::on_ckGray_toggled(bool checked)
 {
-    if (checked && ui->ckColor->isChecked())
-        ui->ckColor->setChecked(false);
-
-    seisSct.setDispCol(checked);
-
-    QList<QRgb> grpal;
-
-    if (ui->ckColor->isChecked())
-        seisSct.setPal(rgb);
-    else
-        seisSct.setPal(grpal);
+    updateDisplayMode();
 }
 
 void MainWindow::on_ckColor_toggled(bool checked)
 {
-    if (checked && ui->ckGray->isChecked())
-        ui->ckGray->setChecked(false);
+    updateDisplayMode();
+}
 
-    seisSct.setDispCol(checked);
+void MainWindow::updateDisplayMode()
+{
+    if (ui->ckGray->isChecked() && ui->ckColor->isChecked()) {
+        CustomCheckBox *otherCheck = sender() == ui->ckGray ? ui->ckColor
+                                                            : ui->ckGray;
+        QSignalBlocker blocker(otherCheck);
+        otherCheck->setChecked(false);
+    }
 
-    QList<QRgb> grpal;
+    if (!ui->ckWiggle->isChecked() && !ui->ckGray->isChecked() &&
+        !ui->ckColor->isChecked()) {
+        CustomCheckBox *changedCheck = qobject_cast<CustomCheckBox *>(sender());
+        if (changedCheck == ui->ckWiggle || changedCheck == ui->ckGray ||
+            changedCheck == ui->ckColor) {
+            QSignalBlocker blocker(changedCheck);
+            changedCheck->setChecked(true);
+        }
+    }
 
-    double v[3] = {-1, 0, 1};
-    QRgb c[3];
-    QList<QRgb> pal;
+    const bool showWiggle = ui->ckWiggle->isChecked();
+    const bool showGray = ui->ckGray->isChecked();
+    const bool showColor = ui->ckColor->isChecked();
 
-    c[0] = QColor(255, 0, 0).rgb();
-    c[1] = QColor(255, 255, 255).rgb();
-    c[2] = QColor(0, 0, 255).rgb();
+    seisSct.setDispWig(showWiggle);
+    ui->groupBox_2->setVisible(showWiggle);
+    ui->groupBox_15->setVisible(showWiggle);
+    updateCompactSeismicControls();
 
-    pal = CreatePalette24(c, v, -1, 1, 3);
+    seisSct.setDispCol(showGray || showColor);
 
-    if (ui->ckColor->isChecked())
-        seisSct.setPal(pal);
-    else
-        seisSct.setPal(grpal);
+    if (showColor) {
+        double v[3] = {-1, 0, 1};
+        QRgb c[3] = {
+            QColor(255, 0, 0).rgb(),
+            QColor(255, 255, 255).rgb(),
+            QColor(0, 0, 255).rgb()
+        };
+        seisSct.setPal(CreatePalette24(c, v, -1, 1, 3));
+    } else {
+        seisSct.setPal(QList<QRgb>());
+    }
 }
 
 void MainWindow::on_rbNon_toggled(bool checked)
@@ -2310,6 +2230,16 @@ void MainWindow::on_rbNeg_toggled(bool checked)
 {
     if (checked)
         seisSct.setWFill(-1);
+}
+
+void MainWindow::on_edSwingRange_valueChanged(int range)
+{
+    seisSct.setWiggleRange(range);
+}
+
+void MainWindow::on_edTraceThinning_valueChanged(int thinning)
+{
+    seisSct.setTraceThinning(thinning);
 }
 
 void MainWindow::FillEdits()
@@ -2343,12 +2273,20 @@ void MainWindow::FillControls()
     ui->rbNon->setChecked((v == 0));
     ui->rbPos->setChecked((v == 1));
 
+    ui->edSwingRange->setValue(seisSct.WiggleRange());
+    ui->edTraceThinning->setValue(qMax(1, seisSct.TraceThinning()));
+
     ui->ckTimLines->setChecked(seisSct.Tl());
 }
 
 void MainWindow::GetRegInfo()
 {
     QSettings settings("WW", "SeiSeeMp");
+
+    AxisDlg.fontSize = qBound(
+        1, settings.value("AxisFontSize", GfxStyle::LabelFontPointSize).toInt(),
+        72);
+    applyAxisFontSize(AxisDlg.fontSize);
 
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
     restoreState(settings.value("mainWindowState").toByteArray());
@@ -2386,6 +2324,8 @@ void MainWindow::GetRegInfo()
 
     seisSct.setGc(settings.value("Gc", 1).toDouble());
     seisSct.setGw(settings.value("Gw", 1).toDouble());
+    seisSct.setWiggleRange(settings.value("WiggleRange", 10).toInt());
+    seisSct.setTraceThinning(settings.value("TraceThinning", 1).toInt());
 
     ui->ckFilt->setChecked(settings.value("Filt", false).toBool());
     ui->ckAgc->setChecked(settings.value("Agc", false).toBool());
@@ -2412,10 +2352,8 @@ void MainWindow::GetRegInfo()
         savedSeismicDpi == 400 || savedSeismicDpi == 600
             ? savedSeismicDpi
             : 300;
-    if (m_exportDpiMenu) {
-        for (QAction *action : m_exportDpiMenu->actions())
-            action->setChecked(action->data().toInt() == m_exportDpi);
-    }
+    for (QAction *action : ui->menu_Export_DPI->actions())
+        action->setChecked(action->data().toInt() == m_exportDpi);
 
     double xs = settings.value("Xs", 1.0).toDouble();
     double ys = settings.value("Ys", 1.0).toDouble();
@@ -2503,10 +2441,14 @@ void MainWindow::GetRegInfo()
 
     double ti = settings.value("Ti", "0.1").toDouble();
     bool tl = settings.value("Tl", "false").toBool();
+    AxisDlg.timeUnit = qBound(0, settings.value("TimeUnit", 0).toInt(), 1);
+    AxisDlg.showTimeUnit = settings.value("ShowTimeUnit", false).toBool();
 
     timeAxis.setTi(ti);
+    timeRightAxis.setTi(ti);
     seisSct.setTi(ti);
     seisSct.setTl(tl);
+    applyTimeAxisDisplaySettings();
 
     ArrangeSections();
 
@@ -2519,6 +2461,7 @@ void MainWindow::SaveRegInfo()
     QSettings settings("WW", "SeiSeeMp");
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
+    settings.setValue("AxisFontSize", AxisDlg.fontSize);
 
     settings.setValue("DataDir", curDir);
     settings.setValue("SaveDir", savDir);
@@ -2539,6 +2482,8 @@ void MainWindow::SaveRegInfo()
 
     settings.setValue("Gc", seisSct.Gc());
     settings.setValue("Gw", seisSct.Gw());
+    settings.setValue("WiggleRange", seisSct.WiggleRange());
+    settings.setValue("TraceThinning", seisSct.TraceThinning());
 
     settings.setValue("Filt", ui->ckFilt->isChecked());
     settings.setValue("Agc", ui->ckAgc->isChecked());
@@ -2627,6 +2572,8 @@ void MainWindow::SaveRegInfo()
 
     settings.setValue("Ti", timeAxis.Ti());
     settings.setValue("Tl", seisSct.Tl());
+    settings.setValue("TimeUnit", AxisDlg.timeUnit);
+    settings.setValue("ShowTimeUnit", AxisDlg.showTimeUnit);
 }
 
 void MainWindow::on_zoomAllBtn_pressed()
@@ -2821,7 +2768,7 @@ void MainWindow::on_zoomInBtn_pressed()
 void MainWindow::on_selDirBtn_pressed()
 {
     QString dir = QFileDialog::getExistingDirectory(
-        this, "Open Directory", curDir,
+        this, "Open Folder", curDir,
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     if (dir == "")
@@ -3046,10 +2993,15 @@ void MainWindow::on_TxtHdrEdit_cursorPositionChanged()
 void MainWindow::on_axisBtn_pressed()
 {
     AxisDlg.ckList = &hdrAxisCk;
-    AxisDlg.dT = timeAxis.Ti() * 1000;
+    AxisDlg.dT = timeAxis.Ti();
     AxisDlg.tL = seisSct.Tl();
 
     AxisDlg.show();
+}
+
+void MainWindow::on_clearTraceHighlightBtn_pressed()
+{
+    seisSct.setSelTr(-1);
 }
 
 void MainWindow::on_captureBtn_pressed()
@@ -3059,13 +3011,68 @@ void MainWindow::on_captureBtn_pressed()
 
 void MainWindow::on_exportHiResBtn_pressed()
 {
-    captureCurrentView(m_exportDpi);
+    if (m_exportInProgress) {
+        m_exportCancellationRequested = true;
+        if (m_exportWorker)
+            m_exportWorker->requestCancel();
+        m_exportStatus->setText(tr("Cancelling export..."));
+        return;
+    }
+
+    SeisFile *file = seisSrc.Sfile();
+    if (!file || !file->Active()) {
+        captureCurrentView(m_exportDpi);
+        return;
+    }
+
+    m_exportInProgress = true;
+    m_exportCancellationRequested = false;
+    ui->exportHiResBtn->setToolTip(tr("Cancel high-resolution image export"));
+    m_exportStatus->setText(tr("Rendering %1 DPI image...").arg(m_exportDpi));
+    progressBar->setRange(0, 0);
+    progressBar->show();
+    statusBar()->repaint();
+
+    const int requestedDpi = m_exportDpi;
+    QTimer::singleShot(0, this, [this, requestedDpi]() {
+        if (m_exportCancellationRequested) {
+            finishHighResolutionExport();
+            if (!m_closeAfterExport) {
+                showScreenshotToast(this, tr("Export cancelled"),
+                                    tr("The image was not saved."),
+                                    ToastPreset::INFORMATION);
+            }
+            return;
+        }
+        statusBar()->repaint();
+        QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+        captureCurrentView(requestedDpi);
+    });
+}
+
+void MainWindow::finishHighResolutionExport()
+{
+    m_exportInProgress = false;
+    m_exportCancellationRequested = false;
+    m_exportStatus->clear();
+    progressBar->setRange(0, 100);
+    progressBar->setValue(0);
+    ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
+    if (m_closeAfterExport) {
+        QTimer::singleShot(0, this, [this]() {
+            m_closeAfterExport = false;
+            close();
+        });
+    }
 }
 
 void MainWindow::captureCurrentView(int requestedDpi)
 {
+    const bool exportHighResolution = requestedDpi > 0;
     SeisFile *file = seisSrc.Sfile();
     if (!file || !file->Active()) {
+        if (exportHighResolution)
+            finishHighResolutionExport();
         showScreenshotToast(
             this, tr("Screenshot unavailable"),
             tr("Open a seismic data file before capturing."),
@@ -3073,7 +3080,6 @@ void MainWindow::captureCurrentView(int requestedDpi)
         return;
     }
 
-    const bool exportHighResolution = requestedDpi > 0;
     const qreal captureScaleX =
         exportHighResolution
             ? static_cast<qreal>(requestedDpi) / timeView.dpiX()
@@ -3099,6 +3105,8 @@ void MainWindow::captureCurrentView(int requestedDpi)
         qMax(1, qRound(captureRect.height() * captureScaleY)));
     QImage capturedImage(captureSize, QImage::Format_RGB32);
     if (capturedImage.isNull()) {
+        if (exportHighResolution)
+            finishHighResolutionExport();
         showScreenshotToast(
             this, tr("Screenshot failed"),
             tr("Could not capture the visible seismic area."),
@@ -3113,20 +3121,48 @@ void MainWindow::captureCurrentView(int requestedDpi)
         qRound(captureDpiY * GfxStyle::MillimetersPerMeter /
                GfxStyle::MillimetersPerInch));
 
+    SeisSectionCaptureSnapshot seismicSnapshot;
+    if (exportHighResolution) {
+        m_exportStatus->setText(tr("Preparing seismic data for rendering..."));
+        const QPoint scrollOffset(
+            seisScrl->horizontalScrollBar()->value(),
+            seisScrl->verticalScrollBar()->value());
+        const QRect visibleSeismicRect =
+            QRect(scrollOffset, seisScrl->viewport()->size())
+                .intersected(seisView.rect());
+        const QPoint targetPosition =
+            seisView.mapTo(ui->seisFrame, visibleSeismicRect.topLeft());
+        if (!seisSct.createCaptureSnapshot(
+                visibleSeismicRect, targetPosition, captureScaleX,
+                captureScaleY,
+                &seismicSnapshot)) {
+            finishHighResolutionExport();
+            showScreenshotToast(
+                this, tr("Screenshot failed"),
+                tr("Could not prepare the seismic data for export."),
+                ToastPreset::ERROR_NOTIFICATION);
+            return;
+        }
+    }
+
     QPainter capturePainter(&capturedImage);
     capturePainter.scale(captureScaleX, captureScaleY);
     QList<GfxView *> captureViews = {
         &timeView, &timeRightView, &hdrsView,
-        &hdrsBottomView, &seisView, &hlabView
+        &hdrsBottomView, &hlabView
     };
     if (exportHighResolution) {
         for (GfxView *view : captureViews)
             view->setCaptureScale(captureScaleY);
+        timeLabel->setCaptureScale(captureScaleY);
+        seisView.setCapturePaintSuppressed(true);
     }
     ui->seisFrame->render(&capturePainter, -captureRect.topLeft(),
                           QRegion(captureRect));
     capturePainter.end();
     if (exportHighResolution) {
+        seisView.setCapturePaintSuppressed(false);
+        timeLabel->setCaptureScale(0);
         for (GfxView *view : captureViews) {
             view->setCaptureScale(0);
             view->update();
@@ -3194,6 +3230,83 @@ void MainWindow::captureCurrentView(int requestedDpi)
             QString("%1_%2.%3").arg(baseName).arg(number).arg(suffix));
     }
 
+    if (exportHighResolution) {
+        if (m_exportCancellationRequested) {
+            finishHighResolutionExport();
+            if (!m_closeAfterExport) {
+                showScreenshotToast(this, tr("Export cancelled"),
+                                    tr("The image was not saved."),
+                                    ToastPreset::INFORMATION);
+            }
+            return;
+        }
+
+        m_exportStatus->setText(
+            tr("Starting high-resolution image worker..."));
+        m_exportThread = new QThread(this);
+        m_exportWorker = new ImageExportWorker(
+            capturedImage, seismicSnapshot, outputPath);
+        m_exportWorker->moveToThread(m_exportThread);
+
+        connect(m_exportThread, SIGNAL(started()), m_exportWorker,
+                SLOT(process()));
+        connect(m_exportWorker, SIGNAL(finished()), m_exportThread,
+                SLOT(quit()));
+        connect(m_exportWorker, SIGNAL(finished()), m_exportWorker,
+                SLOT(deleteLater()));
+        connect(m_exportThread, SIGNAL(finished()), m_exportThread,
+                SLOT(deleteLater()));
+        connect(m_exportWorker, &ImageExportWorker::exportProgress, this,
+                [this](const QString &message) {
+                    m_exportStatus->setText(message);
+                });
+        connect(m_exportWorker, &ImageExportWorker::exportFinished, this,
+                [this](bool canceled, bool succeeded, const QString &error) {
+                    m_exportWorkerCanceled = canceled;
+                    m_exportWorkerSucceeded = succeeded;
+                    m_exportWorkerError = error;
+                    m_exportWorker = nullptr;
+                });
+        connect(m_exportThread, &QThread::finished, this,
+                [this, outputPath]() {
+                    const bool canceled = m_exportWorkerCanceled;
+                    const bool succeeded = m_exportWorkerSucceeded;
+                    const QString error = m_exportWorkerError;
+                    m_exportThread = nullptr;
+                    m_exportWorker = nullptr;
+                    finishHighResolutionExport();
+
+                    if (m_closeAfterExport)
+                        return;
+                    if (canceled) {
+                        showScreenshotToast(
+                            this, tr("Export cancelled"),
+                            tr("The image was not saved."),
+                            ToastPreset::INFORMATION);
+                        return;
+                    }
+                    if (!succeeded) {
+                        showScreenshotToast(
+                            this, tr("Screenshot failed"),
+                            tr("Could not save the screenshot to %1: %2")
+                                .arg(outputPath, error),
+                            ToastPreset::ERROR_NOTIFICATION);
+                        return;
+                    }
+
+                    showScreenshotToast(
+                        this, tr("Image exported"),
+                        tr("Image exported to %1")
+                            .arg(QDir::toNativeSeparators(outputPath)),
+                        ToastPreset::SUCCESS);
+                });
+        m_exportWorkerCanceled = false;
+        m_exportWorkerSucceeded = false;
+        m_exportWorkerError.clear();
+        m_exportThread->start();
+        return;
+    }
+
     if (!capturedImage.save(outputPath, "PNG")) {
         showScreenshotToast(
             this, tr("Screenshot failed"),
@@ -3221,20 +3334,59 @@ void MainWindow::on_actionAxes_Setup_triggered()
 
 void MainWindow::axesDlgEvent()
 {
+    applyAxisFontSize(AxisDlg.fontSize);
+
     hdrsAxis.setHdrList(hdrAxisCk.List());
     hdrsBottomAxis.setHdrList(hdrAxisCk.List());
     hdrsLab.setHdrList(hdrAxisCk.List());
 
-    double ti = AxisDlg.dT / 1000.;
+    double ti = AxisDlg.dT;
     bool tl = AxisDlg.tL;
 
     timeAxis.setTi(ti);
     timeRightAxis.setTi(ti);
     seisSct.setTi(ti);
     seisSct.setTl(tl);
+    applyTimeAxisDisplaySettings();
 
     ui->ckTimLines->setChecked(tl);
     ArrangeSections();
+}
+
+void MainWindow::applyTimeAxisDisplaySettings()
+{
+    const bool seconds = AxisDlg.timeUnit == 1;
+    timeAxis.setTimeUnitSeconds(seconds);
+    timeRightAxis.setTimeUnitSeconds(seconds);
+
+    applyTimeAxisLabel();
+}
+
+void MainWindow::applyTimeAxisLabel()
+{
+    if (!timeLabel)
+        return;
+
+    const QString unit = timeAxis.timeUnitSeconds()
+                             ? QStringLiteral("s")
+                             : QStringLiteral("ms");
+    timeLabel->SetText(AxisDlg.showTimeUnit
+                           ? QStringLiteral("Time (%1)").arg(unit)
+                           : QStringLiteral("Time"));
+}
+
+void MainWindow::applyAxisFontSize(int size)
+{
+    if (timeLabel)
+        timeLabel->SetFontSize(size);
+
+    const QList<GfxView *> axisViews = {
+        &timeView, &timeRightView, &hdrsView, &hdrsBottomView, &hlabView
+    };
+    for (GfxView *view : axisViews) {
+        view->getGfx()->SetFontSize(size);
+        view->update();
+    }
 }
 
 void MainWindow::FillHdrListGrids()
@@ -4072,6 +4224,145 @@ void MainWindow::on_ckTimLines_toggled(bool checked)
     seisSct.setTl(checked);
 }
 
+bool MainWindow::openFile(const QString &fileName)
+{
+    if (fileName.isEmpty())
+        return false;
+
+    QFileInfo fi(fileName);
+    if (!fi.exists() || !fi.isFile())
+        return false;
+
+    const QString absPath = fi.absoluteFilePath();
+    QByteArray qfn = absPath.toLocal8Bit();
+    const char *fname = qfn.data();
+
+    int frm = 0;
+    int cgg = 0, junk = 0, swap = 0;
+
+    if (is_cst_f(fname)) {
+        frm = 3;
+    } else if (is_su_f(fname, swap)) {
+        frm = 2;
+    } else if (is_segy_f(fname, swap, cgg, junk) == 1) {
+        frm = 1;
+    } else {
+        const QString ext = fi.suffix().toLower();
+        if (ext == "sgy" || ext == "segy") {
+            frm = 1;
+        } else if (ext == "su") {
+            frm = 2;
+        } else if (ext == "cst") {
+            frm = 3;
+        } else {
+            return false;
+        }
+    }
+
+    setWindowTitle("");
+    curFileName = absPath;
+
+    OpenSeisFile(frm);
+
+    ChangeDataDir(fi.dir().absolutePath(), fi.fileName());
+    return true;
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasUrls()) {
+        const QList<QUrl> urls = event->mimeData()->urls();
+        for (const QUrl &url : urls) {
+            if (url.isLocalFile()) {
+                const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                    event->acceptProposedAction();
+                    return;
+                }
+            }
+        }
+    }
+    QMainWindow::dragEnterEvent(event);
+}
+
+void MainWindow::dragMoveEvent(QDragMoveEvent *event)
+{
+    if (event->mimeData()->hasUrls()) {
+        const QList<QUrl> urls = event->mimeData()->urls();
+        for (const QUrl &url : urls) {
+            if (url.isLocalFile()) {
+                const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                    event->acceptProposedAction();
+                    return;
+                }
+            }
+        }
+    }
+    QMainWindow::dragMoveEvent(event);
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    const QList<QUrl> urls = event->mimeData()->urls();
+    for (const QUrl &url : urls) {
+        if (url.isLocalFile()) {
+            if (openFile(url.toLocalFile())) {
+                event->acceptProposedAction();
+                return;
+            }
+        }
+    }
+    QMainWindow::dropEvent(event);
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::DragEnter) {
+        QDragEnterEvent *dee = static_cast<QDragEnterEvent *>(event);
+        if (dee->mimeData()->hasUrls()) {
+            const QList<QUrl> urls = dee->mimeData()->urls();
+            for (const QUrl &url : urls) {
+                if (url.isLocalFile()) {
+                    const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                    if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                        dee->acceptProposedAction();
+                        return true;
+                    }
+                }
+            }
+        }
+    } else if (event->type() == QEvent::DragMove) {
+        QDragMoveEvent *dme = static_cast<QDragMoveEvent *>(event);
+        if (dme->mimeData()->hasUrls()) {
+            const QList<QUrl> urls = dme->mimeData()->urls();
+            for (const QUrl &url : urls) {
+                if (url.isLocalFile()) {
+                    const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                    if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                        dme->acceptProposedAction();
+                        return true;
+                    }
+                }
+            }
+        }
+    } else if (event->type() == QEvent::Drop) {
+        QDropEvent *de = static_cast<QDropEvent *>(event);
+        if (de->mimeData()->hasUrls()) {
+            const QList<QUrl> urls = de->mimeData()->urls();
+            for (const QUrl &url : urls) {
+                if (url.isLocalFile()) {
+                    if (openFile(url.toLocalFile())) {
+                        de->acceptProposedAction();
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return QMainWindow::eventFilter(object, event);
+}
+
 void MainWindow::on_actionOpen_File_triggered()
 {
     QString fileName =
@@ -4080,38 +4371,15 @@ void MainWindow::on_actionOpen_File_triggered()
                                      "SEG-Y file (*.sgy);;"
                                      "SEG-Y file (*.segy);;"
                                      "CST file (*cst)");
-    if (fileName == "") {
+    if (fileName.isEmpty()) {
         return;
     }
 
-    QFileInfo fi(fileName);
-
-    QByteArray qfn = fi.filePath().toLocal8Bit();
-    const char *fname = qfn.data();
-
-    setWindowTitle("");
-
-    int frm = 2;
-    int cgg, junk, swap;
-
-    if (is_cst_f(fname)) {
-        frm = 3;
-    } else if (is_su_f(fname, swap)) {
-        frm = 2;
-    } else if (is_segy_f(fname, swap, cgg, junk)) {
-        frm = 1;
-    } else {
+    if (!openFile(fileName)) {
         QMessageBox::critical(
-            this, "Error", "Unknown format for seismic file: " + QString(fname),
+            this, "Error", "Unknown format for seismic file: " + fileName,
             QMessageBox::Discard);
-        return;
     }
-
-    curFileName = fname;
-
-    OpenSeisFile(frm);
-
-    ChangeDataDir(fi.dir().absolutePath(), fi.fileName());
 }
 
 void MainWindow::on_ckDly_toggled(bool checked)

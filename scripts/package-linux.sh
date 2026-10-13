@@ -31,7 +31,10 @@ OUTPUT="$OUTPUT_DIR/SeiSee-$SAFE_VERSION-x86_64.AppImage"
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/seisee-appimage.XXXXXX")"
 APP_DIR="$WORK_DIR/SeiSee.AppDir"
 DESKTOP_FILE="$WORK_DIR/seisee.desktop"
+MIME_FILE="$WORK_DIR/application-x-segy.xml"
 ICON_FILE="$REPO_ROOT/SeiSeeMp/images/SeiSeeMp.png"
+SEGY_ICON_FILE="$REPO_ROOT/SeiSeeMp/images/segyfile.png"
+SEGY_SVG_FILE="$REPO_ROOT/SeiSeeMp/images/segyfile.svg"
 EXECUTABLE=""
 
 cleanup() {
@@ -58,6 +61,9 @@ export PATH="$(dirname "$(command -v "$QMAKE")"):$PATH"
 export QMAKE
 mkdir -p "$OUTPUT_DIR" "$APP_DIR/usr/bin" \
     "$APP_DIR/usr/share/applications" \
+    "$APP_DIR/usr/share/mime/packages" \
+    "$APP_DIR/usr/share/icons/hicolor/scalable/mimetypes" \
+    "$APP_DIR/usr/share/icons/hicolor/256x256/mimetypes" \
     "$APP_DIR/usr/share/icons/hicolor/256x256/apps"
 
 cd "$REPO_ROOT"
@@ -84,12 +90,35 @@ cat > "$DESKTOP_FILE" <<'EOF'
 Type=Application
 Name=SeiSee
 Comment=Seismic data viewer
-Exec=SeiSeeMp
+Exec=SeiSeeMp %F
 Icon=seisee
+MimeType=application/x-segy;
 Categories=Science;Education;
 Terminal=false
 EOF
 install -m 644 "$DESKTOP_FILE" "$APP_DIR/usr/share/applications/seisee.desktop"
+
+cat > "$MIME_FILE" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="application/x-segy">
+        <comment>SEG-Y Seismic Data</comment>
+        <glob pattern="*.sgy"/>
+        <glob pattern="*.segy"/>
+        <glob pattern="*.SGY"/>
+        <glob pattern="*.SEGY"/>
+        <generic-icon name="application-x-segy"/>
+    </mime-type>
+</mime-info>
+EOF
+install -m 644 "$MIME_FILE" "$APP_DIR/usr/share/mime/packages/application-x-segy.xml"
+
+if [[ -f "$SEGY_SVG_FILE" ]]; then
+    install -m 644 "$SEGY_SVG_FILE" "$APP_DIR/usr/share/icons/hicolor/scalable/mimetypes/application-x-segy.svg"
+fi
+if [[ -f "$SEGY_ICON_FILE" ]]; then
+    install -m 644 "$SEGY_ICON_FILE" "$APP_DIR/usr/share/icons/hicolor/256x256/mimetypes/application-x-segy.png"
+fi
 
 run_appimage_tool() {
     APPIMAGE_EXTRACT_AND_RUN=1 "$@"

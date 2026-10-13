@@ -28,6 +28,8 @@ protected:
     double m_Gc; // Color Gain
     double m_Gw; // Wiggle Gain
     double m_Tw; // Trace width (int pos units)
+    int m_WiggleRange; // Wiggle clip multiplier; unit is trace,1-20
+    int m_TraceThinning; // Wiggle step multiplier; unit is trace, >= 1
 
     QList<QRgb> m_Pal; // Color Palette
 
@@ -64,6 +66,28 @@ public:
     {
         m_Gw = v;
         Update();
+    }
+
+    virtual void setWiggleRange(int v)
+    {
+        m_WiggleRange = qBound(1, v, 20);
+        Update();
+    }
+
+    virtual int WiggleRange()
+    {
+        return m_WiggleRange;
+    }
+
+    virtual void setTraceThinning(int v)
+    {
+        m_TraceThinning = qMax(1, v);
+        Update();
+    }
+
+    virtual int TraceThinning()
+    {
+        return m_TraceThinning;
     }
 
     virtual void setDispWig(bool v)
@@ -127,6 +151,8 @@ public:
         m_DispWig = src->m_DispWig;
         m_Gw = src->m_Gw;
         m_Gc = src->m_Gc;
+        m_WiggleRange = src->m_WiggleRange;
+        m_TraceThinning = src->m_TraceThinning;
         m_Pal = src->m_Pal;
 
         Update();

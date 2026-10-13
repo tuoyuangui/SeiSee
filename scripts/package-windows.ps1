@@ -81,6 +81,10 @@ try {
     }
     Copy-Item -LiteralPath (Join-Path $repoRoot "README.md") -Destination $stageDir
 
+    $stageImagesDir = Join-Path $stageDir "images"
+    New-Item -ItemType Directory -Path $stageImagesDir -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repoRoot "SeiSeeMp\images\segyfile.ico") -Destination $stageImagesDir
+
     $iss = @"
 [Setup]
 AppId={{4F15CB68-BEB3-4C36-9E98-61F9BCAC8125}
@@ -97,6 +101,7 @@ OutputDir=$outputDir
 OutputBaseFilename=$outputName
 SetupIconFile=$iconPath
 UninstallDisplayIcon={app}\SeiSeeMp.exe
+ChangesAssociations=yes
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -106,9 +111,29 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
+Name: "associatefiles"; Description: "Associate .sgy and .segy files with SeiSee"; GroupDescription: "File associations:"
 
 [Files]
 Source: "$stageDir\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Registry]
+Root: HKA; Subkey: "Software\Classes\.sgy"; ValueType: string; ValueName: ""; ValueData: "SeiSee.SegyFile"; Flags: uninsdeletevalue; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\.sgy\OpenWithProgids"; ValueType: string; ValueName: "SeiSee.SegyFile"; ValueData: ""; Flags: uninsdeletevalue; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\.segy"; ValueType: string; ValueName: ""; ValueData: "SeiSee.SegyFile"; Flags: uninsdeletevalue; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\.segy\OpenWithProgids"; ValueType: string; ValueName: "SeiSee.SegyFile"; ValueData: ""; Flags: uninsdeletevalue; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\SeiSee.SegyFile"; ValueType: string; ValueName: ""; ValueData: "SEG-Y Seismic Data File"; Flags: uninsdeletekey; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\SeiSee.SegyFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\images\segyfile.ico,0"; Flags: uninsdeletekey; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\SeiSee.SegyFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\SeiSeeMp.exe"" ""%1"""; Flags: uninsdeletekey; Tasks: associatefiles
+Root: HKA; Subkey: "Software\Classes\Applications\SeiSeeMp.exe"; ValueType: string; ValueName: "FriendlyAppName"; ValueData: "SeiSee"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\Applications\SeiSeeMp.exe\SupportedTypes"; ValueType: string; ValueName: ".sgy"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\Applications\SeiSeeMp.exe\SupportedTypes"; ValueType: string; ValueName: ".segy"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\Applications\SeiSeeMp.exe\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\images\segyfile.ico,0"; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\Applications\SeiSeeMp.exe\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\SeiSeeMp.exe"" ""%1"""; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\wangweiwei104\SeiSee\Capabilities"; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "SeiSee Seismic Data Viewer"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\wangweiwei104\SeiSee\Capabilities"; ValueType: string; ValueName: "ApplicationName"; ValueData: "SeiSee"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\wangweiwei104\SeiSee\Capabilities\FileAssociations"; ValueType: string; ValueName: ".sgy"; ValueData: "SeiSee.SegyFile"; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\wangweiwei104\SeiSee\Capabilities\FileAssociations"; ValueType: string; ValueName: ".segy"; ValueData: "SeiSee.SegyFile"; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "SeiSee"; ValueData: "Software\wangweiwei104\SeiSee\Capabilities"; Flags: uninsdeletevalue
 
 [Icons]
 Name: "{autoprograms}\SeiSee"; Filename: "{app}\SeiSeeMp.exe"; AppUserModelID: "wangweiwei104.SeiSee.SeiSeeMp"

@@ -27,14 +27,81 @@ else {
     $make = "make"
 }
 
+function Convert-PngsToIco {
+    param(
+        [Parameter(Mandatory = $true)][string[]]$PngPaths,
+        [Parameter(Mandatory = $true)][string]$OutputPath
+    )
+
+    $images = @()
+    foreach ($path in $PngPaths) {
+        $bytes = [System.IO.File]::ReadAllBytes($path)
+        if ($bytes.Length -lt 24) {
+            throw "Invalid PNG file: $path"
+        }
+        $w = [System.BitConverter]::ToInt32(@($bytes[19], $bytes[18], $bytes[17], $bytes[16]), 0)
+        $h = [System.BitConverter]::ToInt32(@($bytes[23], $bytes[22], $bytes[21], $bytes[20]), 0)
+        $images += [PSCustomObject]@{
+            Width = $w
+            Height = $h
+            Bytes = $bytes
+        }
+    }
+    $images = $images | Sort-Object Width
+
+    $count = $images.Count
+    $fs = [System.IO.File]::Create($OutputPath)
+    $bw = New-Object System.IO.BinaryWriter($fs)
+    try {
+        $bw.Write([uint16]0)
+        $bw.Write([uint16]1)
+        $bw.Write([uint16]$count)
+
+        $offset = 6 + 16 * $count
+        foreach ($img in $images) {
+            $bWidth = if ($img.Width -ge 256) { [byte]0 } else { [byte]$img.Width }
+            $bHeight = if ($img.Height -ge 256) { [byte]0 } else { [byte]$img.Height }
+            $bw.Write($bWidth)
+            $bw.Write($bHeight)
+            $bw.Write([byte]0)
+            $bw.Write([byte]0)
+            $bw.Write([uint16]1)
+            $bw.Write([uint16]32)
+            $bw.Write([uint32]$img.Bytes.Length)
+            $bw.Write([uint32]$offset)
+            $offset += $img.Bytes.Length
+        }
+        foreach ($img in $images) {
+            $bw.Write($img.Bytes)
+        }
+    }
+    finally {
+        $bw.Close()
+        $fs.Close()
+    }
+}
+
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $imageDirectory = Join-Path (Join-Path $repositoryRoot "SeiSeeMp") "images"
 $iconMappings = @(
+    @{ Svg = "segyfile_inner.svg"; Png = "segyfile_inner.png" },
+    @{ Svg = "segdfile_inner.svg"; Png = "segdfile_inner.png" },
+    @{ Svg = "sufile_inner.svg"; Png = "sufile_inner.png" },
+    @{ Svg = "cstfile_inner.svg"; Png = "cstfile_inner.png" },
     @{ Svg = "segyfile.svg"; Png = "segyfile.png" },
     @{ Svg = "segdfile.svg"; Png = "segdfile.png" },
     @{ Svg = "sufile.svg"; Png = "sufile.png" },
     @{ Svg = "cstfile.svg"; Png = "cstfile.png" }
 )
+
+$icoMappings = @(
+    @{ Svg = "segyfile.svg"; Ico = "segyfile.ico" },
+    @{ Svg = "segdfile.svg"; Ico = "segdfile.ico" },
+    @{ Svg = "sufile.svg"; Ico = "sufile.ico" },
+    @{ Svg = "cstfile.svg"; Ico = "cstfile.ico" }
+)
+
+$icoSizes = @(16, 24, 32, 48, 64, 128, 256)
 
 foreach ($mapping in $iconMappings) {
     $svgPath = Join-Path $imageDirectory $mapping.Svg
@@ -125,11 +192,31 @@ SOURCES += main.cpp
         foreach ($mapping in $iconMappings) {
             $svgPath = Join-Path $imageDirectory $mapping.Svg
             $pngPath = Join-Path $imageDirectory $mapping.Png
-            & $rendererExecutable $svgPath $pngPath $Size
-            if ($LASTEXITCODE -ne 0) {
-                throw "Rendering '$($mapping.Svg)' failed with exit code $LASTEXITCODE."
+            if (Test-Path -LiteralPath $svgPath -PathType Leaf) {
+                & $rendererExecutable $svgPath $pngPath $Size
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Rendering '$($mapping.Svg)' failed with exit code $LASTEXITCODE."
+                }
+                Write-Output "Generated $pngPath ($Size x $Size)"
             }
-            Write-Output "Generated $pngPath ($Size x $Size)"
+        }
+
+        foreach ($icoMap in $icoMappings) {
+            $svgPath = Join-Path $imageDirectory $icoMap.Svg
+            $icoPath = Join-Path $imageDirectory $icoMap.Ico
+            if (Test-Path -LiteralPath $svgPath -PathType Leaf) {
+                $tempPngList = @()
+                foreach ($sz in $icoSizes) {
+                    $tempPng = Join-Path $temporaryDirectory "$($icoMap.Ico)_$sz.png"
+                    & $rendererExecutable $svgPath $tempPng $sz
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Rendering '$($icoMap.Svg)' at $sz x $sz failed with exit code $LASTEXITCODE."
+                    }
+                    $tempPngList += $tempPng
+                }
+                Convert-PngsToIco -PngPaths $tempPngList -OutputPath $icoPath
+                Write-Output "Generated $icoPath (Sizes: $($icoSizes -join ', '))"
+            }
         }
     }
     finally {

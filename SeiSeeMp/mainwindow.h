@@ -3,6 +3,8 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFont>
 #include <QHash>
 #include <QLayout>
@@ -13,6 +15,7 @@
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QStack>
+#include <QStringList>
 #include <QThread>
 #include <QWidget>
 
@@ -20,6 +23,7 @@
 #include "gfxobjseishdrs.h"
 #include "gfxobjseissect.h"
 #include "gfxobjtaxis.h"
+#include "gfxtimelabel.h"
 #include "gfxsctlist.h"
 #include "gfxsrcfile.h"
 #include "gfxsrcseismemsegd.h"
@@ -42,7 +46,7 @@
 
 #include "workthread.h"
 
-#define VERSION "4.0.0-alpha.3"
+#define VERSION "4.0.0-alpha.6"
 
 /*
 class zdata
@@ -63,6 +67,8 @@ public:
 namespace Ui {
     class MainWindow;
 }
+
+class QAction;
 
 class myEventCatcher : public QObject
 {
@@ -131,18 +137,22 @@ signals:
 public slots:
 };
 
-class VerticalTimeLabel;
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 protected:
     void resizeEvent(QResizeEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dropEvent(QDropEvent *event);
+    bool eventFilter(QObject *object, QEvent *event);
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    bool openFile(const QString &fileName);
 
 public slots:
     void execProc(SeisFile *sf, int ns, double si, float *smp);
@@ -199,6 +209,8 @@ private slots:
 
     void on_ckColor_toggled(bool checked);
 
+    void updateDisplayMode();
+
     void on_rbNon_toggled(bool checked);
 
     void on_rbPos_toggled(bool checked);
@@ -217,6 +229,10 @@ private slots:
 
     void on_edGn_editingFinished();
 
+    void on_edSwingRange_valueChanged(int range);
+
+    void on_edTraceThinning_valueChanged(int thinning);
+
     void on_zoomPreBtn_pressed();
 
     void on_zoomOutBtn_pressed();
@@ -234,6 +250,10 @@ private slots:
     void on_zoomWinBtn_pressed();
 
     void on_actionOpen_Directory_triggered();
+
+    void on_menu_Recent_Folders_aboutToShow();
+
+    void on_menu_Recent_Folders_triggered(QAction *action);
 
     void on_actionAbout_triggered();
 
@@ -259,11 +279,15 @@ private slots:
 
     void on_axisBtn_pressed();
 
+    void on_clearTraceHighlightBtn_pressed();
+
     void on_captureBtn_pressed();
 
     void on_exportHiResBtn_pressed();
 
     void on_actionAxes_Setup_triggered();
+
+    void on_menu_Export_DPI_triggered(QAction *action);
 
     void on_actionParameters_triggered();
 
@@ -367,8 +391,14 @@ private:
     Ui::MainWindow *ui;
 
     void captureCurrentView(int dpi);
+    void finishHighResolutionExport();
+
+    void applyAxisFontSize(int size);
+    void applyTimeAxisDisplaySettings();
+    void applyTimeAxisLabel();
 
     void updateCompactSeismicControls();
+    void addRecentDirectory(const QString &directory);
 
     //  ReadThread*    WorkThread;
 
@@ -383,6 +413,7 @@ private:
     QLabel *m_statFfid;
     QLabel *m_statSp;
     QLabel *m_statusRight;
+    QLabel *m_exportStatus;
 
     ProcParmDialog ProcParmDlg;
     AboutDialog AboutDlg;
@@ -428,9 +459,17 @@ private:
     MyScrollArea *seisScrl;
     QScrollBar *horizontalAxisScrollBar;
     QScrollBar *verticalAxisScrollBar;
-    VerticalTimeLabel *timeLabel = nullptr;
+    GfxTimeLabel *timeLabel = nullptr;
     int m_exportDpi = 300;
-    QMenu *m_exportDpiMenu = nullptr;
+    QStringList m_recentDirectories;
+    QThread *m_exportThread = nullptr;
+    ImageExportWorker *m_exportWorker = nullptr;
+    bool m_exportInProgress = false;
+    bool m_exportCancellationRequested = false;
+    bool m_closeAfterExport = false;
+    bool m_exportWorkerCanceled = false;
+    bool m_exportWorkerSucceeded = false;
+    QString m_exportWorkerError;
 
     GfxSrcFile seisSrc;
     GfxObjSeisSect seisSct;
