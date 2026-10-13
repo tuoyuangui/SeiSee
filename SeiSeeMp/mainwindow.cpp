@@ -716,11 +716,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&ProcParmDlg, SIGNAL(changedEvent()), this, SLOT(procParmEvent()));
 
     connect(&AxisDlg, SIGNAL(changedEvent()), this, SLOT(axesDlgEvent()));
-    connect(&AxisDlg, &AxisDialog::showTimeUnitChanged, this,
-            [this](bool showUnit) {
-                AxisDlg.showTimeUnit = showUnit;
-                applyTimeAxisLabel();
-            });
 
     connect(&EdHdrDlg, SIGNAL(changedEvent()), this, SLOT(hdreDlgEvent()));
 
@@ -2159,6 +2154,11 @@ void MainWindow::on_ckFilt_toggled(bool)
 
 void MainWindow::on_ckWiggle_toggled(bool checked)
 {
+    if (!checked && !ui->ckGray->isChecked() && !ui->ckColor->isChecked()) {
+        ui->ckWiggle->setChecked(true);
+        return;
+    }
+
     seisSct.setDispWig(checked);
     ui->groupBox_2->setVisible(checked);
     ui->groupBox_15->setVisible(checked);
@@ -2167,6 +2167,11 @@ void MainWindow::on_ckWiggle_toggled(bool checked)
 
 void MainWindow::on_ckGray_toggled(bool checked)
 {
+    if (!checked && !ui->ckColor->isChecked() && !ui->ckWiggle->isChecked()) {
+        ui->ckGray->setChecked(true);
+        return;
+    }
+
     if (checked && ui->ckColor->isChecked())
         ui->ckColor->setChecked(false);
 
@@ -2182,6 +2187,11 @@ void MainWindow::on_ckGray_toggled(bool checked)
 
 void MainWindow::on_ckColor_toggled(bool checked)
 {
+    if (!checked && !ui->ckGray->isChecked() && !ui->ckWiggle->isChecked()) {
+        ui->ckColor->setChecked(true);
+        return;
+    }
+
     if (checked && ui->ckGray->isChecked())
         ui->ckGray->setChecked(false);
 

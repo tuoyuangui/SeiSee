@@ -68,7 +68,6 @@ private:
 
 signals:
     void changedEvent();
-    void showTimeUnitChanged(bool checked);
 };
 
 #endif // AXISDIALOG_H

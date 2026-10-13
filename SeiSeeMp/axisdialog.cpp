@@ -251,7 +251,7 @@ void AxisDialog::on_timeUnitCbx_currentIndexChanged(int index)
 void AxisDialog::on_showTimeUnitCk_toggled(bool checked)
 {
     showTimeUnit = checked;
-    emit showTimeUnitChanged(checked);
+    changed = true;
 }
 
 void AxisDialog::on_ckTimLines_toggled(bool checked)
