@@ -219,9 +219,9 @@ private slots:
 
     void on_edGn_editingFinished();
 
-    void on_edSwingRange_editingFinished();
+    void on_edSwingRange_valueChanged(int range);
 
-    void on_edTraceThinning_editingFinished();
+    void on_edTraceThinning_valueChanged(int thinning);
 
     void on_zoomPreBtn_pressed();
 

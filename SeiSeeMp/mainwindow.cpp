@@ -15,7 +15,6 @@
 #include <QHBoxLayout>
 #include <QImage>
 #include <QIcon>
-#include <QIntValidator>
 #include <QLabel>
 #include <QMessageBox>
 #include <QMenu>
@@ -36,8 +35,6 @@
 #include <QWidget>
 
 #include <functional>
-#include <limits>
-
 #include "Toast.h"
 #include "exportdpimenustyle.h"
 
@@ -108,11 +105,6 @@ MainWindow::MainWindow(QWidget *parent)
     QSettings settings("WW", "SeiSeeMp");
     m_recentDirectories = settings.value("RecentDirectories").toStringList();
 
-    ui->edSwingRange->setValidator(
-        new QIntValidator(1, 20, ui->edSwingRange));
-    ui->edTraceThinning->setValidator(
-        new QIntValidator(1, std::numeric_limits<int>::max(),
-                          ui->edTraceThinning));
     ui->clearTraceHighlightBtn->setToolTip(
         tr("Clear selected trace highlight"));
     ui->exportHiResBtn->setToolTip(tr("Export high-resolution image"));
@@ -2231,42 +2223,13 @@ void MainWindow::on_rbNeg_toggled(bool checked)
         seisSct.setWFill(-1);
 }
 
-void MainWindow::on_edSwingRange_editingFinished()
+void MainWindow::on_edSwingRange_valueChanged(int range)
 {
-    bool ok = false;
-    const int range = ui->edSwingRange->text().toInt(&ok);
-    if (!ok || range < 1 || range > 20) {
-        QMessageBox::warning(
-            this, tr("Invalid Swing Range"),
-            tr("Enter an integer from 1 to 20."));
-        ui->edSwingRange->setText(
-            QString::number(seisSct.WiggleRange()));
-        ui->edSwingRange->setFocus();
-        ui->edSwingRange->selectAll();
-        return;
-    }
-
     seisSct.setWiggleRange(range);
-    ui->edSwingRange->setText(QString::number(range));
 }
 
-void MainWindow::on_edTraceThinning_editingFinished()
+void MainWindow::on_edTraceThinning_valueChanged(int thinning)
 {
-    bool ok = false;
-    const int thinning = ui->edTraceThinning->text().toInt(&ok);
-    if (!ok || thinning < 1) {
-        QMessageBox::warning(
-            this, tr("Invalid Trace Thinning"),
-            tr("Enter an integer greater than or equal to 1."));
-        ui->edTraceThinning->setText(
-            seisSct.TraceThinning() >= 1
-                ? QString::number(seisSct.TraceThinning())
-                : QStringLiteral("1"));
-        ui->edTraceThinning->setFocus();
-        ui->edTraceThinning->selectAll();
-        return;
-    }
-
     seisSct.setTraceThinning(thinning);
 }
 
@@ -2301,10 +2264,8 @@ void MainWindow::FillControls()
     ui->rbNon->setChecked((v == 0));
     ui->rbPos->setChecked((v == 1));
 
-    ui->edSwingRange->setText(
-        QString::number(seisSct.WiggleRange()));
-    ui->edTraceThinning->setText(
-        QString::number(qMax(1, seisSct.TraceThinning())));
+    ui->edSwingRange->setValue(seisSct.WiggleRange());
+    ui->edTraceThinning->setValue(qMax(1, seisSct.TraceThinning()));
 
     ui->ckTimLines->setChecked(seisSct.Tl());
 }

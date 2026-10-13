@@ -995,7 +995,7 @@
                    <number>2</number>
                   </property>
                   <property name="spacing">
-                   <number>0</number>
+                   <number>2</number>
                   </property>
                   <item row="0" column="0">
                    <widget class="QLabel" name="labSwingRange">
@@ -1014,15 +1014,27 @@
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QLineEdit" name="edSwingRange">
+                   <widget class="QSpinBox" name="edSwingRange">
+                    <property name="minimumSize">
+                     <size>
+                      <width>40</width>
+                      <height>0</height>
+                     </size>
+                    </property>
                     <property name="maximumSize">
                      <size>
-                      <width>32</width>
+                      <width>72</width>
                       <height>16777215</height>
                      </size>
                     </property>
-                    <property name="text">
-                     <string>10</string>
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>20</number>
+                    </property>
+                    <property name="value">
+                     <number>10</number>
                     </property>
                    </widget>
                   </item>
@@ -1043,15 +1055,27 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QLineEdit" name="edTraceThinning">
+                   <widget class="QSpinBox" name="edTraceThinning">
+                    <property name="minimumSize">
+                     <size>
+                      <width>40</width>
+                      <height>0</height>
+                     </size>
+                    </property>
                     <property name="maximumSize">
                      <size>
-                      <width>32</width>
+                      <width>72</width>
                       <height>16777215</height>
                      </size>
                     </property>
-                    <property name="text">
-                     <string>1</string>
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>2147483647</number>
+                    </property>
+                    <property name="value">
+                     <number>1</number>
                     </property>
                    </widget>
                   </item>
