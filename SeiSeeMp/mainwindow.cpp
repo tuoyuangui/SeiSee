@@ -18,6 +18,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QMenu>
+#include <QMimeData>
 #include <QPainter>
 #include <QPalette>
 #include <QPixmap>
@@ -783,6 +784,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->seisFrame->setVisible(false);
 
+    setAcceptDrops(true);
+    qApp->installEventFilter(this);
+
     //    exprList["CDP"] = SeisTrExpr("H(21,4)");
     //    exprList["SP" ] = SeisTrExpr("L-N+1");
 
@@ -1217,13 +1221,13 @@ void MainWindow::FillDirGrid(QList<DirItem> list)
                 // dirGrid.setCell(nr, 1, "");
 
                 if (type == 1) {
-                    dirGrid.setImgName(nr, 0, ":/images/SeisFile.png");
+                    dirGrid.setImgName(nr, 0, ":/images/segyfile_inner.png");
                     dirGrid.setCell(nr, 1, "SEG-Y");
                 } else if (type == 2) {
-                    dirGrid.setImgName(nr, 0, ":/images/sufile.png");
+                    dirGrid.setImgName(nr, 0, ":/images/sufile_inner.png");
                     dirGrid.setCell(nr, 1, "SU");
                 } else if (type == 3) {
-                    dirGrid.setImgName(nr, 0, ":/images/cstfile.png");
+                    dirGrid.setImgName(nr, 0, ":/images/cstfile_inner.png");
                     dirGrid.setCell(nr, 1, "CST");
                 }
             }
@@ -4220,6 +4224,145 @@ void MainWindow::on_ckTimLines_toggled(bool checked)
     seisSct.setTl(checked);
 }
 
+bool MainWindow::openFile(const QString &fileName)
+{
+    if (fileName.isEmpty())
+        return false;
+
+    QFileInfo fi(fileName);
+    if (!fi.exists() || !fi.isFile())
+        return false;
+
+    const QString absPath = fi.absoluteFilePath();
+    QByteArray qfn = absPath.toLocal8Bit();
+    const char *fname = qfn.data();
+
+    int frm = 0;
+    int cgg = 0, junk = 0, swap = 0;
+
+    if (is_cst_f(fname)) {
+        frm = 3;
+    } else if (is_su_f(fname, swap)) {
+        frm = 2;
+    } else if (is_segy_f(fname, swap, cgg, junk) == 1) {
+        frm = 1;
+    } else {
+        const QString ext = fi.suffix().toLower();
+        if (ext == "sgy" || ext == "segy") {
+            frm = 1;
+        } else if (ext == "su") {
+            frm = 2;
+        } else if (ext == "cst") {
+            frm = 3;
+        } else {
+            return false;
+        }
+    }
+
+    setWindowTitle("");
+    curFileName = absPath;
+
+    OpenSeisFile(frm);
+
+    ChangeDataDir(fi.dir().absolutePath(), fi.fileName());
+    return true;
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasUrls()) {
+        const QList<QUrl> urls = event->mimeData()->urls();
+        for (const QUrl &url : urls) {
+            if (url.isLocalFile()) {
+                const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                    event->acceptProposedAction();
+                    return;
+                }
+            }
+        }
+    }
+    QMainWindow::dragEnterEvent(event);
+}
+
+void MainWindow::dragMoveEvent(QDragMoveEvent *event)
+{
+    if (event->mimeData()->hasUrls()) {
+        const QList<QUrl> urls = event->mimeData()->urls();
+        for (const QUrl &url : urls) {
+            if (url.isLocalFile()) {
+                const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                    event->acceptProposedAction();
+                    return;
+                }
+            }
+        }
+    }
+    QMainWindow::dragMoveEvent(event);
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    const QList<QUrl> urls = event->mimeData()->urls();
+    for (const QUrl &url : urls) {
+        if (url.isLocalFile()) {
+            if (openFile(url.toLocalFile())) {
+                event->acceptProposedAction();
+                return;
+            }
+        }
+    }
+    QMainWindow::dropEvent(event);
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::DragEnter) {
+        QDragEnterEvent *dee = static_cast<QDragEnterEvent *>(event);
+        if (dee->mimeData()->hasUrls()) {
+            const QList<QUrl> urls = dee->mimeData()->urls();
+            for (const QUrl &url : urls) {
+                if (url.isLocalFile()) {
+                    const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                    if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                        dee->acceptProposedAction();
+                        return true;
+                    }
+                }
+            }
+        }
+    } else if (event->type() == QEvent::DragMove) {
+        QDragMoveEvent *dme = static_cast<QDragMoveEvent *>(event);
+        if (dme->mimeData()->hasUrls()) {
+            const QList<QUrl> urls = dme->mimeData()->urls();
+            for (const QUrl &url : urls) {
+                if (url.isLocalFile()) {
+                    const QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+                    if (ext == "sgy" || ext == "segy" || ext == "su" || ext == "cst") {
+                        dme->acceptProposedAction();
+                        return true;
+                    }
+                }
+            }
+        }
+    } else if (event->type() == QEvent::Drop) {
+        QDropEvent *de = static_cast<QDropEvent *>(event);
+        if (de->mimeData()->hasUrls()) {
+            const QList<QUrl> urls = de->mimeData()->urls();
+            for (const QUrl &url : urls) {
+                if (url.isLocalFile()) {
+                    if (openFile(url.toLocalFile())) {
+                        de->acceptProposedAction();
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return QMainWindow::eventFilter(object, event);
+}
+
 void MainWindow::on_actionOpen_File_triggered()
 {
     QString fileName =
@@ -4228,38 +4371,15 @@ void MainWindow::on_actionOpen_File_triggered()
                                      "SEG-Y file (*.sgy);;"
                                      "SEG-Y file (*.segy);;"
                                      "CST file (*cst)");
-    if (fileName == "") {
+    if (fileName.isEmpty()) {
         return;
     }
 
-    QFileInfo fi(fileName);
-
-    QByteArray qfn = fi.filePath().toLocal8Bit();
-    const char *fname = qfn.data();
-
-    setWindowTitle("");
-
-    int frm = 2;
-    int cgg, junk, swap;
-
-    if (is_cst_f(fname)) {
-        frm = 3;
-    } else if (is_su_f(fname, swap)) {
-        frm = 2;
-    } else if (is_segy_f(fname, swap, cgg, junk)) {
-        frm = 1;
-    } else {
+    if (!openFile(fileName)) {
         QMessageBox::critical(
-            this, "Error", "Unknown format for seismic file: " + QString(fname),
+            this, "Error", "Unknown format for seismic file: " + fileName,
             QMessageBox::Discard);
-        return;
     }
-
-    curFileName = fname;
-
-    OpenSeisFile(frm);
-
-    ChangeDataDir(fi.dir().absolutePath(), fi.fileName());
 }
 
 void MainWindow::on_ckDly_toggled(bool checked)

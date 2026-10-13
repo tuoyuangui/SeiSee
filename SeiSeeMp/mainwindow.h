@@ -3,6 +3,8 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFont>
 #include <QHash>
 #include <QLayout>
@@ -141,10 +143,16 @@ class MainWindow : public QMainWindow
 
 protected:
     void resizeEvent(QResizeEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dropEvent(QDropEvent *event);
+    bool eventFilter(QObject *object, QEvent *event);
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    bool openFile(const QString &fileName);
 
 public slots:
     void execProc(SeisFile *sf, int ns, double si, float *smp);

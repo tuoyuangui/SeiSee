@@ -9,7 +9,8 @@
         <file>images/ChkAll.png</file>
         <file>images/Capture.png</file>
         <file>images/Export_image.png</file>
-        <file>images/cstfile.png</file>
+        <file>images/cstfile_inner.png</file>
+        <file>images/cstfile_inner.svg</file>
         <file>images/clr_log.png</file>
         <file>images/ChkNon.png</file>
         <file>images/delete_item.png</file>
@@ -36,19 +37,24 @@
         <file>images/Procp.png</file>
         <file>images/OpenFile.png</file>
         <file>images/Refresh.png</file>
-        <file>images/segdfile.png</file>
+        <file>images/segdfile_inner.png</file>
+        <file>images/segdfile_inner.svg</file>
         <file>images/segdfile.svg</file>
         <file>images/segyfile.svg</file>
+        <file>images/segyfile.png</file>
+        <file>images/segyfile.ico</file>
         <file>images/SeisFile.png</file>
         <file>images/Reset.png</file>
         <file>images/SeiSeeMp.png</file>
         <file>images/SeiSeeMp.ico</file>
         <file>images/SeiSeeMp.svg</file>
         <file>images/SeiSeeSetup.ico</file>
-        <file>images/segyfile.png</file>
+        <file>images/segyfile_inner.png</file>
+        <file>images/segyfile_inner.svg</file>
         <file>images/SeiSeeSetup.png</file>
         <file>images/SeiSeeSetup.svg</file>
-        <file>images/sufile.png</file>
+        <file>images/sufile_inner.png</file>
+        <file>images/sufile_inner.svg</file>
         <file>images/SStp.png</file>
         <file>images/stop.png</file>
         <file>images/sufile.svg</file>
