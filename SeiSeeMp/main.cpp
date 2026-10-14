@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-    a.setWindowIcon(QIcon(":/images/SeiSeeMp.png"));
+    a.setWindowIcon(QIcon(":/images/SeiSeeMp.ico"));
     if (!setDefaultFont(&a))
         return 1;
 
