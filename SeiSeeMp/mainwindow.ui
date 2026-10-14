@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="myrc.qrc">
-    <normaloff>:/images/SeiSeeMp.png</normaloff>:/images/SeiSeeMp.png</iconset>
+    <normaloff>:/images/SeiSeeMp.ico</normaloff>:/images/SeiSeeMp.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_14">
