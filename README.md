@@ -43,8 +43,8 @@ process
 
 <table>
   <tr>
-    <td><img src="screenshots\d2_17_277_1.0749254_4.2111088_wiggle_filt_2_5_40_60_1.png" width="400"></td>
-    <td><img src="screenshots\d2_17_277_1.0749254_4.2111088_wiggle_filt_2_5_40_60_300_1.png" width="400"></td>
+    <td><img src="screenshots\d2_105_177_1.1129288_1.9756518_wiggle_filt_2_5_40_60.png" width="400"></td>
+    <td><img src="screenshots\d2_105_177_1.1129288_1.9756518_wiggle_filt_2_5_40_60_300.png" width="400"></td>
   </tr>
   <tr>
     <td align="center">截图</td>
