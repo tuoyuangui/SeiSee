@@ -21,22 +21,22 @@
 
 ## 界面
 
-主界面
+主界面</br>
 <img src="screenshots/home.png" alt="主界面" width="800">
 
-主界面-wiggle
+主界面-wiggle</br>
 <img src="screenshots/home1.png" alt="主界面2" width="800">
 
-截图功能
+截图功能</br>
 <img src="screenshots/capture.png" alt="截图功能" width="800">
 
-difference
+difference</br>
 <img src="screenshots/difference.png" alt="difference" width="400">
 
-axis setup
+axis setup</br>
 <img src="screenshots/axissetup.png" alt="axissetup" width="400">
 
-process
+process</br>
 <img src="screenshots/process.png" alt="process" width="400">
 
 截图与图片导出的不同
