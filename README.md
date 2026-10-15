@@ -2,7 +2,7 @@
   <h1 align="center">地震数据查看器SeiSee</h1>
 </div>
 
-<div align="center">一个支持多平台的地震数据查看工具,源代码开发者为：https://mail.dmng.ru/freeware/</div>
+<div align="center">一个支持Windows/Linux的地震数据查看工具,源代码开发者为：https://mail.dmng.ru/freeware/</div>
 <br>
 <p align="center">
   <a href="https://github.com/wangweiwei104/SeiSee/releases/latest">
@@ -21,20 +21,36 @@
 
 ## 界面
 
-![主界面](screenshots/home.png)
 主界面
+<img src="screenshots/home.png" alt="主界面" width="800">
 
-![截图功能](screenshots/capture.png)
+主界面-wiggle
+<img src="screenshots/home1.png" alt="主界面2" width="800">
+
 截图功能
+<img src="screenshots/capture.png" alt="截图功能" width="800">
 
-![difference](screenshots/difference.png)
 difference
+<img src="screenshots/difference.png" alt="difference" width="400">
 
-![axissetup](screenshots/axissetup.png)
 axis setup
+<img src="screenshots/axissetup.png" alt="axissetup" width="400">
 
-![process](screenshots/process.png)
 process
+<img src="screenshots/process.png" alt="process" width="400">
+
+截图与图片导出的不同
+
+<table>
+  <tr>
+    <td><img src="screenshots\d2_17_277_1.0749254_4.2111088_wiggle_filt_2_5_40_60_1.png" width="400"></td>
+    <td><img src="screenshots\d2_17_277_1.0749254_4.2111088_wiggle_filt_2_5_40_60_300_1.png" width="400"></td>
+  </tr>
+  <tr>
+    <td align="center">截图</td>
+    <td align="center">图片导出</td>
+  </tr>
+</table>
 
 ## 功能
 
